@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(npm --version)",
+      "Bash(cd \"/home/hunt/Downloads/family Reunion\" && mkdir -p src/components src/data src/hooks public/images public/audio && ls -la)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -s https://registry.npmjs.org/kokoro-js/latest)",
+      "Bash(curl -s https://unpkg.com/kokoro-js@1.2.1/README.md)",
+      "Bash(curl -s https://unpkg.com/kokoro-js@1.2.1/types/kokoro.d.ts)",
+      "Bash(curl -s https://unpkg.com/@huggingface/transformers@3.5.1/dist/transformers.js)",
+      "mcp__7c633d4e-5576-470f-ac97-2d200126566b__dynamic_space",
+      "Bash(ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t 30 -q:a 9 public/audio/jazz-loop.mp3)",
+      "Bash(npm install *)",
+      "Bash(find /home/hunt/Downloads -maxdepth 2 -mmin -180 -not -path \"*/family Reunion/*\" 2>/dev/null)",
+      "Bash(npm run *)",
+      "Bash(gcloud config *)",
+      "Bash(gcloud auth *)",
+      "Bash(gcloud compute *)",
+      "Bash(curl -s --max-time 5 http://34.74.218.31:8000/api/health)",
+      "Bash(curl -s --max-time 5 http://34.73.113.252:8000/api/health)",
+      "Bash(curl -s --max-time 8 http://34.73.113.252:8000/api/health)",
+      "Bash(curl -s --max-time 6 http://34.73.113.252:8000/api/health)",
+      "Bash(gcloud version *)",
+      "Bash(gcloud components *)",
+      "Bash(curl -s -m 10 http://34.73.113.252:8000/api/health)",
+      "Bash(curl -s -m 3 http://34.74.218.31:8000/api/health)",
+      "Bash(python3 -c ' *)",
+      "Bash(time curl -s -m 60 -X POST http://34.74.218.31:8000/api/restore -H \"Content-Type: application/json\" -d @/tmp/test_payload.json -o /tmp/restore_result.json)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/tmp/restore_result.json'\\)\\); print\\('has image:', 'image' in d, len\\(d.get\\('image',''\\)\\)\\)\")",
+      "Bash(curl -s http://34.74.218.31:8000/api/stats)",
+      "mcp__7c633d4e-5576-470f-ac97-2d200126566b__hf_whoami",
+      "mcp__7c633d4e-5576-470f-ac97-2d200126566b__hf_fs",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

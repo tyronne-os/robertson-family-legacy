@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "robertson-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "dist", "--listen", "5190", "--no-clipboard"],
+      "port": 5190
+    }
+  ]
+}

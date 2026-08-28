@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: #0b0705;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.35);
+  border-radius: 3px;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  30% { opacity: 0.62; transform: scale(0.98); }
+  60% { opacity: 1; transform: scale(1.03); }
+}
+@keyframes goldSweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bookEmerge {
+  0% { filter: blur(26px) brightness(0.32) saturate(0.7); transform: scale(1.1); }
+  45% { filter: blur(12px) brightness(0.6) saturate(0.85); }
+  100% { filter: blur(0) brightness(1) saturate(1); transform: scale(1); }
+}
+@keyframes fogLift {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1.15); }
+  60% { opacity: 0.55; }
+  100% { opacity: 0; transform: translate3d(-6%, -9%, 0) scale(1.45); }
+}
+@keyframes fogDrift {
+  0% { opacity: 0.9; transform: translate3d(0, 0, 0) scale(1.2); }
+  100% { opacity: 0; transform: translate3d(9%, 6%, 0) scale(1.6); }
+}
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+.narrator-scroll::-webkit-scrollbar { width: 5px; }
+.narrator-scroll::-webkit-scrollbar-track { background: transparent; }
+.narrator-scroll::-webkit-scrollbar-thumb { background: rgba(232, 197, 92, 0.35); border-radius: 3px; }
+
+.vault-scroll { scrollbar-width: thin; scrollbar-color: rgba(232, 197, 92, 0.35) transparent; }
+.vault-scroll::-webkit-scrollbar { width: 5px; }
+.vault-scroll::-webkit-scrollbar-track { background: transparent; }
+.vault-scroll::-webkit-scrollbar-thumb { background: rgba(232, 197, 92, 0.35); border-radius: 3px; }
+
+input::placeholder, textarea::placeholder { color: rgba(232, 215, 182, 0.35); font-style: italic; }
+select option { background: #1B100A; color: #E8D7B6; }
