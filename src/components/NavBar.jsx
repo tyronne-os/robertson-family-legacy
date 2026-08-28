@@ -66,6 +66,9 @@ export default function NavBar({ active = 'home', overlay = false, tagline = nul
         <NavLink to="/photo-album" active={active === 'photos'}>
           PHOTO ALBUM
         </NavLink>
+        <NavLink to="/reunion-2026" active={active === 'reunion'}>
+          REUNION 2026
+        </NavLink>
         <NavLink to="/submit-a-chapter" active={active === 'submit'}>
           SUBMIT A CHAPTER
         </NavLink>
