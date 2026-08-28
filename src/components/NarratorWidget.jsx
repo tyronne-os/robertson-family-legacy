@@ -31,7 +31,7 @@ export default function NarratorWidget({ chapter, narrator }) {
 
   const toggleJazz = () => {
     const el = jazzRef.current
-    if (!el) return
+    if (!el || narrator.muted) return
     if (jazzPlaying) el.pause()
     else el.play().catch(() => {})
     setJazzPlaying(!jazzPlaying)
@@ -39,22 +39,30 @@ export default function NarratorWidget({ chapter, narrator }) {
 
   const selected = narrator.voices.find((v) => v.id === narrator.voice)
 
-  const narrateLabel =
-    {
-      idle: 'NARRATE CHAPTER VI',
-      loading: 'WAKING THE NARRATOR',
-      playing: 'NOW READING',
-      paused: 'PAUSED',
-    }[narrator.status] ?? 'NARRATE CHAPTER VI'
+  const narrateLabel = narrator.muted
+    ? 'NARRATION MUTED'
+    : {
+        idle: 'NARRATE CHAPTER VI',
+        loading: 'WAKING THE NARRATOR',
+        playing: 'NOW READING',
+        paused: 'PAUSED',
+        blocked: 'TAP TO BEGIN',
+        error: 'NARRATOR UNAVAILABLE',
+      }[narrator.status] ?? 'NARRATE CHAPTER VI'
 
-  const narrateSub =
-    narrator.status === 'loading'
-      ? `${narrator.loadPct}%`
+  const narrateSub = narrator.muted
+    ? 'unmute to listen'
+    : narrator.status === 'loading'
+      ? narrator.loadPct > 0 ? `${narrator.loadPct}%` : 'preparing…'
       : narrator.status === 'playing'
         ? `${selected?.name.charAt(0)}${selected?.name.slice(1).toLowerCase()}${narrator.remaining ? ' · ' + narrator.remaining : ''}`
         : narrator.status === 'paused'
           ? 'tap to resume'
-          : chapter?.subtitle ?? ''
+          : narrator.status === 'blocked'
+            ? 'your browser paused the audio'
+            : narrator.status === 'error'
+              ? narrator.errorMsg
+              : chapter?.subtitle ?? ''
 
   return (
     <div
@@ -174,7 +182,7 @@ export default function NarratorWidget({ chapter, narrator }) {
             color: 'rgba(232,215,182,.45)',
           }}
         >
-          Saved for this chapter only. Chapter I&ndash;V keep their own.
+          Your chosen voice is remembered across every chapter.
         </div>
         <div
           style={{
@@ -259,7 +267,36 @@ export default function NarratorWidget({ chapter, narrator }) {
 
           <div style={{ width: 1, height: 30, background: 'rgba(201,162,39,.25)' }} />
 
+          {/* Global mute — silences narration and jazz on every page, persisted */}
           <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (!narrator.muted && jazzPlaying) {
+                jazzRef.current?.pause()
+                setJazzPlaying(false)
+              }
+              narrator.toggleMuted()
+            }}
+            title={narrator.muted ? 'Unmute all sound' : 'Mute all sound everywhere'}
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              border: `1px solid ${narrator.muted ? 'rgba(242,133,122,.65)' : 'rgba(201,162,39,.4)'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              background: narrator.muted ? 'rgba(242,133,122,.14)' : 'transparent',
+              fontSize: 13,
+              color: narrator.muted ? '#F2857A' : '#F0D98C',
+            }}
+          >
+            {narrator.muted ? '🔇' : '🔊'}
+          </button>
+
+          <button
+            disabled={narrator.muted}
             onClick={(e) => {
               e.stopPropagation()
               narrator.toggle()

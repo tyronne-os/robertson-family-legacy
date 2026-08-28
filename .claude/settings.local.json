@@ -56,7 +56,8 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(d\\);console.log\\('user:',j.name\\);console.log\\('role:',j.auth?.accessToken?.role\\);console.log\\('token name:',j.auth?.accessToken?.displayName\\)}\\)\")",
       "Bash(git commit *)",
       "Bash(git rm *)",
-      "Bash(rm -f \".claude/settings.local.json.tmp.\"*)"
+      "Bash(rm -f \".claude/settings.local.json.tmp.\"*)",
+      "Bash(python3 -)"
     ]
   }
 }

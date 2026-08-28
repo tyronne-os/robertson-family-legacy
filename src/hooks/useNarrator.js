@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { synthesize } from '../lib/kokoro.js'
 import { fullChapterText } from '../data/chapters.js'
+import { subscribe, getAudioSettings, toggleMuted } from '../lib/audioSettings.js'
 
 const VOICE_STORAGE_KEY = 'robertson-legacy:narrator-voice'
 
+// Every Kokoro voice below is female: `af_` = American Female, `bf_` = British
+// Female. Eight to choose from; the chapter picks its own default.
 export const VOICES = [
   { id: 'af_heart', name: 'HEART', desc: 'warm & maternal — American' },
   { id: 'af_bella', name: 'BELLA', desc: 'rich & unhurried — American' },
@@ -14,6 +17,20 @@ export const VOICES = [
   { id: 'bf_emma', name: 'EMMA', desc: 'poised & literary — British' },
   { id: 'bf_isabella', name: 'ISABELLA', desc: 'stately & mature — British' },
 ]
+
+/** Pre-rendered narration, written by `npm run narrate`. */
+function prerenderedUrl(chapterId, voiceId) {
+  return `./audio/narration/ch${String(chapterId).padStart(2, '0')}-${voiceId}.wav`
+}
+
+async function hasPrerendered(url) {
+  try {
+    const res = await fetch(url, { method: 'HEAD' })
+    return res.ok
+  } catch {
+    return false
+  }
+}
 
 function formatRemaining(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return null
@@ -27,10 +44,15 @@ export function useNarrator(chapter) {
   const [voice, setVoice] = useState(
     () => (typeof localStorage !== 'undefined' && localStorage.getItem(VOICE_STORAGE_KEY)) || 'af_bella',
   )
-  const [status, setStatus] = useState('idle') // idle | loading | playing | paused
+  // idle | loading | playing | paused | blocked | error
+  const [status, setStatus] = useState('idle')
   const [loadPct, setLoadPct] = useState(0)
   const [remaining, setRemaining] = useState(null)
-  const cacheRef = useRef({}) // voice -> object URL, invalidated per chapter
+  const [errorMsg, setErrorMsg] = useState('')
+  const cacheRef = useRef({}) // voice -> object URL or static path, per chapter
+  const autoTriedRef = useRef(null) // chapter id we've already auto-started
+
+  const { muted, autoplay } = useSyncExternalStore(subscribe, getAudioSettings, getAudioSettings)
 
   if (!audioRef.current && typeof Audio !== 'undefined') {
     audioRef.current = new Audio()
@@ -49,32 +71,62 @@ export function useNarrator(chapter) {
     }
   }, [])
 
-  // A new chapter invalidates any cached narration audio.
+  // Global mute stops audio immediately, everywhere.
+  useEffect(() => {
+    const el = audioRef.current
+    if (!el) return
+    el.muted = muted
+    if (muted && !el.paused) {
+      el.pause()
+      setStatus('paused')
+    }
+  }, [muted])
+
+  // A new chapter invalidates cached narration.
   useEffect(() => {
     cacheRef.current = {}
     setStatus('idle')
     setRemaining(null)
+    setErrorMsg('')
   }, [chapter?.id])
 
   const play = useCallback((url) => {
     const el = audioRef.current
     el.src = url
+    el.muted = getAudioSettings().muted
     el.play()
       .then(() => setStatus('playing'))
-      .catch(() => setStatus('paused')) // autoplay blocked — user taps to resume
+      .catch(() => {
+        // Autoplay policy blocked us — say so instead of failing silently.
+        setStatus('blocked')
+      })
   }, [])
 
   const start = useCallback(
     async (voiceOverride) => {
       if (!chapter) return
+      if (getAudioSettings().muted) return
       const v = voiceOverride ?? voice
+
       const cached = cacheRef.current[v]
       if (cached) {
         play(cached)
         return
       }
+
       setStatus('loading')
       setLoadPct(0)
+      setErrorMsg('')
+
+      // Prefer a pre-rendered file: instant, no model download, no GPU.
+      const staticUrl = prerenderedUrl(chapter.id, v)
+      if (await hasPrerendered(staticUrl)) {
+        cacheRef.current[v] = staticUrl
+        play(staticUrl)
+        return
+      }
+
+      // Fall back to synthesizing in-browser.
       try {
         const url = await synthesize(fullChapterText(chapter), v, (p) => {
           if (p?.status === 'progress' && p.total) {
@@ -85,20 +137,34 @@ export function useNarrator(chapter) {
         play(url)
       } catch (err) {
         console.error('Kokoro narration failed', err)
-        setStatus('idle')
+        setErrorMsg(
+          err?.message?.includes('fetch') || err?.name === 'TypeError'
+            ? 'Could not download the voice model — check your connection.'
+            : 'The narrator failed to load. Tap to try again.',
+        )
+        setStatus('error')
       }
     },
     [chapter, voice, play],
   )
+
+  // Auto-start on chapter load, unless muted or already tried for this chapter.
+  useEffect(() => {
+    if (!chapter || muted || !autoplay) return
+    if (autoTriedRef.current === chapter.id) return
+    autoTriedRef.current = chapter.id
+    start()
+  }, [chapter, muted, autoplay, start])
 
   const toggle = useCallback(() => {
     const el = audioRef.current
     if (status === 'playing') {
       el.pause()
       setStatus('paused')
-    } else if (status === 'paused' && el.src) {
-      el.play().then(() => setStatus('playing')).catch(() => {})
-    } else if (status === 'idle') {
+    } else if ((status === 'paused' || status === 'blocked') && el.src) {
+      el.muted = getAudioSettings().muted
+      el.play().then(() => setStatus('playing')).catch(() => setStatus('blocked'))
+    } else {
       start()
     }
   }, [status, start])
@@ -118,5 +184,17 @@ export function useNarrator(chapter) {
     [play, start],
   )
 
-  return { status, loadPct, remaining, voice, voices: VOICES, start, toggle, selectVoice }
+  return {
+    status,
+    loadPct,
+    remaining,
+    errorMsg,
+    voice,
+    voices: VOICES,
+    muted,
+    toggleMuted,
+    start,
+    toggle,
+    selectVoice,
+  }
 }
