@@ -181,6 +181,56 @@ export default function SettingsPanel() {
     setTimeout(() => setSavedFlash(false), 2000)
   }
 
+  const fileInputRef = useRef(null)
+  const [confirmingClear, setConfirmingClear] = useState(false)
+  const confirmTimerRef = useRef(null)
+
+  const handleClearAllClick = () => {
+    if (!confirmingClear) {
+      setConfirmingClear(true)
+      confirmTimerRef.current = setTimeout(() => setConfirmingClear(false), 4000)
+      return
+    }
+    clearTimeout(confirmTimerRef.current)
+    setConfirmingClear(false)
+    setHfToken(''); setHfUser(''); setGcpKey(''); setGcpKeyName(''); setGcpUrl('')
+    setTestStatus(null); setDeployState('idle'); persist({})
+  }
+
+  const handleExportBackup = () => {
+    const data = loadSettings()
+    if (!data || Object.keys(data).length === 0) return
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `robertson-legacy-vault-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportBackup = (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result)
+        persist(data)
+        if (data.hfToken) setHfToken(data.hfToken)
+        if (data.hfUser) setHfUser(data.hfUser)
+        if (data.gcpProvider) setGcpProvider(data.gcpProvider)
+        if (data.gcpKeyName) setGcpKeyName(data.gcpKeyName)
+        if (data.gcpKey) setGcpKey(data.gcpKey)
+        if (data.gcpUrl) setGcpUrl(data.gcpUrl)
+      } catch {
+        // ignore malformed backup file
+      }
+    }
+    reader.readAsText(file)
+  }
+
   const handleCancel = () => {
     abortRef.current = true
     setDeployState('idle')
@@ -530,9 +580,37 @@ export default function SettingsPanel() {
                   {deployDone ? 'Deploy Again' : 'Save & Deploy to HF'}
                 </button>
                 <button
-                  onClick={() => { setHfToken(''); setHfUser(''); setGcpKey(''); setGcpKeyName(''); setGcpUrl(''); setTestStatus(null); setDeployState('idle'); persist({}) }}
-                  style={btnGhost}
-                >Clear All</button>
+                  onClick={handleClearAllClick}
+                  style={{
+                    ...btnGhost,
+                    color: confirmingClear ? '#F87171' : btnGhost.color,
+                    borderColor: confirmingClear ? 'rgba(248,113,113,.55)' : btnGhost.borderColor,
+                  }}
+                >{confirmingClear ? 'Click again to confirm' : 'Clear All'}</button>
+              </div>
+
+              {/* Backup — export/import keys so localStorage loss can't cost you the vault */}
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={handleExportBackup}
+                  style={{ ...btnGhost, flex: 1 }}
+                  title="Download your saved keys as a local backup file"
+                >Export Backup</button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ ...btnGhost, flex: 1 }}
+                  title="Restore keys from a previously exported backup file"
+                >Import Backup</button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/json"
+                  onChange={handleImportBackup}
+                  style={{ display: 'none' }}
+                />
+              </div>
+              <div style={{ fontFamily: "'EB Garamond',serif", fontStyle: 'italic', fontSize: 12.5, color: 'rgba(232,215,182,.4)', textAlign: 'center' }}>
+                Backup files contain your raw keys — store them somewhere private.
               </div>
             </>
           ) : (
