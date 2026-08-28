@@ -98,7 +98,7 @@ export default function Landing() {
           <div style={{ flex: 1 }} />
 
           <Link
-            to="/chapter/6"
+            to="/chapter/0"
             onClick={unlockAudio}
             className="begin-journey-btn"
             style={{
@@ -197,7 +197,7 @@ function SiblingCardLink({ sibling }) {
   const [hover, setHover] = useState(false)
   return (
     <Link
-      to="/chapter/6"
+      to={`/chapter/${sibling.id}`}
       onClick={unlockAudio}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
