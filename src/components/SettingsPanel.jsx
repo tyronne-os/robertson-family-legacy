@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { uploadFiles, fileExists } from '@huggingface/hub'
+import { ACCESS_REQUIREMENTS, verifyHfToken, checkSdkFreshness } from '../lib/vaultManifest.js'
 
 const STORAGE_KEY = 'robertson-legacy:settings'
 const REPO_NAME = 'AIBRUH/robertson-family-legacy'
@@ -8,7 +9,7 @@ function loadSettings() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') } catch { return {} }
 }
 function persist(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...data, savedAt: new Date().toISOString() }))
 }
 
 // All static assets the site needs — discovered from origin
@@ -101,6 +102,11 @@ export default function SettingsPanel() {
 
   const abortRef = useRef(false)
 
+  const [savedAt, setSavedAt] = useState(null)
+  const [access, setAccess] = useState(null)      // verifyHfToken result
+  const [accessBusy, setAccessBusy] = useState(false)
+  const [sdk, setSdk] = useState(null)            // checkSdkFreshness result
+
   useEffect(() => {
     if (!open) return
     const s = loadSettings()
@@ -110,8 +116,29 @@ export default function SettingsPanel() {
     if (s.gcpKeyName) setGcpKeyName(s.gcpKeyName)
     if (s.gcpKey) setGcpKey(s.gcpKey)
     if (s.gcpUrl) setGcpUrl(s.gcpUrl)
+    if (s.savedAt) setSavedAt(s.savedAt)
 
+    // Confirm access on open — no guessing about what's valid.
+    if (s.hfToken) {
+      setAccessBusy(true)
+      verifyHfToken(s.hfToken).then((r) => { setAccess(r); setAccessBusy(false) })
+    } else {
+      setAccess(null)
+    }
+    checkSdkFreshness().then(setSdk)
   }, [open])
+
+  // Re-verify whenever the token changes and settles.
+  useEffect(() => {
+    if (!open) return
+    const t = hfToken.trim()
+    if (!t) { setAccess(null); return }
+    const id = setTimeout(() => {
+      setAccessBusy(true)
+      verifyHfToken(t).then((r) => { setAccess(r); setAccessBusy(false) })
+    }, 700)
+    return () => clearTimeout(id)
+  }, [hfToken, open])
 
   const handleTest = async () => {
     if (!hfToken.trim()) return
@@ -367,6 +394,83 @@ export default function SettingsPanel() {
               Generate at huggingface.co/settings/tokens — needs <strong style={{ color: 'rgba(232,215,182,.55)' }}>Write</strong> scope.
             </div>
 
+            {/* Live access confirmation — what's stored, who it is, what it can do */}
+            <div style={{
+              marginTop: 12, borderRadius: 5, padding: '11px 13px',
+              background: 'rgba(11,7,5,.45)',
+              border: `1px solid ${
+                accessBusy ? 'rgba(201,162,39,.28)'
+                : access?.ok && access.canWrite ? 'rgba(110,231,160,.34)'
+                : access?.ok ? 'rgba(240,180,80,.4)'
+                : access ? 'rgba(248,113,113,.34)'
+                : 'rgba(201,162,39,.18)'
+              }`,
+            }}>
+              <div style={{ fontFamily: "'Cinzel',serif", fontSize: 9, letterSpacing: '.28em', color: '#C9A227', marginBottom: 7 }}>
+                ACCESS STATUS
+              </div>
+
+              {accessBusy && <StatusLine color="#F0D98C" text="Confirming access…" />}
+
+              {!accessBusy && !access && (
+                <StatusLine color="rgba(232,215,182,.45)" text="No token stored — deploys unavailable." />
+              )}
+
+              {!accessBusy && access && !access.ok && (
+                <StatusLine color="#F87171" text={access.reason} />
+              )}
+
+              {!accessBusy && access?.ok && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  <StatusLine
+                    color={access.canWrite ? '#6EE7A0' : '#F0B450'}
+                    text={
+                      access.canWrite
+                        ? `Write access confirmed as ${access.user}`
+                        : `Signed in as ${access.user} — but this token is read-only`
+                    }
+                  />
+                  {access.tokenName && (
+                    <StatusLine color="rgba(232,215,182,.45)" text={`Token: ${access.tokenName}`} />
+                  )}
+                  {access.scopes?.length > 0 && (
+                    <StatusLine color="rgba(232,215,182,.45)" text={`Scopes: ${access.scopes.join(', ')}`} />
+                  )}
+                  {!access.canWrite && (
+                    <StatusLine color="#F0B450" text="Deploy needs Write scope — regenerate with Write enabled." />
+                  )}
+                </div>
+              )}
+
+              {/* SDK freshness — dated, so you know when it last looked */}
+              {sdk && (
+                <div style={{ marginTop: 9, paddingTop: 9, borderTop: '1px solid rgba(201,162,39,.14)' }}>
+                  {sdk.results.map((r) => (
+                    <StatusLine
+                      key={r.name}
+                      color={r.status === 'current' ? '#6EE7A0' : r.status === 'outdated' ? '#F0B450' : 'rgba(232,215,182,.4)'}
+                      text={
+                        r.status === 'current' ? `${r.name} ${r.current} — up to date`
+                        : r.status === 'outdated' ? `${r.name} ${r.current} → ${r.latest} available`
+                        : `${r.name} — could not check (${r.reason})`
+                      }
+                    />
+                  ))}
+                  <div style={{ marginTop: 4, fontFamily: "'EB Garamond',serif", fontStyle: 'italic', fontSize: 11.5, color: 'rgba(232,215,182,.32)' }}>
+                    Checked {sdk.checkedAt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {' at '}
+                    {sdk.checkedAt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+                  </div>
+                </div>
+              )}
+
+              {savedAt && (
+                <div style={{ marginTop: 7, fontFamily: "'EB Garamond',serif", fontStyle: 'italic', fontSize: 11.5, color: 'rgba(232,215,182,.32)' }}>
+                  Keys last saved {new Date(savedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                </div>
+              )}
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
               <button
                 onClick={handleTest}
@@ -524,6 +628,59 @@ export default function SettingsPanel() {
             </div>
           )}
 
+          {/* Required access — the Vault declares what it needs and what's filled */}
+          <div style={{ height: 1, background: 'rgba(201,162,39,.14)' }} />
+          <section>
+            <div style={sLabel}>REQUIRED ACCESS</div>
+            <div style={sDesc}>
+              What this site needs to function, and whether it's stored right now.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+              {ACCESS_REQUIREMENTS.map((req) => {
+                const value = { hfToken, gcpKey, gcpUrl }[req.field] ?? ''
+                const filled = !!value.trim()
+                const dot = filled ? '#6EE7A0' : req.required ? '#F87171' : 'rgba(232,215,182,.3)'
+                return (
+                  <div key={req.id} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+                    <span style={{ color: dot, fontSize: 9, lineHeight: 1.9 }}>●</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: "'EB Garamond',serif", fontSize: 14.5, color: 'rgba(232,215,182,.8)' }}>
+                        {req.label}
+                        {req.requiredScope && (
+                          <span style={{ fontSize: 12, color: 'rgba(232,197,92,.7)' }}> · {req.requiredScope} scope</span>
+                        )}
+                        {!req.required && (
+                          <span style={{ fontSize: 12, color: 'rgba(232,215,182,.35)' }}> · optional</span>
+                        )}
+                      </div>
+                      <div style={{ fontFamily: "'EB Garamond',serif", fontStyle: 'italic', fontSize: 12.5, color: 'rgba(232,215,182,.42)', lineHeight: 1.5 }}>
+                        {req.usedFor}{' '}
+                        {!filled && <span style={{ color: 'rgba(240,180,80,.7)' }}>{req.breaksWithout}</span>}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+
+          {/* CLI sync — persist the token outside the browser */}
+          <div style={{ height: 1, background: 'rgba(201,162,39,.14)' }} />
+          <section>
+            <div style={sLabel}>SYNC TO CLI</div>
+            <div style={sDesc}>
+              A browser can't write to your machine. Export a backup, then run this
+              once — it verifies the token and installs it where every HF tool looks,
+              so the terminal stays authenticated even if this browser is wiped.
+            </div>
+            <code style={{
+              display: 'block', padding: '10px 12px', borderRadius: 4,
+              background: 'rgba(11,7,5,.6)', border: '1px solid rgba(201,162,39,.22)',
+              fontFamily: 'ui-monospace,Menlo,monospace', fontSize: 12.5,
+              color: 'rgba(232,215,182,.75)', overflowX: 'auto', whiteSpace: 'nowrap',
+            }}>node vault-sync.mjs</code>
+          </section>
+
           {/* About */}
           <div style={{ height: 1, background: 'rgba(201,162,39,.14)' }} />
           <section>
@@ -621,6 +778,16 @@ export default function SettingsPanel() {
         </div>
       </div>
     </>
+  )
+}
+
+/* ── Small presentational helpers ── */
+function StatusLine({ color, text }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 7 }}>
+      <span style={{ color, fontSize: 9, lineHeight: 1.6 }}>●</span>
+      <span style={{ fontFamily: "'EB Garamond',serif", fontSize: 13.5, color, lineHeight: 1.5 }}>{text}</span>
+    </div>
   )
 }
 
