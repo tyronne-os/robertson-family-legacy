@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Nobility Depository</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #0B0705;
+    color: #E8D7B6;
+    font-family: Georgia, 'EB Garamond', serif;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input, textarea, button { -webkit-user-select: text; user-select: text; }
+  .titlebar {
+    padding: 20px 28px 14px;
+    border-bottom: 1px solid rgba(201,162,39,.22);
+  }
+  .titlebar h1 {
+    font-family: Georgia, serif;
+    font-weight: 700;
+    letter-spacing: .18em;
+    font-size: 18px;
+    color: #F0D98C;
+    margin: 0 0 4px;
+  }
+  .titlebar p { margin: 0; font-size: 13px; color: rgba(232,215,182,.55); }
+  .wrap { padding: 22px 28px 40px; max-width: 760px; }
+  .card {
+    background: rgba(240,217,140,.04);
+    border: 1px solid rgba(201,162,39,.28);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 13px;
+    letter-spacing: .22em;
+    color: #C9A227;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+  }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; }
+  input[type=text], input[type=password] {
+    flex: 1;
+    background: rgba(240,217,140,.06);
+    border: 1px solid rgba(201,162,39,.4);
+    color: #F0D98C;
+    padding: 9px 11px;
+    border-radius: 3px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+  }
+  button {
+    background: linear-gradient(150deg,#3a2415,#231409);
+    border: 1px solid rgba(201,162,39,.5);
+    color: #F0D98C;
+    padding: 9px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: .05em;
+    font-family: inherit;
+  }
+  button:hover { background: rgba(240,217,140,.14); }
+  button.danger { border-color: rgba(242,133,122,.6); color: #F2857A; }
+  button.danger:hover { background: rgba(242,133,122,.12); }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: .4; cursor: default; }
+  .entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(201,162,39,.12);
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry .name { font-weight: 700; color: #F0D98C; min-width: 140px; font-size: 13px; }
+  .entry .value {
+    flex: 1;
+    font-family: monospace;
+    font-size: 12px;
+    color: rgba(232,215,182,.65);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .muted { color: rgba(232,215,182,.5); font-size: 12px; }
+  .status { font-size: 13px; margin-top: 10px; }
+  .status.ok { color: #8FD19E; }
+  .status.err { color: #F2857A; }
+  .toolbar { display: flex; gap: 10px; margin-top: 6px; }
+  .empty { color: rgba(232,215,182,.4); font-style: italic; font-size: 13px; padding: 6px 0; }
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <h1>NOBILITY DEPOSITORY</h1>
+    <p id="savedAtLabel">Universal credential vault for all projects · not yet saved</p>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <h2>Add a key</h2>
+      <div class="row">
+        <input type="text" id="newName" placeholder="Name (e.g. HF_TOKEN, GCP_MIRANDA)" />
+      </div>
+      <div class="row">
+        <input type="password" id="newValue" placeholder="Value" />
+        <button id="toggleVisBtn" class="ghost">Show</button>
+      </div>
+      <div class="toolbar">
+        <button id="addBtn">Add Key</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Stored keys</h2>
+      <div id="entryList"></div>
+      <div id="emptyMsg" class="empty" style="display:none;">No keys stored yet.</div>
+    </div>
+
+    <div class="card">
+      <h2>Hugging Face access</h2>
+      <p class="muted">Verify a token's real granted scope, and optionally install it to the CLI cache (<code>~/.cache/huggingface/token</code>) so any Claude Code session on this machine can use it.</p>
+      <div class="row">
+        <input type="text" id="hfKeySelect" placeholder="Type the exact key Name above holding your HF token (e.g. HF_TOKEN)" />
+      </div>
+      <div class="toolbar">
+        <button id="hfVerifyBtn">Verify Token</button>
+        <button id="hfSyncBtn">Sync to CLI</button>
+      </div>
+      <div id="hfStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Backup</h2>
+      <p class="muted">Export writes a plain JSON file you choose the location for. Import restores from one. Nothing is ever cleared without a two-step confirmation.</p>
+      <div class="toolbar">
+        <button id="exportBtn">Export Backup…</button>
+        <button id="importBtn">Import Backup…</button>
+        <button id="clearBtn" class="danger">Clear All…</button>
+      </div>
+      <div id="backupStatus" class="status"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

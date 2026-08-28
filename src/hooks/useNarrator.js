@@ -18,18 +18,23 @@ export const VOICES = [
   { id: 'bf_isabella', name: 'ISABELLA', desc: 'stately & mature — British' },
 ]
 
-/** Pre-rendered narration, written by `npm run narrate`. */
-function prerenderedUrl(chapterId, voiceId) {
-  return `./audio/narration/ch${String(chapterId).padStart(2, '0')}-${voiceId}.wav`
+/** Pre-rendered narration, written by `npm run narrate` (MP3 if ffmpeg was
+ *  available at render time, WAV fallback otherwise). */
+function prerenderedCandidates(chapterId, voiceId) {
+  const stem = `./audio/narration/ch${String(chapterId).padStart(2, '0')}-${voiceId}`
+  return [`${stem}.mp3`, `${stem}.wav`]
 }
 
-async function hasPrerendered(url) {
-  try {
-    const res = await fetch(url, { method: 'HEAD' })
-    return res.ok
-  } catch {
-    return false
+async function findPrerendered(chapterId, voiceId) {
+  for (const url of prerenderedCandidates(chapterId, voiceId)) {
+    try {
+      const res = await fetch(url, { method: 'HEAD' })
+      if (res.ok) return url
+    } catch {
+      // try the next candidate
+    }
   }
+  return null
 }
 
 function formatRemaining(seconds) {
@@ -41,9 +46,7 @@ function formatRemaining(seconds) {
 
 export function useNarrator(chapter) {
   const audioRef = useRef(null)
-  const [voice, setVoice] = useState(
-    () => (typeof localStorage !== 'undefined' && localStorage.getItem(VOICE_STORAGE_KEY)) || 'af_bella',
-  )
+  const [voice, setVoice] = useState(() => chapter?.voice || 'af_bella')
   // idle | loading | playing | paused | blocked | error
   const [status, setStatus] = useState('idle')
   const [loadPct, setLoadPct] = useState(0)
@@ -82,12 +85,14 @@ export function useNarrator(chapter) {
     }
   }, [muted])
 
-  // A new chapter invalidates cached narration.
+  // A new chapter invalidates cached narration and resets to that
+  // chapter's assigned voice (each chapter reads in its own voice).
   useEffect(() => {
     cacheRef.current = {}
     setStatus('idle')
     setRemaining(null)
     setErrorMsg('')
+    setVoice(chapter?.voice || 'af_bella')
   }, [chapter?.id])
 
   const play = useCallback((url) => {
@@ -119,8 +124,8 @@ export function useNarrator(chapter) {
       setErrorMsg('')
 
       // Prefer a pre-rendered file: instant, no model download, no GPU.
-      const staticUrl = prerenderedUrl(chapter.id, v)
-      if (await hasPrerendered(staticUrl)) {
+      const staticUrl = await findPrerendered(chapter.id, v)
+      if (staticUrl) {
         cacheRef.current[v] = staticUrl
         play(staticUrl)
         return
