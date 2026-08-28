@@ -1,0 +1,7 @@
+public/images/*.jpg filter=lfs diff=lfs merge=lfs -text
+public/images/*.jpeg filter=lfs diff=lfs merge=lfs -text
+public/images/*.png filter=lfs diff=lfs merge=lfs -text
+public/audio/*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.PNG filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
