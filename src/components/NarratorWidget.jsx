@@ -39,16 +39,17 @@ export default function NarratorWidget({ chapter, narrator }) {
 
   const selected = narrator.voices.find((v) => v.id === narrator.voice)
 
+  const chapterLabel = chapter ? chapter.title.toUpperCase() : 'CHAPTER'
   const narrateLabel = narrator.muted
     ? 'NARRATION MUTED'
     : {
-        idle: 'NARRATE CHAPTER VI',
+        idle: `NARRATE ${chapterLabel}`,
         loading: 'WAKING THE NARRATOR',
         playing: 'NOW READING',
         paused: 'PAUSED',
         blocked: 'TAP TO BEGIN',
         error: 'NARRATOR UNAVAILABLE',
-      }[narrator.status] ?? 'NARRATE CHAPTER VI'
+      }[narrator.status] ?? `NARRATE ${chapterLabel}`
 
   const narrateSub = narrator.muted
     ? 'unmute to listen'
@@ -104,7 +105,7 @@ export default function NarratorWidget({ chapter, narrator }) {
           }}
         >
           <div style={{ fontFamily: "'Cinzel',serif", fontSize: 10.5, letterSpacing: '.3em', color: '#C9A227' }}>
-            NARRATOR FOR CH. VI
+            {chapter ? `NARRATOR · ${chapter.title.toUpperCase()}` : 'NARRATOR'}
           </div>
           <div style={{ fontFamily: "'EB Garamond',serif", fontStyle: 'italic', fontSize: 13, color: 'rgba(232,215,182,.5)' }}>
             tap to preview
