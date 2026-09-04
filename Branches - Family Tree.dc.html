@@ -75,6 +75,15 @@
   ::-webkit-scrollbar-track { background:#100d0a; }
   ::-webkit-scrollbar-thumb { background:#3a3128; border-radius:6px; }
   input, select, textarea, button { font-family:Helvetica, Arial, sans-serif; }
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+  @media (max-width: 1150px) {
+    .dash-grid { grid-template-columns: 1fr; }
+  }
   @media (max-width: 980px) {
     .branch-row { overflow-x: auto; padding-bottom: 14px !important; }
     .branch-col { flex: 0 0 168px !important; }
@@ -244,7 +253,7 @@
           <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:21px;color:#f6f1e6">Family Workspace</div>
           <div style="font-size:13px;color:#a39685;font-style:italic">Everything you need to add to the tree and keep the family updated</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(330px, 1fr));gap:18px;align-items:stretch">
+        <div class="dash-grid">
 
           <div style="order:2;display:flex;flex-direction:column;gap:12px;min-width:0">
             <div style="display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid #2b241c"><div style="font-size:17px;flex:0 0 auto">&#9998;</div><div style="min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d9b463">Update your family tree</div><div style="font-size:11.5px;color:#7d7266;margin-top:2px">Add a descendant, filter, and see totals</div></div></div>
@@ -463,8 +472,10 @@
                 📎
                 <input type="file" accept="image/*,video/*" sc-camel-on-change="{{ onChatAnyFile }}" style="display:none">
               </label>
+              <div style="width:1px;height:20px;background:#2b241c;margin:0 4px;flex:0 0 auto"></div>
+              <button sc-camel-on-click="{{ toggleMic }}" title="{{ micTitle }}" style="width:36px;height:36px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:7px;font-size:17px;border:1px solid {{ micBorder }};background:{{ micBg }};color:{{ micColor }};transition:background 0.12s">&#127908;</button>
               <div style="flex:1"></div>
-              <div style="font-size:11px;color:#4a3f31;letter-spacing:0.5px">drag &amp; drop above</div>
+              <div style="font-size:11px;color:{{ micHintColor }};letter-spacing:0.5px;font-weight:{{ micHintWeight }}">{{ composerHint }}</div>
             </div>
             <div style="display:flex;gap:0">
               <input type="text" value="{{ chatDraft }}" sc-camel-on-change="{{ onChatDraft }}" sc-camel-on-key-down="{{ onChatKey }}" placeholder="Message Cuzzo…" style="flex:1;background:transparent;border:none;padding:12px 14px;color:#f4efe3;font-size:14px;outline:none">
@@ -588,6 +599,7 @@ class Component extends DCLogic {
     chatVideoFlag: false,
     chatDropHighlight: false,
     panelOpen: false,
+    micOn: false,
     chat: [{ from: 'bot', text: 'Hey family! \ud83c\udf33 I\u2019m Cuzzo \u2014 here to help you keep our branch of the tree updated. Who are we adding today?' }]
   };
 
@@ -745,6 +757,42 @@ class Component extends DCLogic {
     this.setState({ chatFlow: { i: 0, data: {} } });
     return steps[0].ask;
   }
+
+  toggleMic() {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) {
+      this.setState(s => ({ chat: s.chat.concat([{ from: 'bot', text: 'Voice typing works in Chrome, Edge, or Safari. On this browser you can still type to me.' }]) }));
+      return;
+    }
+    if (this.state.micOn) { if (this.rec) { try { this.rec.stop(); } catch (e) {} } this.setState({ micOn: false }); return; }
+
+    const rec = new Rec();
+    this.rec = rec;
+    rec.lang = 'en-US';
+    rec.interimResults = true;
+    rec.continuous = false;
+    // keep whatever they already typed, then append what they say
+    const base = this.state.chatDraft ? this.state.chatDraft.replace(/\s+$/, '') + ' ' : '';
+
+    rec.onresult = e => {
+      let heard = '';
+      for (let i = 0; i < e.results.length; i++) heard += e.results[i][0].transcript;
+      this.setState({ chatDraft: (base + heard).replace(/^\s+/, '') });
+    };
+    rec.onerror = ev => {
+      const msg = ev.error === 'not-allowed' || ev.error === 'service-not-allowed'
+        ? 'I need permission to use the microphone. Allow it in your browser, then tap the mic again.'
+        : ev.error === 'no-speech'
+          ? 'I did not catch that \u2014 tap the mic and try again.'
+          : 'Voice typing stopped. Tap the mic to try again.';
+      this.setState(s => ({ micOn: false, chat: s.chat.concat([{ from: 'bot', text: msg }]) }));
+    };
+    rec.onend = () => this.setState({ micOn: false });
+
+    try { rec.start(); this.setState({ micOn: true }); } catch (e) { this.setState({ micOn: false }); }
+  }
+
+  componentWillUnmount() { if (this.rec) { try { this.rec.stop(); } catch (e) {} } }
 
   readChatPhoto(file) {
     if (!file) return;
@@ -1000,6 +1048,15 @@ class Component extends DCLogic {
       chatPhotoPreview: s.chatPhotoData ? 'url("' + s.chatPhotoData + '")' : 'none',
       chatPhotoBadge: s.chatPhotoData ? '' : '📷',
       chatPhotoLabel: s.chatPhotoData ? (s.chatPhotoName || 'Photo chosen') + ' — tap to change' : 'Choose their photo',
+      micOn: s.micOn,
+      micTitle: s.micOn ? 'Stop voice typing' : 'Voice typing \u2014 speak instead of typing',
+      micBg: s.micOn ? '#c9a24a' : 'transparent',
+      micColor: s.micOn ? '#1a1409' : '#7d7266',
+      micBorder: s.micOn ? '#c9a24a' : 'transparent',
+      micHintColor: s.micOn ? '#d9b463' : '#4a3f31',
+      micHintWeight: s.micOn ? '700' : '400',
+      composerHint: s.micOn ? 'listening\u2026 speak now' : 'drag & drop above',
+      toggleMic: () => this.toggleMic(),
       chatDropActive: s.chatDropHighlight,
       chatDropBorder: s.chatDropHighlight ? '#c9a24a' : '#2e2720',
       onChatPhotoFile: e => this.readChatPhoto(e.target.files && e.target.files[0]),
