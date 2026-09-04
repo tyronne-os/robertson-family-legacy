@@ -64,6 +64,7 @@ PAGES = [
     ("submit-a-chapter",  "Submit a Chapter.dc.html"),
     ("branches",          "Branches - Family Tree.dc.html"),
     ("branches-admin",    "Branches Admin.dc.html"),
+    ("family-growth",     "Family Growth.dc.html"),
 ]
 
 app = FastAPI()

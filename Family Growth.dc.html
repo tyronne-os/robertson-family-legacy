@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Growth — The Big Ma Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0B0705; --panel: #150E08; --panel-2: #1E1409;
+    --rule: rgba(201,162,39,.20); --rule-soft: rgba(201,162,39,.11);
+    --gold: #C9A227; --gold-hi: #F0D98C; --gold-deep: #8A6A1F;
+    --parchment: #E8D7B6; --dim: rgba(232,215,182,.58); --dimmer: rgba(232,215,182,.34);
+    --ok: #7FCF9B;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--black); color: var(--parchment);
+    font-family: 'EB Garamond', Georgia, serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { color: var(--gold-hi); }
+  ::-webkit-scrollbar { height: 9px; width: 9px; }
+  ::-webkit-scrollbar-thumb { background: #35291a; border-radius: 5px; }
+
+  .cz { font-family: 'Cinzel', serif; }
+  .label { font-family:'Cinzel',serif; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); }
+
+  header { display:flex; align-items:center; gap:20px; padding:16px 5vw; border-bottom:1px solid var(--rule); }
+  header .grow { flex:1; }
+  header a.nav { font-family:'Cinzel',serif; font-size:12px; letter-spacing:.2em; color:var(--parchment); }
+  header a.nav:hover { color: var(--gold-hi); }
+
+  .hero {
+    position:relative; overflow:hidden; min-height: 62vh;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding: 0 5vw 44px; text-align:center; background:#0B0705;
+  }
+  .hero .bg {
+    position:absolute; inset:0; background-size:cover; background-position:center 30%;
+    background-image:url('uploads/trunk-big-ma-big-papa.jpg');
+    filter: saturate(.82) brightness(.62);
+  }
+  .hero .bg::after { content:''; }
+  .hero .scrim {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(11,7,5,.15) 0%, rgba(11,7,5,.35) 40%, rgba(11,7,5,.94) 92%, #0B0705 100%),
+      radial-gradient(60% 55% at 50% 18%, rgba(240,217,140,.10), rgba(11,7,5,0) 70%);
+  }
+  .hero .content { position:relative; max-width: 760px; }
+  .hero h1 {
+    font-family:'Cinzel',serif; font-weight:900;
+    font-size: clamp(28px,4.4vw,56px); line-height:1.05; letter-spacing:.02em;
+    color: var(--gold-hi); margin: 12px 0 6px;
+    text-shadow: 0 3px 0 var(--gold-deep), 0 10px 26px rgba(0,0,0,.9), 0 0 60px rgba(240,217,140,.3);
+  }
+  .hero .sub { font-family:'Pinyon Script',cursive; font-size: clamp(19px,2.2vw,30px); color: var(--gold); }
+  .hero .updated { font-size:13px; color:var(--dimmer); margin-top:14px; font-style:italic; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 5vw 70px; }
+
+  .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin: 28px 0 40px; }
+  .stat {
+    background: linear-gradient(165deg, var(--panel-2), var(--panel));
+    border:1px solid var(--rule); border-radius:5px; padding:20px 18px; text-align:center;
+  }
+  .stat .n { font-family:'Cinzel',serif; font-weight:800; font-size: clamp(28px,3vw,42px); color:var(--gold-hi);
+    font-variant-numeric: tabular-nums; line-height:1; }
+  .stat .l { font-size:12.5px; letter-spacing:.06em; color:var(--dim); margin-top:9px; text-transform:uppercase; font-family:'Cinzel',serif; font-size:10.5px; }
+
+  .section { margin: 46px 0; }
+  .section-head { display:flex; align-items:baseline; gap:14px; margin-bottom:18px; }
+  .section-head h2 { font-family:'Cinzel',serif; font-size: clamp(18px,2vw,24px); color:var(--gold-hi); margin:0; font-weight:600; }
+  .section-head .rule { flex:1; height:1px; background: var(--rule-soft); }
+
+  .insight-cards { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .insight {
+    background: var(--panel); border:1px solid var(--rule-soft); border-radius:5px;
+    padding:20px 22px; position: relative;
+  }
+  .insight .k { font-family:'Cinzel',serif; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); }
+  .insight .v { font-family:'Cinzel',serif; font-size:24px; color:var(--gold-hi); margin-top:8px; }
+  .insight .d { font-size:14.5px; color:var(--dim); margin-top:6px; line-height:1.5; }
+
+  .bars { display:flex; flex-direction:column; gap:10px; }
+  .bar-row { display:grid; grid-template-columns: 64px 1fr 44px; align-items:center; gap:12px; }
+  .bar-row .lbl { font-family:'Cinzel',serif; font-size:12px; color:var(--dim); text-align:right; }
+  .bar-track { height:14px; background: rgba(201,162,39,.08); border-radius:3px; overflow:hidden; border:1px solid var(--rule-soft); }
+  .bar-fill { height:100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-hi)); border-radius:3px; transition: width .8s cubic-bezier(.2,.9,.25,1); }
+  .bar-row .val { font-size:13px; color:var(--dimmer); font-variant-numeric: tabular-nums; }
+
+  .branch-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+  .branch-card {
+    background: var(--panel); border:1px solid var(--rule-soft); border-radius:5px;
+    padding:15px 17px; text-decoration:none; display:block; transition: border-color .18s, transform .18s;
+  }
+  .branch-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .branch-card .n { font-family:'Cinzel',serif; font-size:15px; color:var(--gold-hi); }
+  .branch-card .c { font-family:'Cinzel',serif; font-size:26px; color:var(--parchment); margin-top:6px; font-weight:700; }
+  .branch-card .s { font-size:12.5px; color:var(--dimmer); margin-top:3px; }
+
+  .gen-ladder { display:flex; flex-direction:column; gap:8px; }
+  .gen-row { display:grid; grid-template-columns: 1fr 40px; align-items:center; gap:12px; }
+  .gen-row .lbl { font-size:14px; color:var(--parchment); }
+  .gen-row .val { text-align:right; font-family:'Cinzel',serif; color:var(--gold-hi); font-variant-numeric: tabular-nums; }
+
+  .empty { text-align:center; padding:50px 20px; color:var(--dimmer); font-style:italic; font-size:15.5px; }
+  .empty strong { color: var(--gold-hi); font-style: normal; }
+
+  footer { text-align:center; padding: 20px; border-top:1px solid var(--rule-soft); font-size:13px; color:var(--dimmer); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="nav" href="/">&#8592; HOME</a>
+  <a class="nav" href="/branches">BRANCHES</a>
+  <div class="grow"></div>
+  <a class="nav" href="/family-growth" style="color:var(--gold);pointer-events:none">FAMILY GROWTH</a>
+</header>
+
+<div class="hero">
+  <div class="bg"></div>
+  <div class="scrim"></div>
+  <div class="content">
+    <div class="label">Big Ma &amp; Big Papa</div>
+    <h1>The Family, Counted</h1>
+    <div class="sub">every branch, every generation, in one place</div>
+    <div class="updated" id="updatedAt">Fetching family data&hellip;</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="stat-row" id="statRow"></div>
+
+  <div id="content"></div>
+
+</div>
+
+<footer>Recalculated live from what every branch has entered — nothing here is estimated.</footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); };
+
+  function ordinal(n) {
+    var s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  function timeAgo(ts) {
+    var s = Math.floor(Date.now() / 1000 - ts);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s/60) + ' minutes ago';
+    if (s < 86400) return Math.floor(s/3600) + ' hours ago';
+    return Math.floor(s/86400) + ' days ago';
+  }
+
+  async function load() {
+    try {
+      var res = await fetch('/api/social/insights');
+      var d = await res.json();
+      render(d);
+    } catch(e) {
+      $('updatedAt').textContent = 'Could not reach server — try refreshing.';
+    }
+  }
+
+  function render(d) {
+    $('updatedAt').textContent = 'Last updated ' + timeAgo(d.updated_at);
+
+    $('statRow').innerHTML = [
+      [d.total_people, 'People Recorded'],
+      [d.living, 'Living'],
+      [d.passed, 'In Memoriam'],
+      [d.generations_deep, d.generations_deep === 1 ? 'Generation Deep' : 'Generations Deep'],
+      [d.birth_years_recorded, 'Birth Years Known'],
+    ].map(function (s) {
+      return '<div class="stat"><div class="n">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>';
+    }).join('');
+
+    if (d.total_people === 0) {
+      $('content').innerHTML = '<div class="empty">No one has been added to the branches yet.<br>'
+        + 'As soon as the family starts posting on <strong>/branches</strong>, this page fills in on its own.</div>';
+      return;
+    }
+
+    var sections = [];
+
+    // ---- insight cards
+    var cards = [];
+    if (d.busiest_decade) {
+      cards.push({
+        k: 'Biggest Growth Decade', v: d.busiest_decade,
+        d: (d.by_decade[d.busiest_decade] || 0) + ' recorded births fall in the ' + d.busiest_decade
+           + (d.by_decade ? ' — more than any other decade on record.' : '.')
+      });
+    }
+    if (d.busiest_month) {
+      cards.push({
+        k: 'Most Common Birth Month', v: d.busiest_month,
+        d: 'When a birth month is on file, ' + d.busiest_month + ' comes up most — the month to plan a party around.'
+      });
+    }
+    if (d.earliest_year && d.latest_year) {
+      cards.push({
+        k: 'Span of Record', v: d.earliest_year + ' – ' + d.latest_year,
+        d: (d.latest_year - d.earliest_year) + ' years between the oldest and newest birth year on the tree.'
+      });
+    }
+    cards.push({
+      k: 'How Far the Tree Reaches', v: ordinal(d.generations_deep) + ' generation',
+      d: d.generations_deep <= 1
+        ? 'So far every branch holds Big Ma’s grandchildren. The first great-grandchild entered will start the next ring.'
+        : 'From Big Ma and Big Papa down to great-'.repeat(Math.max(0, d.generations_deep - 2)) + (d.generations_deep >= 2 ? 'grandchildren' : 'grandchildren') + ' recorded so far.'
+    });
+
+    sections.push(
+      '<div class="section"><div class="section-head"><h2>What the Numbers Say</h2><div class="rule"></div></div>'
+      + '<div class="insight-cards">' + cards.map(function (c) {
+          return '<div class="insight"><div class="k">' + esc(c.k) + '</div>'
+            + '<div class="v">' + esc(c.v) + '</div><div class="d">' + esc(c.d) + '</div></div>';
+        }).join('') + '</div></div>'
+    );
+
+    // ---- decade bars
+    var decades = Object.keys(d.by_decade || {});
+    if (decades.length) {
+      var maxD = Math.max.apply(null, decades.map(function (k) { return d.by_decade[k]; }));
+      sections.push(
+        '<div class="section"><div class="section-head"><h2>Births by Decade</h2><div class="rule"></div></div>'
+        + '<div class="bars">' + decades.map(function (k) {
+            var v = d.by_decade[k], pct = Math.round((v / maxD) * 100);
+            return '<div class="bar-row"><div class="lbl">' + esc(k) + '</div>'
+              + '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>'
+              + '<div class="val">' + v + '</div></div>';
+          }).join('') + '</div></div>'
+      );
+    }
+
+    // ---- month bars
+    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var monthVals = months.map(function (m) { return (d.by_month && d.by_month[m]) || 0; });
+    if (monthVals.some(function (v) { return v > 0; })) {
+      var maxM = Math.max.apply(null, monthVals);
+      sections.push(
+        '<div class="section"><div class="section-head"><h2>Birth Months</h2><div class="rule"></div></div>'
+        + '<div class="bars">' + months.map(function (m, i) {
+            var v = monthVals[i], pct = maxM ? Math.round((v / maxM) * 100) : 0;
+            return '<div class="bar-row"><div class="lbl">' + m + '</div>'
+              + '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>'
+              + '<div class="val">' + v + '</div></div>';
+          }).join('') + '</div>'
+        + '<div style="font-size:13px;color:var(--dimmer);margin-top:10px;font-style:italic">'
+        + 'Only shows for people whose birth date includes a month, not just a year.</div></div>'
+      );
+    }
+
+    // ---- generation ladder
+    var gens = Object.keys(d.by_generation || {});
+    if (gens.length) {
+      var order = ['grandchild'];
+      for (var i = 0; i < 12; i++) order.push(new Array(i + 2).join('great-') + 'grandchild');
+      gens.sort(function (a, b) { return order.indexOf(a) - order.indexOf(b); });
+      sections.push(
+        '<div class="section"><div class="section-head"><h2>Generations from Big Ma &amp; Big Papa</h2><div class="rule"></div></div>'
+        + '<div class="gen-ladder">' + gens.map(function (g) {
+            return '<div class="gen-row"><div class="lbl">Big Ma’s ' + esc(g) + '</div>'
+              + '<div class="val">' + d.by_generation[g] + '</div></div>';
+          }).join('') + '</div></div>'
+      );
+    }
+
+    // ---- per-branch
+    if (d.by_branch && d.by_branch.length) {
+      sections.push(
+        '<div class="section"><div class="section-head"><h2>By Branch</h2><div class="rule"></div></div>'
+        + '<div class="branch-grid">' + d.by_branch.map(function (b) {
+            return '<a class="branch-card" href="/branch/' + esc(b.slug) + '">'
+              + '<div class="n">' + esc(b.name) + '</div>'
+              + '<div class="c">' + b.count + '</div>'
+              + '<div class="s">' + b.living + ' living'
+              + (b.passed ? ' · ' + b.passed + ' in memoriam' : '') + '</div></a>';
+          }).join('') + '</div></div>'
+      );
+    }
+
+    $('content').innerHTML = sections.join('');
+  }
+
+  load();
+  setInterval(load, 20000);
+})();
+</script>
+</body>
+</html>

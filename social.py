@@ -560,6 +560,92 @@ def stream(since: float = 0.0, slug: str = ""):
     }
 
 
+@router.get("/insights")
+def insights():
+    """Family-wide totals and patterns for the Big Ma & Papa page.
+
+    Reads every branch's people file fresh each call rather than caching --
+    this is meant to reflect additions the moment they happen, and the
+    underlying reads are already in-memory once hydrated, so recomputing is
+    cheap next to the honesty of always showing the current count.
+    """
+    all_people = []
+    per_branch = []
+    for slug in BRANCH_SLUGS:
+        people = _get(f"people/{slug}.json")
+        by_id = {p["id"]: p for p in people if "id" in p}
+        for p in people:
+            depth, label = _generation(p, by_id)
+            all_people.append({**p, "branch": slug, "depth": depth, "generation": label})
+        per_branch.append({
+            "slug": slug,
+            "name": BRANCH_NAMES[slug],
+            "count": len(people),
+            "living": sum(1 for p in people if not p.get("death_year")),
+            "passed": sum(1 for p in people if p.get("death_year")),
+        })
+
+    total = len(all_people)
+    living = sum(1 for p in all_people if not p.get("death_year"))
+    passed = total - living
+    deepest = max([p["depth"] for p in all_people], default=-1) + 1
+
+    by_generation: dict[str, int] = {}
+    for p in all_people:
+        by_generation[p["generation"]] = by_generation.get(p["generation"], 0) + 1
+
+    month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+    by_month = {m: 0 for m in month_names}
+    by_decade: dict[str, int] = {}
+    years_seen = []
+
+    for p in all_people:
+        by_ = str(p.get("birth_year") or "").strip()
+        # A bare year is what the family actually enters; a month is asked for
+        # nowhere in the UI, so a month distribution needs a real date if one
+        # is ever recorded. Support "YYYY-MM" or "YYYY-MM-DD" without
+        # requiring it -- most entries will just be a year, and that's fine.
+        m = None
+        parts = by_.replace("/", "-").split("-")
+        if len(parts) >= 2 and parts[0].isdigit() and parts[1].isdigit():
+            mi = int(parts[1])
+            if 1 <= mi <= 12:
+                m = month_names[mi - 1]
+        if m:
+            by_month[m] += 1
+
+        year_part = parts[0] if parts and parts[0].isdigit() else ""
+        if year_part and len(year_part) == 4:
+            years_seen.append(int(year_part))
+            decade = f"{year_part[:3]}0s"
+            by_decade[decade] = by_decade.get(decade, 0) + 1
+
+    busiest_decade = max(by_decade.items(), key=lambda kv: kv[1])[0] if by_decade else None
+    busiest_month = max(
+        ((k, v) for k, v in by_month.items() if v > 0),
+        key=lambda kv: kv[1], default=(None, 0),
+    )[0]
+
+    decades_sorted = sorted(by_decade.items(), key=lambda kv: kv[0])
+
+    return {
+        "total_people": total,
+        "living": living,
+        "passed": passed,
+        "generations_deep": deepest,
+        "by_generation": by_generation,
+        "by_branch": per_branch,
+        "by_month": by_month,
+        "by_decade": dict(decades_sorted),
+        "busiest_decade": busiest_decade,
+        "busiest_month": busiest_month,
+        "birth_years_recorded": len(years_seen),
+        "earliest_year": min(years_seen) if years_seen else None,
+        "latest_year": max(years_seen) if years_seen else None,
+        "updated_at": time.time(),
+    }
+
+
 @router.get("/status")
 def status():
     return {

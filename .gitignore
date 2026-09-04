@@ -8,3 +8,10 @@ dist/
 # transient editor/tool temp files
 *.tmp.*
 robertson-legacy-vault-backup*.json
+
+# local python env + caches
+.venv/
+__pycache__/
+
+# Claude Design runtime, mirrored from the HF Space for local preview
+vendor/

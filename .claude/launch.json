@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "bigma-api",
+      "runtimeExecutable": "/home/hunt/Downloads/family Reunion/.venv/bin/uvicorn",
+      "runtimeArgs": ["app:app", "--host", "0.0.0.0", "--port", "7860"],
+      "port": 7860
+    },
+    {
       "name": "robertson-dev",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "dist", "--listen", "5190", "--no-clipboard"],
