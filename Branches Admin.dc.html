@@ -180,11 +180,14 @@
     </div>
   </div>
 
-  <!-- Vault gear trigger — only reachable if you already know it's here -->
+  <!-- Vault gear trigger — hidden by default; JS reveals it only when this
+       page is loaded from the Hugging Face Spaces domain, never on the
+       public bigmaproject.family site -->
   <button id="vaultGearBtn" title="Vault" style="
+    display: none;
     position: fixed; top: 22px; right: 26px; z-index: 60;
     width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    align-items: center; justify-content: center;
     background: rgba(16,13,10,.85); border: 1px solid rgba(201,162,74,.38);
     box-shadow: 0 4px 18px rgba(0,0,0,.45); cursor: pointer;
     color: #c9a24a; font-size: 17px;
@@ -230,6 +233,12 @@
   </div>
 
 <script>
+// Only show the Vault gear on the HF Spaces domain (huggingface.co or
+// *.hf.space), never on the public bigmaproject.family site.
+if (/(^|\.)hf\.space$/.test(location.hostname) || /(^|\.)huggingface\.co$/.test(location.hostname)) {
+  document.getElementById('vaultGearBtn').style.display = 'flex';
+}
+
 document.getElementById('vaultGearBtn').addEventListener('click', () => {
   document.getElementById('vaultBackdrop').style.display = 'block';
   document.getElementById('vaultPanel').style.transform = 'translateX(0)';
