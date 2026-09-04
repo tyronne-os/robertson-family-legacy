@@ -8,6 +8,12 @@
       "port": 5190
     },
     {
+      "name": "branches-test",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "/tmp/claude-1000/-home-hunt-Downloads-family-Reunion/60890fe6-a4d8-4e59-9e82-507d5bf5b1cf/scratchpad/brtest", "--listen", "5197", "--no-clipboard"],
+      "port": 5197
+    },
+    {
       "name": "voice-preview",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "/tmp/claude-1000/-home-hunt-Downloads-family-Reunion/60890fe6-a4d8-4e59-9e82-507d5bf5b1cf/scratchpad/allprev", "--listen", "5196", "--no-clipboard"],
