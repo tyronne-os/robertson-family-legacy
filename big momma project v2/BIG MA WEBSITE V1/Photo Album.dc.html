@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#0B0705; }
+  a { color:#C9A227; text-decoration:none; }
+  a:hover { color:#F0D98C; }
+  input, textarea { font-family:'EB Garamond',Georgia,serif; }
+  input::placeholder, textarea::placeholder { color:rgba(232,215,182,.35); font-style:italic; }
+  .vault-scroll::-webkit-scrollbar { width:5px; }
+  .vault-scroll::-webkit-scrollbar-track { background:transparent; }
+  .vault-scroll::-webkit-scrollbar-thumb { background:rgba(232,197,92,.35); border-radius:3px; }
+</style>
+</helmet>
+
+<div style="font-family:'EB Garamond',Georgia,serif;background:#0B0705;color:#E8D7B6;min-height:100vh;box-sizing:border-box;padding:18px 3vw 40px">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:12px;border-bottom:1px solid rgba(201,162,39,.18);font-family:'Cinzel',serif;font-size:15px;letter-spacing:.2em;white-space:nowrap">
+    <a href="Magnolia Book Landing.dc.html" style="letter-spacing:.3em;color:#C9A227;font-size:15px">&#8592; HOME</a>
+    <div style="display:flex;gap:20px;color:rgba(232,215,182,.55)">
+      <a href="Magnolia Book Landing.dc.html" style="color:rgba(232,215,182,.55)">CHAPTERS</a>
+      <span style="color:#F0D98C">PHOTO ALBUM</span>
+      <a href="Submit a Chapter.dc.html" style="color:rgba(232,215,182,.55)">SUBMIT A CHAPTER</a>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:26px">
+    <div>
+      <div style="font-family:'Cinzel',serif;font-weight:900;font-size:clamp(24px,3.2vw,46px);letter-spacing:.05em;color:#F0D98C;text-shadow:0 3px 0 #8A6A1F,0 8px 22px rgba(0,0,0,.85)">THE PHOTO ALBUM</div>
+
+    </div>
+    <label style="cursor:pointer;padding:14px 30px;border:1px solid #8A6A1F;border-radius:2px;font-family:'Cinzel',serif;font-weight:600;font-size:13px;letter-spacing:.28em;color:#2A1C14;background:linear-gradient(180deg,#E8C55C,#C9A227);box-shadow:0 8px 20px rgba(60,40,10,.35)" style-hover="background:linear-gradient(180deg,#F0D98C,#D8B233)">
+      ADD PHOTOS
+      <input type="file" accept="image/*" multiple style="display:none" onChange="{{ onUpload }}">
+    </label>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">
+    <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+      <div style="padding:9px 16px;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:.22em;border:{{ f.border }};color:{{ f.color }};background:{{ f.bg }}" style-hover="border-color:rgba(232,197,92,.7)" onClick="{{ f.pick }}">{{ f.label }}</div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:26px;margin-top:24px;align-items:start">
+
+    <div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+      <sc-for list="{{ photos }}" as="p" hint-placeholder-count="9">
+        <div onClick="{{ p.openIt }}" style="position:relative;cursor:pointer;border-radius:3px;overflow:hidden;background:linear-gradient(150deg,#4A2E16,#26150A 60%,#3C2412);padding:10px;box-shadow:0 14px 30px rgba(0,0,0,.55),inset 0 0 0 1px rgba(232,197,92,.4)">
+          <div style="position:relative;aspect-ratio:4/3;border-radius:2px;overflow:hidden;background-color:#120B07;background-image:{{ p.image }};background-size:cover;background-position:center">
+            <div style="position:absolute;inset:0;display:{{ p.emptyDisplay }};align-items:center;justify-content:center;text-align:center;padding:14px;box-sizing:border-box;background-image:repeating-linear-gradient(135deg,rgba(232,197,92,.07) 0 8px,rgba(0,0,0,0) 8px 16px)">
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;color:rgba(232,215,182,.5);line-height:1.7">{{ p.slotLabel }}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:9px">
+            <div style="font-family:'Cinzel',serif;font-size:11.5px;letter-spacing:.14em;color:#F0D98C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.subject }}</div>
+            <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:13px;color:rgba(232,215,182,.5);white-space:nowrap">{{ p.by }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:{{ pagerDisplay }};align-items:center;justify-content:center;gap:10px;margin-top:22px">
+      <div style="padding:8px 16px;border:1px solid rgba(201,162,39,.3);border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:rgba(232,215,182,.7)" style-hover="border-color:rgba(232,197,92,.7);color:#F0D98C" onClick="{{ prev }}">&#8592; PREV</div>
+      <sc-for list="{{ pageNumbers }}" as="pg" hint-placeholder-count="2">
+        <div style="min-width:38px;text-align:center;padding:8px 10px;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:{{ pg.color }};background:{{ pg.bg }};border:{{ pg.border }}" onClick="{{ pg.pick }}">{{ pg.label }}</div>
+      </sc-for>
+      <div style="padding:8px 16px;border:1px solid rgba(201,162,39,.3);border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:rgba(232,215,182,.7)" style-hover="border-color:rgba(232,197,92,.7);color:#F0D98C" onClick="{{ next }}">NEXT &#8594;</div>
+    </div>
+    </div>
+
+    <div style="position:sticky;top:18px;display:flex;flex-direction:column;height:min(760px,80vh);border-radius:6px;overflow:hidden;background:linear-gradient(155deg,#241610,#150C07 60%,#1F130D);box-shadow:0 24px 54px rgba(0,0,0,.7),inset 0 0 0 1px rgba(201,162,39,.4)">
+
+      <div style="padding:14px 16px;border-bottom:1px solid rgba(201,162,39,.22)">
+        <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.28em;color:#C9A227">THE PARLOR</div>
+        <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,215,182,.55);margin-top:2px">{{ parlorSub }}</div>
+      </div>
+
+      <div class="vault-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:rgba(232,197,92,.35) transparent">
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="5">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:{{ m.nameColor }}">{{ m.who }}</div>
+              <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:12px;color:rgba(232,215,182,.4)">{{ m.time }}</div>
+            </div>
+            <div style="font-size:16px;line-height:1.45;color:rgba(232,215,182,.85);margin-top:3px;text-wrap:pretty">{{ m.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="border-top:1px solid rgba(201,162,39,.22);padding:14px 16px;display:{{ signedInDisplay }};gap:10px;align-items:flex-end">
+        <textarea rows="2" placeholder="Share a memory&hellip;" value="{{ draft }}" onInput="{{ onDraft }}" style="flex:1;padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none;resize:none" style-focus="border-color:#F0D98C"></textarea>
+        <div style="padding:11px 18px;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:#2A1C14;background:linear-gradient(180deg,#E8C55C,#C9A227)" style-hover="background:linear-gradient(180deg,#F0D98C,#D8B233)" onClick="{{ send }}">SEND</div>
+      </div>
+
+      <div style="border-top:1px solid rgba(201,162,39,.22);padding:16px;display:{{ signInDisplay }};flex-direction:column;gap:10px">
+        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:#C9A227">JOIN THE PARLOR</div>
+        <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:13.5px;color:rgba(232,215,182,.55);line-height:1.4">Your name and an email or phone &mdash; nothing else, no outside accounts.</div>
+        <input type="text" placeholder="Your name" value="{{ nameDraft }}" onInput="{{ onName }}" style="padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none" style-focus="border-color:#F0D98C">
+        <input type="text" placeholder="Email or phone" value="{{ contactDraft }}" onInput="{{ onContact }}" style="padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none" style-focus="border-color:#F0D98C">
+        <div style="padding:12px 18px;text-align:center;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.26em;color:#2A1C14;background:linear-gradient(180deg,#E8C55C,#C9A227)" style-hover="background:linear-gradient(180deg,#F0D98C,#D8B233)" onClick="{{ join }}">ENTER</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:fixed;inset:0;z-index:60;display:{{ openDisplay }};grid-template-columns:minmax(0,1fr) 380px;gap:22px;padding:28px;box-sizing:border-box;background:rgba(8,5,3,.96)">
+    <div style="display:flex;flex-direction:column;min-width:0">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding-bottom:12px;border-bottom:1px solid rgba(201,162,39,.22)">
+        <div>
+          <div style="font-family:'Cinzel',serif;font-size:16px;letter-spacing:.2em;color:#F0D98C">{{ openSubject }}</div>
+          <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:15px;color:rgba(232,215,182,.55);margin-top:2px">{{ openBy }} &middot; {{ openCount }}</div>
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.26em;color:#C9A227;cursor:pointer;border:1px solid rgba(201,162,39,.35);border-radius:2px;padding:9px 16px" style-hover="color:#F0D98C;border-color:#F0D98C" onClick="{{ closePhoto }}">CLOSE &#10005;</div>
+      </div>
+      <div style="flex:1;min-height:0;margin-top:16px;padding:14px;box-sizing:border-box;border-radius:3px;background:linear-gradient(150deg,#4A2E16,#26150A 60%,#3C2412);box-shadow:inset 0 0 0 1px rgba(232,197,92,.45)">
+        <div style="width:100%;height:100%;border-radius:2px;background-color:#120B07;background-image:{{ openImage }};background-size:contain;background-repeat:no-repeat;background-position:center;display:flex;align-items:center;justify-content:center">
+          <div style="display:{{ openEmptyDisplay }};font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.12em;color:rgba(232,215,182,.5);line-height:1.9;text-align:center;white-space:pre-line">{{ openSlotLabel }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;min-height:0;border-radius:6px;overflow:hidden;background:linear-gradient(155deg,#241610,#150C07 60%,#1F130D);box-shadow:inset 0 0 0 1px rgba(201,162,39,.4)">
+      <div style="padding:14px 16px;border-bottom:1px solid rgba(201,162,39,.22)">
+        <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.28em;color:#C9A227">ABOUT THIS PHOTO</div>
+        <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:14px;color:rgba(232,215,182,.55);margin-top:2px">{{ parlorSub }}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <div style="flex:1;min-width:0;padding:8px 10px;border:1px solid rgba(201,162,39,.3);border-radius:2px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(232,215,182,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ shareUrl }}</div>
+          <div style="padding:9px 14px;border:1px solid rgba(232,197,92,.6);border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;color:#F0D98C;white-space:nowrap" style-hover="background:rgba(240,217,140,.14)" onClick="{{ copyLink }}">{{ copyLabel }}</div>
+        </div>
+      </div>
+      <div class="vault-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:rgba(232,197,92,.35) transparent">
+        <div style="display:{{ photoEmptyDisplay }};font-family:'EB Garamond',serif;font-style:italic;font-size:15px;color:rgba(232,215,182,.45);line-height:1.5">No one has spoken on this photograph yet. Be the first to tell its story.</div>
+        <sc-for list="{{ photoMessages }}" as="m" hint-placeholder-count="0">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:{{ m.nameColor }}">{{ m.who }}</div>
+              <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:12px;color:rgba(232,215,182,.4)">{{ m.time }}</div>
+            </div>
+            <div style="font-size:16px;line-height:1.45;color:rgba(232,215,182,.85);margin-top:3px;text-wrap:pretty">{{ m.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border-top:1px solid rgba(201,162,39,.22);padding:14px 16px;display:{{ signedInDisplay }};gap:10px;align-items:flex-end">
+        <textarea rows="2" placeholder="Say something about this photo&hellip;" value="{{ draft }}" onInput="{{ onDraft }}" style="flex:1;padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none;resize:none" style-focus="border-color:#F0D98C"></textarea>
+        <div style="padding:11px 18px;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:#2A1C14;background:linear-gradient(180deg,#E8C55C,#C9A227)" onClick="{{ send }}">SEND</div>
+      </div>
+      <div style="border-top:1px solid rgba(201,162,39,.22);padding:16px;display:{{ signInDisplay }};flex-direction:column;gap:10px">
+        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;color:#C9A227">JOIN THE PARLOR</div>
+        <input type="text" placeholder="Your name" value="{{ nameDraft }}" onInput="{{ onName }}" style="padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none">
+        <input type="text" placeholder="Email or phone" value="{{ contactDraft }}" onInput="{{ onContact }}" style="padding:10px;font-size:16px;color:#F0D98C;background:rgba(240,217,140,.06);border:1px solid rgba(201,162,39,.4);border-radius:2px;outline:none">
+        <div style="padding:12px 18px;text-align:center;border-radius:2px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.26em;color:#2A1C14;background:linear-gradient(180deg,#E8C55C,#C9A227)" onClick="{{ join }}">ENTER</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  state = {
+    filter: 'All',
+    page: 0,
+    open: null,
+    threads: {},
+    copied: false,
+    member: null,
+    nameDraft: '',
+    contactDraft: '',
+    draft: '',
+    uploads: [],
+    messages: [
+      { who: 'Gloria W.', time: '4:12 pm', text: 'Found Mama\u2019s Easter photos from 1968 \u2014 adding them tonight.' },
+      { who: 'Arelita G.', time: '4:20 pm', text: 'Please do. I only have the one from the kitchen.' },
+      { who: 'Tyronne', time: '4:31 pm', text: 'Anything you upload lands in the vault, full size. Nothing gets compressed.' }
+    ]
+  };
+
+  onName = (e) => this.setState({ nameDraft: e.target.value });
+  onContact = (e) => this.setState({ contactDraft: e.target.value });
+  onDraft = (e) => this.setState({ draft: e.target.value });
+
+  join = () => {
+    const { nameDraft, contactDraft } = this.state;
+    if (!nameDraft.trim() || !contactDraft.trim()) return;
+    this.setState({ member: { name: nameDraft.trim(), contact: contactDraft.trim() } });
+  };
+
+  send = () => {
+    const t = this.state.draft.trim();
+    if (!t || !this.state.member) return;
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+    const msg = { who: this.state.member.name, time, text: t, mine: true };
+    const key = this.state.open ? this.photoKey(this.state.open) : null;
+    if (key) {
+      this.setState(s => {
+        const threads = Object.assign({}, s.threads);
+        threads[key] = (threads[key] || []).concat([msg]);
+        return { threads, draft: '' };
+      });
+    } else {
+      this.setState(s => ({ messages: s.messages.concat([msg]), draft: '' }));
+    }
+  };
+
+  photoKey = (p) => `${p.subject}-${p.index || 0}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  copyLink = () => {
+    const url = this.shareUrl();
+    if (navigator.clipboard) navigator.clipboard.writeText(url);
+    this.setState({ copied: true });
+    clearTimeout(this._c);
+    this._c = setTimeout(() => this.setState({ copied: false }), 1800);
+  };
+
+  shareUrl = () => {
+    const p = this.state.open;
+    if (!p) return '';
+    return `${location.origin}${location.pathname}#photo/${this.photoKey(p)}`;
+  };
+
+  onUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    const added = files.map(f => ({
+      url: URL.createObjectURL(f),
+      subject: this.state.filter === 'All' ? 'Unfiled' : this.state.filter,
+      by: this.state.member ? this.state.member.name : 'You'
+    }));
+    this.setState(s => ({ uploads: added.concat(s.uploads) }));
+  };
+
+  renderVals() {
+    const { filter, member, uploads } = this.state;
+    const chapters = ['All', 'Big Ma', 'Ethel', 'Johnny', 'Mary', 'Beaulah', 'Leola', 'Lydia', 'Beatrice', 'Lamar', 'Susanna'];
+    const official = [
+      { subject: 'Ethel Brown', by: 'Chapter I', file: 'ethel-framed.png' },
+      { subject: 'Leola Robertson', by: 'Chapter II', file: 'leola-framed.png' },
+      { subject: 'Johnnie Robertson', by: 'Chapter III', file: 'johnnie-framed.png' },
+      { subject: 'Mary Robertson', by: 'Chapter IV', file: 'mary-framed.png' },
+      { subject: 'Beulah Barabino', by: 'Chapter V', file: 'beulah-framed.png' },
+      { subject: 'Lydia Robertson', by: 'Chapter VI', file: 'lydia-framed.png' },
+      { subject: 'Beatrice Bowman', by: 'Chapter VII', file: 'beatrice-framed.png' },
+      { subject: 'Lamar Robertson', by: 'Chapter VIII', file: 'lamar-framed.png' },
+      { subject: 'Susianna Duchane', by: 'Chapter IX', file: 'susianna-framed.png' }
+    ];
+    const seeded = [];
+    const officialPhotos = official
+      .filter(p => filter === 'All' || p.subject.toLowerCase().includes(filter.toLowerCase()))
+      .map(p => ({
+        subject: p.subject, by: p.by,
+        image: `url("uploads/${p.file}")`, emptyDisplay: 'none', slotLabel: ''
+      }));
+    const uploaded = uploads.map(u => ({
+      subject: u.subject, by: u.by,
+      image: `url("${u.url}")`, emptyDisplay: 'none', slotLabel: ''
+    }));
+    const placeholders = seeded
+      .filter(p => filter === 'All' || p.subject.toLowerCase().includes(filter.toLowerCase()))
+      .map(p => ({
+        subject: p.subject, by: p.by,
+        image: 'none', emptyDisplay: 'flex',
+        slotLabel: p.slot + '\ndrop a photo here'
+      }));
+    const PER_PAGE = 24;
+    const all = officialPhotos.concat(uploaded, placeholders);
+    const pageCount = Math.max(1, Math.ceil(all.length / PER_PAGE));
+    const page = Math.min(this.state.page, pageCount - 1);
+    const slice = all.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+    while (slice.length < PER_PAGE) {
+      slice.push({ subject: 'Open slot', by: '\u2014', image: 'none', emptyDisplay: 'flex', slotLabel: 'awaiting a photo\ndrop one here' });
+    }
+    return {
+      pageNumbers: Array.from({ length: pageCount }, (_, i) => ({
+        label: String(i + 1),
+        pick: () => this.setState({ page: i }),
+        color: i === page ? '#2A1C14' : 'rgba(232,215,182,.7)',
+        bg: i === page ? 'linear-gradient(180deg,#E8C55C,#C9A227)' : 'transparent',
+        border: i === page ? '1px solid #8A6A1F' : '1px solid rgba(201,162,39,.3)'
+      })),
+      pageLabel: `Page ${page + 1} of ${pageCount}`,
+      prev: () => this.setState(s => ({ page: Math.max(0, s.page - 1) })),
+      next: () => this.setState(s => ({ page: Math.min(pageCount - 1, s.page + 1) })),
+      pagerDisplay: pageCount > 1 ? 'flex' : 'none',
+      filters: chapters.map(c => ({
+        label: c.toUpperCase(),
+        pick: () => this.setState({ filter: c, page: 0 }),
+        border: c === filter ? '1px solid rgba(232,197,92,.8)' : '1px solid rgba(201,162,39,.28)',
+        color: c === filter ? '#F0D98C' : 'rgba(232,215,182,.6)',
+        bg: c === filter ? 'rgba(240,217,140,.12)' : 'transparent'
+      })),
+      photos: slice.map((p, i) => Object.assign({}, p, {
+        openIt: () => this.setState({ open: Object.assign({}, p, { index: page * PER_PAGE + i + 1, total: all.length }) })
+      })),
+      openDisplay: this.state.open ? 'grid' : 'none',
+      openImage: this.state.open ? this.state.open.image : 'none',
+      openEmptyDisplay: this.state.open ? this.state.open.emptyDisplay : 'none',
+      openSlotLabel: this.state.open ? this.state.open.slotLabel : '',
+      openSubject: this.state.open ? this.state.open.subject : '',
+      openBy: this.state.open ? `Shared by ${this.state.open.by}` : '',
+      openCount: this.state.open ? `${this.state.open.index} of ${this.state.open.total}` : '',
+      closePhoto: () => this.setState({ open: null }),
+      photoMessages: (this.state.open ? (this.state.threads[this.photoKey(this.state.open)] || []) : []).map(m => ({
+        who: m.who, time: m.time, text: m.text, nameColor: '#F0D98C'
+      })),
+      photoEmptyDisplay: (this.state.open && (this.state.threads[this.photoKey(this.state.open)] || []).length) ? 'none' : 'block',
+      shareUrl: this.state.open ? this.shareUrl() : '',
+      copyLink: this.copyLink,
+      copyLabel: this.state.copied ? 'LINK COPIED' : 'COPY LINK',
+      messages: this.state.messages.map(m => ({
+        who: m.who, time: m.time, text: m.text,
+        nameColor: m.mine ? '#F0D98C' : 'rgba(232,197,92,.8)'
+      })),
+      parlorSub: member ? `Signed in as ${member.name}` : 'Family chat \u00b7 join to post',
+      signedInDisplay: member ? 'flex' : 'none',
+      signInDisplay: member ? 'none' : 'flex',
+      nameDraft: this.state.nameDraft,
+      contactDraft: this.state.contactDraft,
+      draft: this.state.draft,
+      onName: this.onName, onContact: this.onContact, onDraft: this.onDraft,
+      join: this.join, send: this.send, onUpload: this.onUpload
+    };
+  }
+}
+
+</script>
+</body>
+</html>

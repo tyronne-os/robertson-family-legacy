@@ -1,0 +1,15 @@
+{
+  "_note": "Canonical framed portrait per family member, one file each, named to match the site's page slugs (see MAGNOLIA-BRANCHES app.py PAGES list). Pulled from the live Space's uploads/ folder on 2026-09-03 so this mirrors exactly what each page currently displays. Intended as the source-of-truth photo set for the Phase Two Neo4j family-tree app -- each person node can reference its portrait as family-portraits/{slug}.webp.",
+  "people": [
+    { "slug": "big-ma",             "name": "Magnolia \"Big Ma\" Robertson", "birth": "1892 (per Foreword)", "file": "big-ma.webp",             "sourcedFrom": "uploads/foreword-family-hi.webp (group photo -- no solo Big Ma portrait is currently live)" },
+    { "slug": "ethel-robertson",    "name": "Ethel Robertson",               "birth": "September 10, 1911",  "file": "ethel-robertson.webp",    "sourcedFrom": "uploads/ethel-framed-hi.webp" },
+    { "slug": "leola-robertson",    "name": "Leola Robertson",               "birth": "November 29, 1913",   "file": "leola-robertson.webp",    "sourcedFrom": "uploads/leola-hi.webp" },
+    { "slug": "johnnie-robertson",  "name": "Johnnie Robertson",             "birth": "October 18, 1916",    "file": "johnnie-robertson.webp",  "sourcedFrom": "uploads/johnnie-hi.webp" },
+    { "slug": "mary-robertson",     "name": "Mary Robertson",                "birth": "March 6, 1919",       "file": "mary-robertson.webp",     "sourcedFrom": "uploads/mary-hi.webp" },
+    { "slug": "beulah-robertson",   "name": "Beulah Robertson",              "birth": "September 3, 1921",   "file": "beulah-robertson.webp",   "sourcedFrom": "uploads/beulah-hi.webp" },
+    { "slug": "lydia-robertson",    "name": "Lydia Robertson",               "birth": "November 4, 1923",    "file": "lydia-robertson.webp",    "sourcedFrom": "uploads/lydia-hi.webp" },
+    { "slug": "beatrice-robertson", "name": "Beatrice Robertson",            "birth": "April 11, 1926",      "file": "beatrice-robertson.webp", "sourcedFrom": "uploads/beatrice-hi.webp" },
+    { "slug": "lemar-robertson",    "name": "Lemar Robertson",               "birth": "September 22, 1928",  "file": "lemar-robertson.webp",    "sourcedFrom": "uploads/lamar-hi.webp (site content reads \"Lemar\"; underlying HF filename kept as \"lamar\" to avoid breaking existing links)" },
+    { "slug": "susianna-robertson", "name": "Susianna Robertson",            "birth": "June 14, 1931",       "file": "susianna-robertson.webp", "sourcedFrom": "uploads/susianna-hi.webp" }
+  ]
+}

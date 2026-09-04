@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#0B0705; }
+  a { color:#C9A227; text-decoration:none; }
+  a:hover { color:#F0D98C; }
+  @keyframes wave { 0%,100%{transform:scaleY(.3)} 50%{transform:scaleY(1)} }
+  @keyframes flicker { 0%,100%{opacity:.9} 40%{opacity:.62} 70%{opacity:1} }
+  .vault-scroll::-webkit-scrollbar { width:5px; }
+  .vault-scroll::-webkit-scrollbar-track { background:transparent; }
+  .vault-scroll::-webkit-scrollbar-thumb { background:rgba(232,197,92,.35); border-radius:3px; }
+  @media (max-width:900px) {
+    .lydia-grid { grid-template-columns:1fr !important; }
+    .lydia-grid > div:first-child { order:1 !important; max-width:360px; margin:0 auto; }
+    .lydia-grid > div:last-child { order:2 !important; }
+  }
+</style>
+</helmet>
+
+<div style="font-family:'EB Garamond',Georgia,serif;background:#0B0705;color:#E8D7B6;min-height:100vh;box-sizing:border-box;padding:18px 3vw 140px">
+
+  <div style="max-width:1240px;margin:0 auto 22px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:12px;border-bottom:1px solid rgba(201,162,39,.18)">
+    <div style="display:flex;align-items:baseline;gap:18px;min-width:0">
+      <a href="Magnolia Book Landing.dc.html" style="font-family:'Cinzel',serif;font-size:15px;letter-spacing:.3em;color:#C9A227;white-space:nowrap">&#8592; HOME</a>
+    </div>
+    <div style="display:flex;gap:20px;flex:none;white-space:nowrap;font-family:'Cinzel',serif;font-size:15px;letter-spacing:.18em;color:rgba(232,215,182,.55)">
+      <a href="Magnolia Book Landing.dc.html" style="color:rgba(232,215,182,.55)">CHAPTERS</a>
+      <a href="Photo Album.dc.html" style="color:rgba(232,215,182,.55)">PHOTO ALBUM</a>
+      <a href="Submit a Chapter.dc.html" style="color:rgba(232,215,182,.55)">SUBMIT A CHAPTER</a>
+    </div>
+  </div>
+
+  <div style="max-width:1800px;margin:0 auto;position:relative;padding:10px;box-sizing:border-box;border-radius:8px;background:linear-gradient(155deg,#F5E6A8 0%,#B8860B 22%,#8A6A1F 42%,#F0D98C 55%,#8A6A1F 68%,#5C4413 82%,#E8C55C 100%);box-shadow:0 30px 70px rgba(0,0,0,.65),inset 0 1px 1px rgba(255,250,220,.6),inset 0 -1px 1px rgba(60,40,10,.6)">
+    <div style="position:relative;display:grid;grid-template-columns:minmax(460px,1fr) minmax(380px,40%);border-radius:4px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(60,40,10,.5)">
+
+    <div style="position:sticky;top:18px;align-self:start;height:calc(100vh - 36px);overflow-y:auto;padding:44px clamp(24px,3.4vw,56px) 56px;box-sizing:border-box;background:linear-gradient(255deg,#F4E9D4 0%,#EFE1C7 55%,#E7D5B4 100%);box-shadow:inset -30px 0 40px -28px rgba(70,44,18,.55)">
+      <div style="position:absolute;inset:0;opacity:.5;background-image:radial-gradient(rgba(150,112,60,.12) 1px,rgba(0,0,0,0) 1px);background-size:4px 4px;pointer-events:none"></div>
+
+      <div style="position:relative;text-align:center">
+        <div style="font-family:'Cinzel',serif;font-size:clamp(24px,2.8vw,38px);letter-spacing:.24em;color:#241812">CHAPTER EIGHT</div>
+        <div style="font-family:'Pinyon Script',cursive;font-size:clamp(24px,2.6vw,36px);color:#3A2617;margin-top:6px">The Journey of Lamar Robertson</div>
+      </div>
+
+      <div style="position:relative;margin-top:26px;column-count:2;column-gap:40px;display:block">
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          <span style="float:left;font-family:'Pinyon Script',cursive;font-size:96px;line-height:.7;padding:6px 10px 0 0;color:#0F0904">W</span>elcome to Chapter Eight. I am Betty Butler, and it is my absolute honor to invite you to step into the story of my dear father, Lamar Robertson. Come along with me on this journey as we reflect on the life of a truly remarkable, quiet, and strong family man who built a legacy of love from Rosedale to New Orleans. This is his story.
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          Born in the quiet country town of Rosedale, Louisiana, my father&rsquo;s journey began with the deep, grounding roots of our family. He later moved to Pine Grove, Louisiana, with his mother. It was there, amidst the peaceful beauty of Pine Grove, that his life would change forever when he met my mother, Cora. The two fell deeply in love, married, and eventually journeyed together to New Orleans, Louisiana, where they set out to build a beautiful family and a life of their own.
+        </p>
+
+        <div style="font-family:'Pinyon Script',cursive;font-weight:700;font-size:34px;color:#7A1E1E;margin-top:8px">His Pride &amp; His Joy</div>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          My parents, Lamar and Cora, were profoundly blessed to build a wonderful family together. To their beautiful union, five children were born, and we were, without a doubt, his absolute pride and joy.
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          My father was a quiet, strong, and incredibly hardworking man who firmly believed in taking care of his family. For most of his life, he worked two jobs, sacrificing his own rest to make absolutely certain that our family was always provided for and well cared for. He was a devoted husband and a fiercely loving father who gave so much of himself to the people he loved.
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          One of the things that stood out most about my father was how deeply and beautifully he loved my mother, Cora. Growing up, I watched the way he cherished her; it was abundantly clear to everyone that he would do absolutely anything for her and for all of us. His love wasn&rsquo;t always spoken in loud words; it was shown through his calloused hands, his endless sacrifices, his unwavering protection, and his complete dedication to our home. He was dependable, steady, and always willing to do whatever was necessary for his family.
+        </p>
+
+        <div style="font-family:'Pinyon Script',cursive;font-weight:700;font-size:34px;color:#7A1E1E;margin-top:8px">His Legacy</div>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          The quiet strength and unwavering love my father possessed left a lasting impression on everyone who knew him. Today, his beautiful legacy lives on through his five children, thirteen grandchildren, thirty great-grandchildren, and all the family members who were blessed to know and love him.
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          But his legacy of love extended far beyond our front door &mdash; he was a deeply devoted brother who cherished his siblings. As my cousin Tyronne Jacques beautifully recalls, &ldquo;One of the main memories I have of my uncle Lamar &mdash; or as we all affectionately called him, &lsquo;Uncle Man&rsquo; &mdash; was how he always made his rounds to check on all of his sisters. Once a month, you could count on this powerful, amazing man arriving with his captivating smile. He would walk in, his voice booming with joy, calling out to my grandmother, &lsquo;OH MARY, WHAT&rsquo;S COOKING TODAY?&rsquo; He had that profoundly warm effect on our entire family, and we all cherished those special days when Uncle Man made his rounds.&rdquo;
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          That joyous, familiar scene of a brother faithfully looking after his sisters was just another testament to the kind of man he was, and it is a memory our family holds dear.
+        </p>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          On behalf of myself and my siblings, it is my absolute honor to formally reintroduce you to our hero, a devoted husband, and the ultimate family man &mdash; our father, Lamar Robertson. He will always be remembered for his strength, his hard work, and, most of all, his tremendous love. Thank you so much for coming along with me on this journey through Chapter Eight to celebrate his unforgettable life.
+        </p>
+
+        <div style="font-family:'Pinyon Script',cursive;font-weight:700;font-size:34px;color:#7A1E1E;margin-top:8px">Family Record Update</div>
+        <p style="margin:0 0 16px;font-size:24px;font-weight:600;line-height:1.5;color:#000000;text-align:left;text-wrap:pretty">
+          A loving addition for our family archives: as we celebrate this beautiful history together today, we also warmly remember Betty&rsquo;s siblings, Marie and James, who have since joined their loving parents in Glory. Their spirits and memories remain a beautiful, cherished part of the Robertson family legacy.
+        </p>
+      </div>
+
+      <div style="position:relative;display:flex;justify-content:space-between;margin-top:30px;padding-top:14px;border-top:1px solid rgba(140,105,55,.4);font-family:'Pinyon Script',cursive;font-size:19px;color:#5A422A">
+        <span>Robertson Family Reunion</span><span>Page 1</span>
+      </div>
+    </div>
+
+    <div style="position:sticky;top:18px;align-self:start;height:calc(100vh - 36px);background:linear-gradient(105deg,#E7D5B4 0%,#EFE1C7 55%,#F4E9D4 100%);box-shadow:inset 30px 0 40px -28px rgba(70,44,18,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 32px;box-sizing:border-box;overflow:hidden">
+      <div style="position:absolute;inset:0;opacity:.5;background-image:radial-gradient(rgba(150,112,60,.12) 1px,rgba(0,0,0,0) 1px);background-size:4px 4px;pointer-events:none"></div>
+      <img src="uploads/lamar-framed.png" alt="Lamar Robertson" style="position:relative;display:block;width:100%;max-width:100%;flex:1 1 0%;min-height:0;height:100%;object-fit:contain">
+      <div style="position:relative;flex:none;margin-top:22px;font-family:'Pinyon Script',cursive;font-size:26px;color:#3A2617">Lamar Robertson</div>
+      <div style="position:relative;flex:none;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.22em;color:#6B4E2C;margin-top:4px">NEW ORLEANS, LOUISIANA</div>
+      <div style="position:relative;flex:none;width:100%;max-width:340px;margin-top:16px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:24px;background:linear-gradient(150deg,#331E14,#1A0F09 55%,#2A1810);border:1px solid rgba(201,162,39,.45);box-shadow:0 10px 22px rgba(0,0,0,.4),inset 0 1px 0 rgba(240,217,140,.14)">
+        <div style="width:32px;height:32px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 34% 30%,rgba(255,196,120,.35),rgba(201,162,39,.12) 70%);border:1px solid rgba(232,197,92,.55);color:#F0D98C;font-size:13px">&#9654;</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:rgba(232,197,92,.8)">NARRATE THIS CHAPTER</div>
+          <div style="width:100%;height:2px;border-radius:1px;background:rgba(232,215,182,.16);margin-top:5px">
+            <div style="height:100%;width:0%;border-radius:1px;background:linear-gradient(90deg,#8A6A1F,#F0D98C)"></div>
+          </div>
+        </div>
+        <div style="width:26px;height:26px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(201,162,39,.4);color:#C9A227;font-size:13px">&#9881;</div>
+      </div>
+    </div>
+
+    </div>
+
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1600}}">
+const NAMES = [
+  ['heart', 'HEART', 'warm & maternal'],
+  ['bella', 'BELLA', 'rich & unhurried'],
+  ['nicole', 'NICOLE', 'soft, close-mic'],
+  ['sarah', 'SARAH', 'clear & steady'],
+  ['nova', 'NOVA', 'bright & lively'],
+  ['sky', 'SKY', 'light & airy'],
+  ['emma', 'EMMA', 'poised & literary'],
+  ['isabella', 'ISABELLA', 'stately & mature']
+];
+
+class Component extends DCLogic {
+  expanded = false;
+  state = {
+    expanded: false, pop: false,
+    voicesReady: false, loadingPct: 0,
+    playing: false, paused: false,
+    sentenceIndex: 0, selectedId: 'sky', layout: 'a'
+  };
+
+  paragraphs = [
+    "Welcome to Chapter Eight. I am Betty Butler, and it is my absolute honor to invite you to step into the story of my dear father, Lamar Robertson. Come along with me on this journey as we reflect on the life of a truly remarkable, quiet, and strong family man who built a legacy of love from Rosedale to New Orleans. This is his story.",
+    "Born in the quiet country town of Rosedale, Louisiana, my father\u2019s journey began with the deep, grounding roots of our family. He later moved to Pine Grove, Louisiana, with his mother. It was there, amidst the peaceful beauty of Pine Grove, that his life would change forever when he met my mother, Cora. The two fell deeply in love, married, and eventually journeyed together to New Orleans, Louisiana, where they set out to build a beautiful family and a life of their own.",
+    "His Pride and His Joy.",
+    "My parents, Lamar and Cora, were profoundly blessed to build a wonderful family together. To their beautiful union, five children were born, and we were, without a doubt, his absolute pride and joy.",
+    "My father was a quiet, strong, and incredibly hardworking man who firmly believed in taking care of his family. For most of his life, he worked two jobs, sacrificing his own rest to make absolutely certain that our family was always provided for and well cared for. He was a devoted husband and a fiercely loving father who gave so much of himself to the people he loved.",
+    "One of the things that stood out most about my father was how deeply and beautifully he loved my mother, Cora. Growing up, I watched the way he cherished her; it was abundantly clear to everyone that he would do absolutely anything for her and for all of us. His love wasn\u2019t always spoken in loud words; it was shown through his calloused hands, his endless sacrifices, his unwavering protection, and his complete dedication to our home. He was dependable, steady, and always willing to do whatever was necessary for his family.",
+    "His Legacy.",
+    "The quiet strength and unwavering love my father possessed left a lasting impression on everyone who knew him. Today, his beautiful legacy lives on through his five children, thirteen grandchildren, thirty great-grandchildren, and all the family members who were blessed to know and love him.",
+    "But his legacy of love extended far beyond our front door, he was a deeply devoted brother who cherished his siblings. As my cousin Tyronne Jacques beautifully recalls: one of the main memories I have of my uncle Lamar, or as we all affectionately called him, Uncle Man, was how he always made his rounds to check on all of his sisters. Once a month, you could count on this powerful, amazing man arriving with his captivating smile. He would walk in, his voice booming with joy, calling out to my grandmother, Oh Mary, what's cooking today? He had that profoundly warm effect on our entire family, and we all cherished those special days when Uncle Man made his rounds.",
+    "That joyous, familiar scene of a brother faithfully looking after his sisters was just another testament to the kind of man he was, and it is a memory our family holds dear.",
+    "On behalf of myself and my siblings, it is my absolute honor to formally reintroduce you to our hero, a devoted husband, and the ultimate family man, our father, Lamar Robertson. He will always be remembered for his strength, his hard work, and, most of all, his tremendous love. Thank you so much for coming along with me on this journey through Chapter Eight to celebrate his unforgettable life.",
+    "Family Record Update.",
+    "A loving addition for our family archives: as we celebrate this beautiful history together today, we also warmly remember Betty\u2019s siblings, Marie and James, who have since joined their loving parents in Glory. Their spirits and memories remain a beautiful, cherished part of the Robertson family legacy."
+  ];
+
+  componentDidMount() {
+    this.sentences = [];
+    this.paragraphs.forEach(p => {
+      const parts = p.match(/[^.!?]+[.!?]+/g) || [p];
+      parts.forEach(s => this.sentences.push(s.trim()));
+    });
+    this.loadVoices();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._pctTimer);
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+
+  loadVoices() {
+    const synth = window.speechSynthesis;
+    if (!synth) { this.setState({ voicesReady: true, loadingPct: 100 }); return; }
+    const got = synth.getVoices();
+    if (got && got.length) { this.setState({ voicesReady: true, loadingPct: 100 }, () => this.autoPlay()); return; }
+    this._pctTimer = setInterval(() => this.setState(s => ({ loadingPct: Math.min(92, s.loadingPct + 6) })), 120);
+    synth.onvoiceschanged = () => {
+      clearInterval(this._pctTimer);
+      this.setState({ voicesReady: true, loadingPct: 100 }, () => this.autoPlay());
+    };
+  }
+
+  englishVoices() {
+    const synth = window.speechSynthesis;
+    if (!synth) return [];
+    const all = synth.getVoices();
+    const en = all.filter(v => /^en/i.test(v.lang));
+    return (en.length ? en : all).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  voiceFor(id) {
+    const idx = NAMES.findIndex(n => n[0] === id);
+    const pool = this.englishVoices();
+    if (!pool.length) return null;
+    return pool[idx % pool.length];
+  }
+
+  hoverOn = () => this.setState({ expanded: true });
+  hoverOff = () => this.setState({ expanded: false, pop: false });
+  togglePop = (e) => { e.stopPropagation(); this.setState(s => ({ pop: !s.pop })); };
+
+  speakFrom = (index) => {
+    const synth = window.speechSynthesis;
+    if (!synth || index >= this.sentences.length) {
+      this.setState({ playing: false, paused: false, sentenceIndex: 0 });
+      return;
+    }
+    const utt = new SpeechSynthesisUtterance(this.sentences[index]);
+    const v = this.voiceFor(this.state.selectedId);
+    if (v) utt.voice = v;
+    utt.rate = 0.96; utt.pitch = 1;
+    utt.onstart = () => this.setState({ sentenceIndex: index });
+    utt.onend = () => { if (this.state.playing) this.speakFrom(index + 1); };
+    utt.onerror = () => { if (this.state.playing) this.speakFrom(index + 1); };
+    synth.speak(utt);
+  };
+
+  autoPlay = () => {
+    if (this._autoplayed || this.state.playing || !this.englishVoices().length) return;
+    this._autoplayed = true;
+    this.togglePlay();
+  };
+
+  togglePlay = (e) => {
+    if (e) e.stopPropagation();
+    const synth = window.speechSynthesis;
+    if (!synth || !this.englishVoices().length) return;
+    if (this.state.playing && !this.state.paused) { synth.pause(); this.setState({ paused: true }); return; }
+    if (this.state.playing && this.state.paused) { synth.resume(); this.setState({ paused: false }); return; }
+    synth.cancel();
+    this.setState({ playing: true, paused: false }, () => this.speakFrom(this.state.sentenceIndex >= this.sentences.length - 1 ? 0 : this.state.sentenceIndex));
+  };
+
+  selectVoice = (id) => {
+    this.setState({ selectedId: id });
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    if (this.state.playing) {
+      synth.cancel();
+      this.speakFrom(this.state.sentenceIndex);
+    } else {
+      synth.cancel();
+      const sample = new SpeechSynthesisUtterance('This is how I will read Chapter Eight.');
+      const v = this.voiceFor(id);
+      if (v) sample.voice = v;
+      synth.speak(sample);
+    }
+  };
+
+  bars(active, seed) {
+    const heights = [7, 13, 9, 15, 6];
+    return heights.map((h, i) => ({
+      h: h + (seed % 3),
+      color: active ? '#F0D98C' : 'rgba(232,197,92,.38)',
+      anim: active ? `wave 1.1s ease-in-out ${(-0.15 * i).toFixed(2)}s infinite` : 'none'
+    }));
+  }
+
+  renderVals() {
+    const { expanded, pop, voicesReady, loadingPct, playing, paused, sentenceIndex, selectedId } = this.state;
+    const total = (this.sentences || []).length || 1;
+    const unavailable = voicesReady && (!window.speechSynthesis || !this.englishVoices().length);
+    const loading = !voicesReady && !unavailable;
+    const voiceLabel = NAMES.find(n => n[0] === selectedId)[1];
+    const isB = this.state.layout === 'b';
+    const sel = { border: '1px solid rgba(140,105,55,.8)', bg: 'rgba(140,105,55,.16)', color: '#241812' };
+    const unsel = { border: '1px solid rgba(140,105,55,.35)', bg: 'transparent', color: 'rgba(58,38,23,.7)' };
+    return {
+      pickA: () => this.setState({ layout: 'a' }),
+      pickB: () => this.setState({ layout: 'b' }),
+      gridCols: isB ? 'minmax(420px,1fr) clamp(240px,28vw,520px)' : 'clamp(220px,26vw,426px) minmax(420px,1fr)',
+      photoOrder: isB ? 2 : 1,
+      textOrder: isB ? 1 : 2,
+      aBorder: isB ? unsel.border : sel.border,
+      aBg: isB ? unsel.bg : sel.bg,
+      aColor: isB ? unsel.color : sel.color,
+      bBorder: isB ? sel.border : unsel.border,
+      bBg: isB ? sel.bg : unsel.bg,
+      bColor: isB ? sel.color : unsel.color,
+      hoverOn: this.hoverOn, hoverOff: this.hoverOff,
+      togglePop: this.togglePop, togglePlay: this.togglePlay,
+      pillWidth: expanded ? '440px' : '54px',
+      controlsOpacity: expanded ? 1 : 0,
+      popOpacity: pop ? 1 : 0,
+      popTransform: pop ? 'none' : 'translateY(10px) scale(.97)',
+      popEvents: pop ? 'auto' : 'none',
+      gearRotate: pop ? 'rotate(90deg)' : 'rotate(0deg)',
+      gearBorder: pop ? 'rgba(232,197,92,.7)' : 'rgba(201,162,39,.4)',
+      gearBg: pop ? 'rgba(240,217,140,.14)' : 'transparent',
+      gearColor: pop ? '#F0D98C' : '#C9A227',
+      iconWaveDisplay: playing && !paused ? 'flex' : 'none',
+      iconGlyphDisplay: playing && !paused ? 'none' : 'flex',
+      iconGlyph: loading ? '\u22EF' : (paused ? '\u25B6' : (playing ? '\u2016' : '\u25B6')),
+      iconBars: this.bars(true, 1).slice(0, 4),
+      narrateLabel: unavailable ? 'NARRATION UNAVAILABLE HERE' : (loading ? 'WAKING THE NARRATOR' : (playing ? (paused ? 'PAUSED' : 'NOW READING') : 'NARRATE THIS CHAPTER')),
+      narrateSub: unavailable ? 'open in a browser tab' : (loading ? `${loadingPct}%` : (playing ? `${voiceLabel} \u00b7 line ${sentenceIndex + 1} of ${total}` : (paused ? 'tap to resume' : 'The Journey of Lamar Robertson'))),
+      progressWidth: loading ? `${loadingPct}%` : `${Math.round((sentenceIndex / total) * 100)}%`,
+      unavailableOpacity: unavailable ? .45 : 1,
+      gearDisplay: unavailable ? 'none' : 'flex',
+      voices: NAMES.map(([id, name, desc]) => {
+        const on = id === selectedId;
+        return {
+          id, name, desc,
+          ring: on ? 'inset 0 0 0 999px rgba(240,217,140,.10), inset 0 0 0 1px rgba(232,197,92,.45)' : 'none',
+          dot: on ? '#F0D98C' : 'transparent',
+          dotBorder: on ? '#F0D98C' : 'rgba(232,197,92,.4)',
+          dotGlow: on ? '0 0 10px rgba(240,217,140,.65)' : 'none',
+          nameColor: on ? '#F0D98C' : 'rgba(232,215,182,.82)',
+          waveOpacity: on ? 1 : .45,
+          bars: this.bars(on, name.length),
+          select: () => this.selectVoice(id)
+        };
+      })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

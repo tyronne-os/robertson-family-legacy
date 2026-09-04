@@ -6,12 +6,14 @@ import PhotoAlbum from './pages/PhotoAlbum.jsx'
 import SubmitChapter from './pages/SubmitChapter.jsx'
 import PhotoLab from './pages/PhotoLab.jsx'
 import Reunion2026 from './pages/Reunion2026.jsx'
+import LandingV2 from './pages/LandingV2.jsx'
 
 export default function App() {
   return (
     <HashRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/landing-v2" element={<LandingV2 />} />
         <Route path="/chapter/:id" element={<ChapterView />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/submit-a-chapter" element={<SubmitChapter />} />
