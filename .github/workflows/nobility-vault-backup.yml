@@ -1,0 +1,43 @@
+name: NOBILITY VAULT — daily database backup
+
+on:
+  schedule:
+    # 09:00 UTC daily (~4am CST / 3am CDT)
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch database snapshot from the live Space
+        env:
+          ADMIN_PASSCODE: ${{ secrets.ADMIN_PASSCODE }}
+        run: |
+          set -euo pipefail
+          curl -sf "https://aibruh-magnolia-branches.hf.space/api/backup/export" \
+            -H "X-Admin-Passcode: ${ADMIN_PASSCODE}" \
+            -o "NOBILITY VAULT/latest.json"
+          python3 -c "import json; json.load(open('NOBILITY VAULT/latest.json'))"
+
+      - name: Save a dated snapshot alongside the rolling latest copy
+        run: |
+          mkdir -p "NOBILITY VAULT/history"
+          cp "NOBILITY VAULT/latest.json" "NOBILITY VAULT/history/$(date -u +%Y-%m-%d).json"
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name "NOBILITY VAULT bot"
+          git config user.email "actions@github.com"
+          git add "NOBILITY VAULT"
+          if git diff --cached --quiet; then
+            echo "No changes to back up today."
+          else
+            git commit -m "NOBILITY VAULT: daily backup $(date -u +%Y-%m-%d)"
+            git push
+          fi
