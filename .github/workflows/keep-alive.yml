@@ -1,0 +1,24 @@
+name: Keep Space alive
+
+on:
+  schedule:
+    # Ping every 25 minutes around the clock — prevents HF free-tier sleep.
+    # Five entries cover the hour at offsets: :00, :25, :50, :15, :40
+    - cron: "0,25,50 * * * *"
+    - cron: "15,40 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the Space
+        run: |
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" \
+            --max-time 30 \
+            "https://aibruh-magnolia-branches.hf.space/")
+          echo "HTTP $STATUS"
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 500 ]; then
+            echo "Unexpected status — Space may be restarting." >&2
+            exit 1
+          fi
