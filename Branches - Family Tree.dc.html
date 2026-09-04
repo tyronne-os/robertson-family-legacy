@@ -77,7 +77,7 @@
   input, select, textarea, button { font-family:Helvetica, Arial, sans-serif; }
   .dash-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 18px;
     align-items: stretch;
   }
@@ -421,7 +421,7 @@
 
           <!-- chat messages / drop zone -->
           <div
-            style="background:#1b1611;border:2px solid {{ chatDropBorder }};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:150px;overflow:auto;transition:border-color 0.15s"
+            style="background:#1b1611;border:2px solid {{ chatDropBorder }};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:225px;overflow:auto;transition:border-color 0.15s"
             sc-camel-on-drag-over="{{ onChatDragOver }}"
             sc-camel-on-drag-leave="{{ onChatDragLeave }}"
             sc-camel-on-drop="{{ onChatDrop }}"
