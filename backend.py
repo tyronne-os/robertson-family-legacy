@@ -7,9 +7,9 @@ Adds:
   - Pending changes queue: any visitor's tree edit is staged, not applied,
     until a branch admin or the owner approves it
   - Notification log: every registration + pending change is logged here;
-    if RESEND_API_KEY is set as a Space env var, it also sends a real email
-    to NOTIFY_EMAIL. Until then, notifications are visible in the admin
-    dashboard only -- no code change needed once the key is added.
+    if SMTP_HOST/USER/PASS are set as Space secrets, it also sends a real
+    email to NOTIFY_EMAIL. Until then, notifications are visible in the
+    admin dashboard only -- no code change needed once the keys are added.
 
 Mounted into app.py under /api/*.
 """
@@ -86,6 +86,14 @@ def init_db():
                 reviewed_by TEXT,
                 created_at REAL NOT NULL,
                 reviewed_at REAL
+            )
+        """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS pending_secrets (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                smtp_host TEXT, smtp_port INTEGER, smtp_user TEXT, smtp_pass TEXT,
+                verified INTEGER NOT NULL DEFAULT 0,
+                created_at REAL NOT NULL
             )
         """)
         c.execute("""
@@ -298,4 +306,81 @@ def list_notifications(limit: int = 100):
         rows = c.execute(
             "SELECT * FROM notifications ORDER BY created_at DESC LIMIT ?", (limit,)
         ).fetchall()
-    return {"notifications": [dict(r) for r in rows], "email_configured": bool(RESEND_API_KEY)}
+    return {"notifications": [dict(r) for r in rows], "email_configured": bool(SMTP_HOST and SMTP_USER and SMTP_PASS)}
+
+
+class SmtpSubmission(BaseModel):
+    host: str
+    port: int = 465
+    user: str
+    password: str
+
+
+def _test_smtp(host: str, port: int, user: str, password: str):
+    try:
+        if port == 465:
+            with smtplib.SMTP_SSL(host, port, timeout=10) as s:
+                s.login(user, password)
+        else:
+            with smtplib.SMTP(host, port, timeout=10) as s:
+                s.starttls()
+                s.login(user, password)
+        return True, "Connected and authenticated successfully."
+    except smtplib.SMTPAuthenticationError:
+        return False, "Authentication failed — check the username/password."
+    except (smtplib.SMTPException, OSError, TimeoutError) as e:
+        return False, f"Could not connect: {e}"
+
+
+@router.post("/secrets/smtp/submit")
+def submit_smtp_secret(sub: SmtpSubmission, x_admin_passcode: str | None = Header(default=None)):
+    """Tests the mailbox credentials live, then stages them in a locked
+    table for the site owner's agent to move into the real Space secret
+    store. Never written to browser storage; cleared after being read."""
+    _require_passcode(x_admin_passcode)
+    ok, message = _test_smtp(sub.host, sub.port, sub.user, sub.password)
+    with closing(_conn()) as c, c:
+        c.execute(
+            "INSERT INTO pending_secrets (id, smtp_host, smtp_port, smtp_user, smtp_pass, verified, created_at) "
+            "VALUES (1, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(id) DO UPDATE SET smtp_host=excluded.smtp_host, smtp_port=excluded.smtp_port, "
+            "smtp_user=excluded.smtp_user, smtp_pass=excluded.smtp_pass, verified=excluded.verified, created_at=excluded.created_at",
+            (sub.host, sub.port, sub.user, sub.password, int(ok), time.time()),
+        )
+    return {"ok": ok, "message": message}
+
+
+@router.get("/secrets/smtp/pending")
+def get_pending_smtp(x_admin_passcode: str | None = Header(default=None)):
+    _require_passcode(x_admin_passcode)
+    with closing(_conn()) as c:
+        row = c.execute("SELECT * FROM pending_secrets WHERE id=1").fetchone()
+    return {"pending": dict(row) if row else None}
+
+
+@router.delete("/secrets/smtp/pending")
+def clear_pending_smtp(x_admin_passcode: str | None = Header(default=None)):
+    _require_passcode(x_admin_passcode)
+    with closing(_conn()) as c, c:
+        c.execute("DELETE FROM pending_secrets WHERE id=1")
+    return {"ok": True}
+
+
+@router.get("/backup/export")
+def backup_export(x_admin_passcode: str | None = Header(default=None)):
+    """Full snapshot of every table -- used by the NOBILITY VAULT GitHub Action
+    to back up the database daily. Gated by the same passcode as other admin
+    actions since this includes family members' names/emails."""
+    _require_passcode(x_admin_passcode)
+    with closing(_conn()) as c:
+        admins = [dict(r) for r in c.execute("SELECT * FROM admins ORDER BY id").fetchall()]
+        changes = [dict(r) for r in c.execute("SELECT * FROM pending_changes ORDER BY id").fetchall()]
+        notifications = [dict(r) for r in c.execute("SELECT * FROM notifications ORDER BY id").fetchall()]
+    for row in changes:
+        row["payload"] = json.loads(row["payload"])
+    return {
+        "exported_at": time.time(),
+        "admins": admins,
+        "pending_changes": changes,
+        "notifications": notifications,
+    }

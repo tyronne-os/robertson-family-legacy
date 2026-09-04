@@ -102,6 +102,7 @@
   .form-msg { font-size: 13px; margin-top: 8px; }
   .form-msg.ok { color: var(--ok); }
   .form-msg.err { color: var(--err); }
+  .vault-desc { font-size: 13px; line-height: 1.6; color: var(--text-dimmer); margin-bottom: 16px; }
 </style>
 </head>
 <body>
@@ -132,6 +133,7 @@
           <div class="tab" data-tab="admins">Branch Admins</div>
           <div class="tab" data-tab="register">Register</div>
           <div class="tab" data-tab="notify">Notifications</div>
+          <div class="tab" data-tab="email">Email Access</div>
         </div>
 
         <div class="tab-content">
@@ -172,6 +174,23 @@
             <div class="status-box" id="serverStatus"><div class="empty">Loading…</div></div>
             <div class="section-title">Notification Log</div>
             <div id="notifyList"><div class="empty">Loading…</div></div>
+          </div>
+
+          <div id="panel-email" style="display:none">
+            <div class="section-title">Email Access — Hostinger SMTP</div>
+            <div class="vault-desc">Paste your mailbox credentials, then <strong>Save &amp; Verify</strong>. The connection is tested live against Hostinger. Nothing here is stored in this browser — a verified credential is staged in a locked server-side spot, then moved into the site's real secret store and the staging copy is deleted.</div>
+            <form class="reg-form" id="smtpForm">
+              <label>SMTP Host</label>
+              <input type="text" id="smtpHost" placeholder="smtp.hostinger.com" required>
+              <label>SMTP Port</label>
+              <input type="number" id="smtpPort" placeholder="465" value="465" required>
+              <label>Mailbox address</label>
+              <input type="email" id="smtpUser" placeholder="notifications@bigmaproject.family" required>
+              <label>Password / API token</label>
+              <input type="password" id="smtpPass" required>
+              <button type="submit" class="submit-btn">Save &amp; Verify</button>
+              <div class="form-msg" id="smtpMsg"></div>
+            </form>
           </div>
 
         </div>
@@ -315,13 +334,38 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    ['changes','admins','register','notify'].forEach(name => {
+    ['changes','admins','register','notify','email'].forEach(name => {
       document.getElementById('panel-' + name).style.display = (name === tab.dataset.tab) ? 'block' : 'none';
     });
     if (tab.dataset.tab === 'changes') loadChanges();
     if (tab.dataset.tab === 'admins') loadAdmins();
     if (tab.dataset.tab === 'notify') { loadServerStatus(); loadNotifications(); }
   });
+});
+
+// Email Access (SMTP) form — verify live, stage server-side, never localStorage
+document.getElementById('smtpForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('smtpMsg');
+  msg.textContent = 'Verifying…'; msg.className = 'form-msg';
+  try {
+    const result = await api('/secrets/smtp/submit', {
+      method: 'POST',
+      headers: { 'X-Admin-Passcode': passcode() },
+      body: JSON.stringify({
+        host: document.getElementById('smtpHost').value,
+        port: parseInt(document.getElementById('smtpPort').value, 10) || 465,
+        user: document.getElementById('smtpUser').value,
+        password: document.getElementById('smtpPass').value,
+      }),
+    });
+    msg.textContent = result.message + (result.ok ? ' Staged for activation.' : '');
+    msg.className = 'form-msg ' + (result.ok ? 'ok' : 'err');
+    if (result.ok) document.getElementById('smtpPass').value = '';
+  } catch (err) {
+    msg.textContent = 'Failed: ' + err.message;
+    msg.className = 'form-msg err';
+  }
 });
 
 // Registration form
