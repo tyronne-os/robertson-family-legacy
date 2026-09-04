@@ -36,9 +36,10 @@ code change needed.
 import os
 from urllib.parse import quote
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -70,6 +71,46 @@ app = FastAPI()
 from backend import router as api_router, init_db
 init_db()
 app.include_router(api_router)
+
+
+# Owner-only Vault gear -- injected into every HTML page so it's always
+# reachable no matter which page you're on. Hidden by default; JS reveals it
+# only when the page is loaded from the Hugging Face Spaces domain, never on
+# the public bigmaproject.family site. Skipped on /branches-admin, which
+# already has its own full gear + Vault panel.
+GEAR_SNIPPET = b"""
+<button id="__siteVaultGear" title="Branches Admin" style="display:none;position:fixed;top:22px;right:26px;z-index:9999;width:40px;height:40px;border-radius:50%;align-items:center;justify-content:center;background:rgba(16,13,10,.85);border:1px solid rgba(201,162,74,.38);box-shadow:0 4px 18px rgba(0,0,0,.45);cursor:pointer;color:#c9a24a;font-size:17px;font-family:sans-serif">&#9881;</button>
+<script>
+(function(){
+  if (/(^|\\.)hf\\.space$/.test(location.hostname) || /(^|\\.)huggingface\\.co$/.test(location.hostname)) {
+    var btn = document.getElementById('__siteVaultGear');
+    if (btn) {
+      btn.style.display = 'flex';
+      btn.addEventListener('click', function(){ window.location.href = '/branches-admin'; });
+    }
+  }
+})();
+</script>
+"""
+
+
+class InjectGearMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        content_type = response.headers.get("content-type", "")
+        if request.url.path == "/branches-admin" or not content_type.startswith("text/html"):
+            return response
+        body = b""
+        async for chunk in response.body_iterator:
+            body += chunk
+        if b"</body>" in body:
+            body = body.replace(b"</body>", GEAR_SNIPPET + b"</body>", 1)
+        headers = dict(response.headers)
+        headers.pop("content-length", None)
+        return Response(content=body, status_code=response.status_code, headers=headers, media_type=response.media_type)
+
+
+app.add_middleware(InjectGearMiddleware)
 
 
 def _make_page_route(filename):
