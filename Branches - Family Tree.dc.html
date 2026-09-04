@@ -169,7 +169,7 @@
           </div>
         </div>
 
-        <div class="branch-row" style="display:flex;gap:6px;padding:0 0 8px;align-items:flex-start;align-self:stretch">
+        <div class="branch-row" style="display:flex;gap:6px;padding:0 0 8px;align-items:stretch;align-self:stretch">
           <sc-for list="{{ columns }}" as="col" hint-placeholder-count="9">
             <div class="branch-col" data-branch="{{ col.slug }}" data-screen-label="{{ col.shortName }}" style="flex:1 1 0;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;background:#1b1611;border:1px solid #2e2720;border-radius:12px;padding:9px">
 
@@ -188,9 +188,9 @@
                       <div style="font-size:12.5px;font-weight:600;color:#3f382e;line-height:1.4;margin-top:3px">{{ col.wellness }}</div>
                     </div>
                   </sc-if>
-                  <div style="font-family:'Libre Baskerville', Georgia, serif;font-weight:700;font-size:12.5px;line-height:1.25;color:#1f1a14;text-align:center;width:100%;overflow-wrap:break-word">{{ col.name }}</div>
+                  <div style="font-family:'Libre Baskerville', Georgia, serif;font-weight:700;font-size:12.5px;line-height:1.25;color:#1f1a14;text-align:center;width:100%;overflow-wrap:break-word;min-height:32px">{{ col.name }}</div>
                   <image-slot id="portrait-{{ col.slug }}" src="{{ col.portrait }}" fit="contain" style="width:100%;aspect-ratio:17/20;flex:0 0 auto" shape="rect" placeholder="{{ col.shortName }}"></image-slot>
-                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;width:100%">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;width:100%;min-height:74px">
                     <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}">
                       <div style="font-size:10.5px;font-weight:600;color:#4a4239">b. {{ col.birth }}</div>
                     </sc-if>
@@ -205,9 +205,7 @@
                 </sc-if>
               </div>
 
-              <sc-if value="{{ col.isEmpty }}" hint-placeholder-val="{{ true }}">
-                <div sc-camel-on-click="{{ col.addTo }}" style="border:1px dashed #6b5a3c;border-radius:9px;padding:10px 7px;color:#d9b463;font-size:10.5px;font-weight:600;line-height:1.45;text-align:center;cursor:pointer;background:rgba(201,162,74,0.06)" style-hover="border-color:#c9a24a;background:rgba(201,162,74,0.14)">Click to add {{ col.shortName }}’s children &amp; grandchildren</div>
-              </sc-if>
+              <div sc-camel-on-click="{{ col.addTo }}" style="border:1px dashed #6b5a3c;border-radius:9px;padding:10px 6px;color:#d9b463;font-size:10px;font-weight:600;line-height:1.4;text-align:center;cursor:pointer;background:rgba(201,162,74,0.06);box-sizing:border-box;overflow-wrap:break-word;min-height:48px" style-hover="border-color:#c9a24a;background:rgba(201,162,74,0.14)">Click to add {{ col.shortName }}’s descendants</div>
 
               <sc-for list="{{ col.people }}" as="d" hint-placeholder-count="0">
                 <div style="display:flex;gap:0;align-items:stretch;padding-left:{{ d.indent }}">
@@ -242,10 +240,77 @@
                 </div>
               </sc-for>
 
-              <button sc-camel-on-click="{{ col.addTo }}" style="background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:8px 5px;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="background:#2b2318;border-color:#c9a24a">+ Add to {{ col.shortName }}</button>
+              <button sc-camel-on-click="{{ col.openPanel }}" style="margin-top:auto;background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:8px 5px;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="background:#2b2318;border-color:#c9a24a">+ Add to {{ col.shortName }}</button>
             </div>
           </sc-for>
         </div>
+
+        <sc-if value="{{ expandedOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="align-self:stretch;margin-top:4px;background:#1b1611;border:1px solid #c9a24a;border-radius:14px;padding:14px 15px 16px;box-shadow:0 10px 40px rgba(0,0,0,.5)">
+
+            <div style="display:flex;justify-content:flex-end;margin-bottom:2px">
+              <button sc-camel-on-click="{{ expanded.close }}" style="background:transparent;border:1px solid #4a3f31;color:#a39685;border-radius:8px;padding:6px 13px;font-size:11.5px;font-weight:700;cursor:pointer" style-hover="border-color:#c9a24a;color:#e9cd88">Close</button>
+            </div>
+
+            <sc-for list="{{ expanded.rows }}" as="row" hint-placeholder-count="1">
+              <div style="border-top:1px solid #2e2720;padding-top:12px;margin-top:10px">
+
+                <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:9.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#8a7c62">{{ row.genLabel }}</div>
+                    <div style="font-family:'Libre Baskerville', Georgia, serif;font-size:16px;font-weight:700;color:#f6e6bd;line-height:1.3;margin-top:3px">{{ row.heading }}</div>
+                    <div style="font-size:11.5px;font-weight:600;color:#a39685;margin-top:4px;letter-spacing:0.3px">{{ row.tally }}</div>
+                    <sc-if value="{{ row.shortNote }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11px;font-weight:600;color:#d9b463;margin-top:6px;line-height:1.45">{{ row.shortNote }}</div>
+                    </sc-if>
+                  </div>
+                  <button sc-camel-on-click="{{ row.add }}" style="flex:0 0 auto;background:#2b2318;border:1px solid #c9a24a;color:#e9cd88;border-radius:8px;padding:8px 13px;font-size:11.5px;font-weight:700;cursor:pointer" style-hover="background:#3a2f1f">{{ row.addLabel }}</button>
+                </div>
+
+                <div style="display:flex;gap:10px;overflow-x:auto;padding:14px 2px 4px;align-items:stretch">
+                  <sc-for list="{{ row.kids }}" as="k" hint-placeholder-count="4">
+                    <div style="flex:0 0 178px;box-sizing:border-box;background:#f4efe3;border:1px solid {{ k.cardBorder }};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px">
+
+                      <label style="position:relative;display:block;width:100%;aspect-ratio:17/20;border-radius:7px;background-color:#e6dfd0;background-image:{{ k.photoUrl }};background-size:cover;background-position:center;border:1px dashed #c2b699;cursor:pointer;overflow:hidden">
+                        <input type="file" accept="image/*" sc-camel-on-change="{{ k.onPhoto }}" style="display:none">
+                        <sc-if value="{{ k.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute;right:5px;bottom:5px;background:rgba(20,17,14,.72);color:#e9cd88;font-size:9px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Change</div>
+                        </sc-if>
+                        <sc-if value="{{ !k.hasPhoto }}" hint-placeholder-val="{{ true }}">
+                          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8d8168;text-align:center;padding:6px">
+                            <div style="font-size:19px;line-height:1">&#128247;</div>
+                            <div style="font-size:9.5px;font-weight:700;letter-spacing:0.3px;line-height:1.3">Add a photo</div>
+                          </div>
+                        </sc-if>
+                      </label>
+
+                      <input type="text" value="{{ k.name }}" sc-camel-on-change="{{ k.onName }}" placeholder="Name" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:7px 8px;color:#1f1a14;font-size:12.5px;font-weight:700;outline:none;font-family:'Libre Baskerville', Georgia, serif">
+
+                      <input type="text" value="{{ k.contact }}" sc-camel-on-change="{{ k.onContact }}" placeholder="Phone or email" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10.5px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+
+                      <textarea value="{{ k.bio }}" sc-camel-on-change="{{ k.onBio }}" rows="3" placeholder="A short bio — where they live, what they do, who they married" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;resize:vertical;line-height:1.45;font-family:Helvetica, Arial, sans-serif"></textarea>
+
+                      <input type="text" value="{{ k.videoUrl }}" sc-camel-on-change="{{ k.onVideo }}" placeholder="YouTube or video link" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+
+                      <input type="text" value="{{ k.note }}" sc-camel-on-change="{{ k.onNote }}" placeholder="A note about them" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#5c5347;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+
+                      <div style="display:flex;gap:6px;align-items:center;margin-top:1px">
+                        <button sc-camel-on-click="{{ k.cycleStatus }}" style="flex:1;min-width:0;background:transparent;border:1px solid {{ k.statusColor }};color:{{ k.statusColor }};border-radius:5px;padding:5px 4px;font-size:9.5px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ k.statusLabel }}</button>
+                        <button sc-camel-on-click="{{ k.remove }}" title="Remove" style="flex:0 0 auto;background:transparent;border:1px solid #d8cfba;color:#9a8f7a;border-radius:5px;padding:5px 8px;font-size:11px;font-weight:700;cursor:pointer" style-hover="border-color:#a4443a;color:#a4443a">&#215;</button>
+                      </div>
+
+                      <button sc-camel-on-click="{{ k.drill }}" style="width:100%;box-sizing:border-box;background:#2b2318;border:1px solid #4a3f31;color:#e9cd88;border-radius:6px;padding:7px 5px;font-size:10px;font-weight:700;letter-spacing:0.3px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" style-hover="border-color:#c9a24a;background:#3a2f1f">{{ k.drillLabel }}</button>
+
+                    </div>
+                  </sc-for>
+                </div>
+
+              </div>
+            </sc-for>
+
+            <div style="font-size:10.5px;font-weight:600;color:#7d7266;margin-top:10px;line-height:1.5">Every edit saves to this browser as you type. Tap a status to move it between living, passed on, and unconfirmed — and use the button on any card to open that person’s own children.</div>
+          </div>
+        </sc-if>
 
         <div style="margin-top:26px;font-size:12.5px;font-weight:600;color:#7d7266;letter-spacing:0.6px">Every name added here becomes part of the family record</div>
       </div>
@@ -558,6 +623,79 @@ const CHILDREN = [
   { order: 9, slug: 'susianna-robertson', name: 'Susianna Robertson', birth: 'June 14, 1931' }
 ];
 
+// Second generation, transcribed from each sibling's own chapter page. `alive`
+// is only set where that chapter states it outright -- null means the family
+// still has to tell us, and the UI says so rather than guessing.
+const SEED_CHILDREN = {
+  'ethel-robertson': [
+    { name: 'Edna' }, { name: 'Josh' }, { name: 'Anniebelle' }, { name: 'Oliver' },
+    { name: 'Lottie' }, { name: 'Alcee', note: 'known to everybody as T-man' },
+    { name: 'Irene' }, { name: 'Evelina' },
+    { name: 'Gladys', alive: true, note: 'narrates Chapter One' },
+    { name: 'Brenda' }, { name: 'Ernest' }
+  ],
+  'leola-robertson': [
+    { name: 'Kenneth Wayne Howard', note: 'adopted and reared in Baton Rouge' }
+  ],
+  'johnnie-robertson': [
+    { name: 'Allen' }, { name: 'James' }, { name: 'Jannie' }, { name: 'Leroy' },
+    { name: 'Louis' }, { name: 'Shirley' }, { name: 'Leann' }, { name: 'Eloise' },
+    { name: 'Howard' }
+  ],
+  'mary-robertson': [
+    { name: 'Nelson' }, { name: 'Bertha Lee' }, { name: 'Walter' },
+    { name: 'Mary Ethel', note: 'named for Mary and her older sister Ethel' },
+    { name: 'Raymond' }, { name: 'Alfred' }, { name: 'Clarence' },
+    { name: 'Catherine', alive: true, note: 'narrates Chapter Four' }
+  ],
+  'beulah-robertson': [
+    { name: 'Beverly' }, { name: 'Betty' }, { name: 'Catherine' }, { name: 'Edgar' },
+    { name: 'Larry' }, { name: 'Kevin' }, { name: 'Marshall' }, { name: 'Wilbert' }
+  ],
+  'lydia-robertson': [
+    { name: 'Gloria Williams', alive: true, note: 'narrates Chapter Six' },
+    { name: 'Delores Brown', alive: true },
+    { name: 'Arelita Griffin', alive: true },
+    { name: 'Patricia Brown', alive: false }
+  ],
+  'beatrice-robertson': [
+    { name: 'Pete' }, { name: 'Donald Wayne' }, { name: 'Torrence' },
+    { name: 'Brenda' }, { name: 'Patricia' }, { name: 'Diane' },
+    { name: 'Stacey' }, { name: 'Regina' }
+  ],
+  'lemar-robertson': [
+    { name: 'Betty Butler', alive: true, note: 'narrates Chapter Eight' },
+    { name: 'Marie', alive: false }, { name: 'James', alive: false }
+  ],
+  'susianna-robertson': [
+    { name: 'Jaqueline', alive: false },
+    { name: 'Charles Duchane Jr.' },
+    { name: 'Carolyn', alive: true, note: 'narrates Chapter Nine' },
+    { name: 'Michael' },
+    { name: 'Jackie', note: 'mother of Alfreneisha, Cordell and Cleo' }
+  ]
+};
+
+// Chapter Eight names three of Lamar's five children, so his branch opens short
+// on purpose -- the two missing names are for his family to fill in.
+const SEED_SHORTFALL = { 'lemar-robertson': 5 };
+
+function seedPeople() {
+  const out = [];
+  Object.keys(SEED_CHILDREN).forEach(slug => {
+    SEED_CHILDREN[slug].forEach((c, i) => {
+      out.push({
+        id: 'seed_' + slug + '_' + i, slug: slug, parentId: null,
+        name: c.name, relation: 'Child', birth: '',
+        alive: c.alive === undefined ? null : c.alive,
+        wellness: '', photo: false, photoData: null, video: false,
+        news: c.note || '', contact: '', seeded: true, pending: false
+      });
+    });
+  });
+  return out;
+}
+
 function portraitUrl(slug) { return 'uploads/' + slug + '.png'; }
 
 const RELATIONS = ['Child', 'Spouse / married in', 'Adopted / raised as ours', 'Stepchild', 'Sibling remembered'];
@@ -582,8 +720,10 @@ class Component extends DCLogic {
   _saved = loadSaved();
   state = {
     branches: (this._saved && this._saved.branches) || CHILDREN.map(c => Object.assign({}, c, { alive: null, wellness: '' })),
-    people: (this._saved && this._saved.people) || [],
+    people: (this._saved && this._saved.people) || seedPeople(),
     activeSlug: 'ethel-robertson',
+    expandedSlug: null,
+    drillPath: [],
     focusId: null,
     tab: 'chat',
     chatFlow: null,
@@ -712,7 +852,62 @@ class Component extends DCLogic {
       form: Object.assign({}, s.form, { name: '', birth: '', news: '', photo: false, photoData: null, photoName: '', video: false }),
       outbox: mail ? [mail].concat(s.outbox).slice(0, 8) : s.outbox,
       activity: [{ text: name + ' filed as a ' + tier + ' under ' + under + (person.pending ? ' \u2014 awaiting a custodian\u2019s approval.' : '. Totals updated.') }].concat(s.activity).slice(0, 7)
+    }), this.persist);
+  }
+
+  // The DC runtime never calls componentDidUpdate, so every mutation saves itself.
+  persist = () => saveState(this.state.people, this.state.branches);
+
+  toggleExpand(slug) {
+    this.setState(s => ({
+      expandedSlug: s.expandedSlug === slug ? null : slug,
+      activeSlug: slug,
+      drillPath: []
     }));
+  }
+
+  // Opening a person's own children appends them to the drill path, so each
+  // generation gets its own row beneath the one that produced it.
+  drillTo(level, id) {
+    this.setState(s => {
+      const path = (s.drillPath || []).slice(0, level);
+      return { drillPath: (s.drillPath || [])[level] === id ? path : path.concat([id]) };
+    });
+  }
+
+  editChild(id, field, value) {
+    this.setState(s => ({
+      people: s.people.map(p => p.id === id ? Object.assign({}, p, { [field]: value }) : p)
+    }), this.persist);
+  }
+
+  childPhoto(id, file) {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => this.setState(s => ({
+      people: s.people.map(p => p.id === id ? Object.assign({}, p, { photoData: r.result, photo: true }) : p)
+    }), this.persist);
+    r.readAsDataURL(file);
+  }
+
+  addChildTo(slug, parentId) {
+    const id = 'kid_' + slug + '_' + (++this.seq) + '_' + Date.now();
+    this.setState(s => ({
+      people: s.people.concat([{
+        id: id, slug: slug, parentId: parentId || null, name: '', relation: 'Child', birth: '',
+        alive: null, wellness: '', photo: false, photoData: null, video: false,
+        news: '', contact: '', bio: '', videoUrl: '', seeded: false, pending: false
+      }]),
+      expandedSlug: slug
+    }), this.persist);
+  }
+
+  removeChild(id) {
+    const p = this.person(id);
+    if (!p) return;
+    const label = (p.name || '').trim() || 'this blank card';
+    if (!window.confirm('Remove ' + label + ' from the family record?\n\nAnyone recorded beneath them is removed too. This cannot be undone.')) return;
+    this.setState(s => ({ people: s.people.filter(x => x.id !== id && x.parentId !== id) }), this.persist);
   }
 
   approveAll() {
@@ -969,10 +1164,16 @@ class Component extends DCLogic {
         countLabel: n === 0 ? 'Running total: 0' : 'Running total: ' + n + (n === 1 ? ' descendant' : ' descendants'),
         tierLine: parts.join(' \u00b7 '),
         isActive: b.slug === s.activeSlug,
+        isExpanded: b.slug === s.expandedSlug,
         isEmpty: n === 0,
-        select: () => { this.setState({ activeSlug: b.slug, focusId: null, tab: 'hub', panelOpen: true }); },
-        addTo: () => this.openForm(b.slug, ''),
-        people: rows.map(x => {
+        kidCount: (() => {
+          const k = s.people.filter(p => p.slug === b.slug && !p.parentId).length;
+          return k ? k + (k === 1 ? ' child' : ' children') : 'no children yet';
+        })(),
+        select: () => this.toggleExpand(b.slug),
+        openPanel: () => { this.setState({ activeSlug: b.slug, focusId: null, tab: 'hub', panelOpen: true }); },
+        addTo: () => this.toggleExpand(b.slug),
+        people: rows.filter(x => x.depth > 1).map(x => {
           const p = x.p;
           const parent = p.parentId ? this.person(p.parentId) : null;
           const kids = this.lineOf(p.id, p.slug).length;
@@ -994,6 +1195,84 @@ class Component extends DCLogic {
       };
     });
 
+    const expBranch = s.expandedSlug ? this.branch(s.expandedSlug) : null;
+    const drill = expBranch ? (s.drillPath || []) : [];
+    const GEN_LABEL = [
+      'Second generation · Big Ma’s grandchildren',
+      'Third generation · great-grandchildren',
+      'Fourth generation · great-great-grandchildren'
+    ];
+    const genRows = [];
+    if (expBranch) {
+      [null].concat(drill).forEach((pid, i) => {
+        const owner = pid ? this.person(pid) : null;
+        if (pid && !owner) return;
+        const ownerName = owner
+          ? ((owner.name || '').trim() || 'this child')
+          : expBranch.name.split(' ')[0];
+        const kids = s.people.filter(p => p.slug === expBranch.slug && (p.parentId || null) === (pid || null));
+        const living = kids.filter(p => p.alive === true).length;
+        const gone = kids.filter(p => p.alive === false).length;
+        const unknown = kids.length - living - gone;
+        const short = (!pid && SEED_SHORTFALL[expBranch.slug])
+          ? SEED_SHORTFALL[expBranch.slug] - kids.length : 0;
+        genRows.push({
+          heading: 'Children of ' + ownerName,
+          genLabel: GEN_LABEL[i] || ('Generation ' + (i + 3)),
+          tally: kids.length
+            ? [
+                kids.length + (kids.length === 1 ? ' child' : ' children') + ' recorded',
+                living ? living + ' living' : null,
+                gone ? gone + ' passed on' : null,
+                unknown ? unknown + ' still to confirm' : null
+              ].filter(Boolean).join('  ·  ')
+            : 'Nobody recorded yet — start with ' + ownerName + '’s oldest child.',
+          shortNote: short > 0
+            ? 'Chapter Eight names three of Lamar’s five children. ' + short + ' more are still for his family to add.'
+            : '',
+          isEmpty: kids.length === 0,
+          addLabel: pid ? '+ Add ' + ownerName + '’s oldest child' : '+ Add a child',
+          add: () => this.addChildTo(expBranch.slug, pid),
+          kids: kids.map(p => {
+            const mine = s.people.filter(x => x.parentId === p.id).length;
+            const who = ((p.name || '').trim() || 'this child');
+            return {
+              id: p.id,
+              name: p.name,
+              contact: p.contact || '',
+              note: p.news || '',
+              bio: p.bio || '',
+              videoUrl: p.videoUrl || '',
+              hasPhoto: !!p.photoData,
+              photoUrl: p.photoData ? 'url("' + p.photoData + '")' : 'none',
+              statusLabel: p.alive === true ? 'Living' : (p.alive === false ? 'Passed on' : 'Unconfirmed'),
+              statusColor: p.alive === true ? '#2f6d3f' : (p.alive === false ? '#6b5a3c' : '#8a5a12'),
+              isOpen: drill[i] === p.id,
+              cardBorder: drill[i] === p.id ? '#c9a24a' : '#d8cfba',
+              drillLabel: mine
+                ? (drill[i] === p.id ? 'Hide ' + mine + (mine === 1 ? ' child' : ' children') : 'Show ' + mine + (mine === 1 ? ' child' : ' children'))
+                : 'Add ' + who + '’s children',
+              drill: () => this.drillTo(i, p.id),
+              onName: e => this.editChild(p.id, 'name', e.target.value),
+              onContact: e => this.editChild(p.id, 'contact', e.target.value),
+              onNote: e => this.editChild(p.id, 'news', e.target.value),
+              onBio: e => this.editChild(p.id, 'bio', e.target.value),
+              onVideo: e => this.editChild(p.id, 'videoUrl', e.target.value),
+              onPhoto: e => this.childPhoto(p.id, e.target.files && e.target.files[0]),
+              cycleStatus: () => this.editChild(p.id, 'alive', p.alive === true ? false : (p.alive === false ? null : true)),
+              remove: () => this.removeChild(p.id)
+            };
+          })
+        });
+      });
+    }
+    const expanded = expBranch ? {
+      slug: expBranch.slug,
+      firstName: expBranch.name.split(' ')[0],
+      close: () => this.setState({ expandedSlug: null, drillPath: [] }),
+      rows: genRows
+    } : { rows: [] };
+
     const active = this.active();
     const activeRows = this.ordered(active.slug);
     const activePending = s.people.filter(p => p.slug === active.slug && p.pending).length;
@@ -1014,7 +1293,7 @@ class Component extends DCLogic {
 
     return {
       mainRef: this.mainRef,
-      showDates, columns,
+      showDates, columns, expanded, expandedOpen: !!expBranch,
       query: s.query,
       onQuery: e => this.setState({ query: e.target.value }),
       totalMembers: 2 + s.branches.length + treeTotal,
