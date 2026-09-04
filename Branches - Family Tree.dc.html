@@ -80,6 +80,28 @@
 
 <div style="min-height:100vh;display:flex;flex-direction:column;background:#14110e;color:#f4efe3;font-family:Helvetica, Arial, sans-serif">
 
+  <nav style="background:#0d0b08;border-bottom:1px solid #2b241c;padding:0 26px;display:flex;align-items:center;gap:0;flex:0 0 auto">
+    <a href="/" style="font-family:'Libre Baskerville',Georgia,serif;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#a39685;padding:13px 14px;display:block;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#a39685'">HOME</a>
+    <div style="position:relative;display:inline-block" onmouseenter="this.querySelector('.ch-menu').style.display='block'" onmouseleave="this.querySelector('.ch-menu').style.display='none'">
+      <a href="/foreword" style="font-family:'Libre Baskerville',Georgia,serif;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#a39685;padding:13px 14px;display:block;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#a39685'">CHAPTERS ▾</a>
+      <div class="ch-menu" style="display:none;position:absolute;top:100%;left:0;background:#100d0a;border:1px solid #2b241c;border-radius:8px;min-width:220px;z-index:999;padding:8px 0">
+        <a href="/foreword" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">The Foreword — Big Ma</a>
+        <a href="/chapter-one" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter One — Ethel</a>
+        <a href="/chapter-two" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Two — Robert</a>
+        <a href="/chapter-three" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Three — Lemar</a>
+        <a href="/chapter-four" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Four — Linda</a>
+        <a href="/chapter-five" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Five — Donna</a>
+        <a href="/chapter-six" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Six — Rosie</a>
+        <a href="/chapter-seven" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Seven — Annie</a>
+        <a href="/chapter-eight" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Eight — Michael</a>
+        <a href="/chapter-nine" style="display:block;padding:9px 16px;font-size:13px;color:#d3cabb;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#d3cabb'">Chapter Nine — Susianna</a>
+      </div>
+    </div>
+    <a href="/branches" style="font-family:'Libre Baskerville',Georgia,serif;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#d9b463;padding:13px 14px;display:block;text-decoration:none;border-bottom:2px solid #d9b463">BRANCHES</a>
+    <a href="/photo-album" style="font-family:'Libre Baskerville',Georgia,serif;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#a39685;padding:13px 14px;display:block;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#a39685'">PHOTO ALBUM</a>
+    <a href="/family-growth" style="font-family:'Libre Baskerville',Georgia,serif;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#a39685;padding:13px 14px;display:block;text-decoration:none" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#a39685'">FAMILY GROWTH</a>
+  </nav>
+
   <header style="display:flex;align-items:center;gap:22px;padding:16px 26px;background:#100d0a;border-bottom:1px solid #2b241c;flex:0 0 auto">
     <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
       <div style="font-family:'Libre Baskerville', Georgia, serif;font-size:21px;color:#f6f1e6">Magnolia Branches — Robertson Family Tree</div>
@@ -97,14 +119,12 @@
       <div style="font-family:'Libre Baskerville', Georgia, serif;font-size:20px;color:#f6f1e6">{{ totalMembers }}</div>
       <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a08d5f">in the graph</div>
     </div>
-    <button sc-camel-on-click="{{ toggleRoot }}" style="background:transparent;border:1px solid #c9a24a;color:#d9b463;border-radius:8px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:rgba(201,162,74,0.12)">{{ rootToggleLabel }}</button>
   </header>
 
   <div style="flex:1;display:flex;align-items:flex-start">
 
     <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:radial-gradient(1100px 520px at 50% -60px, #221c15 0%, #14110e 70%)">
 
-      <sc-if value="{{ rootVisible }}" hint-placeholder-val="{{ true }}">
         <div style="flex:0 0 auto;background:#1a150f;padding:16px 30px 6px;display:flex;justify-content:center">
           <div style="width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:10px">
             <div style="display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center">
@@ -118,7 +138,6 @@
           </div>
         </div>
         <div style="flex:0 0 auto;display:flex;justify-content:center"><div style="width:1px;height:26px;background:#4a3f31"></div></div>
-      </sc-if>
 
       <div ref="{{ mainRef }}" style="flex:0 0 auto;overflow-x:auto;overflow-y:visible;padding:0 30px 40px">
       <div style="display:inline-flex;flex-direction:column;align-items:center;min-width:max-content">
@@ -185,7 +204,7 @@
                     </sc-if>
                     <div style="display:flex;gap:9px;align-items:flex-start">
                       <sc-if value="{{ d.hasPhoto }}" hint-placeholder-val="{{ false }}">
-                        <image-slot id="p-{{ d.id }}" fit="cover" style="width:44px;height:52px;flex:0 0 auto" shape="rounded" radius="5" placeholder="{{ d.firstName }}"></image-slot>
+                        <div style="width:44px;height:52px;flex:0 0 auto;border-radius:5px;background-color:#e6dfd0;background-image:{{ d.photoUrl }};background-size:cover;background-position:center"></div>
                       </sc-if>
                       <div style="min-width:0;flex:1">
                         <div style="display:flex;align-items:baseline;gap:6px">
@@ -212,7 +231,7 @@
           </sc-for>
         </div>
 
-        <div style="margin-top:26px;font-size:12.5px;font-weight:600;color:#7d7266;letter-spacing:0.6px">Powered by Neo4j · every addition is merged into the family knowledge graph</div>
+        <div style="margin-top:26px;font-size:12.5px;font-weight:600;color:#7d7266;letter-spacing:0.6px">Every name added here becomes part of the family record</div>
       </div>
       </div>
     </main>
@@ -259,10 +278,9 @@
               </div>
 
               <div style="background:#241d14;border:1px solid #3a3128;border-radius:8px;padding:10px 11px">
-                <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#a08d5f">Graph will file this as</div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#a08d5f">Where they land</div>
                 <div style="font-size:14px;font-weight:700;color:#d9b463;margin-top:4px">{{ inferred.tier }}</div>
                 <div style="font-size:12.5px;color:#a39685;margin-top:3px;line-height:1.45">{{ inferred.path }}</div>
-                <div style="font-family:ui-monospace, Menlo, monospace;font-size:11px;color:#7d7266;margin-top:7px;line-height:1.5;word-break:break-word">{{ inferred.cypher }}</div>
               </div>
 
               <div style="display:flex;flex-direction:column;gap:5px">
@@ -294,10 +312,15 @@
                 <div style="font-size:12px;color:#7d7266;line-height:1.45">Unchecked records them as passed. That word never shows on the tree — only a Wellness Update can surface it.</div>
               </div>
 
-              <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid #2b241c;padding-top:11px">
-                <label style="display:flex;align-items:center;gap:9px;font-size:14px;color:#e6dfd0;cursor:pointer">
-                  <input type="checkbox" checked="{{ form.photo }}" sc-camel-on-change="{{ onPhoto }}" style="width:19px;height:19px;accent-color:#c9a24a;cursor:pointer">
-                  I have a photo to add for them
+              <div style="display:flex;flex-direction:column;gap:9px;border-top:1px solid #2b241c;padding-top:11px">
+                <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#a08d5f">Their picture</div>
+                <label style="display:flex;align-items:center;gap:11px;cursor:pointer">
+                  <div style="width:56px;height:66px;flex:0 0 auto;border:1px dashed #4a3f31;border-radius:7px;background-color:#14110e;background-image:{{ form.photoPreview }};background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:20px;color:#7d7266">{{ form.photoBadge }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13.5px;font-weight:600;color:#d9b463;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ form.photoLabel }}</div>
+                    <div style="font-size:12px;color:#7d7266;margin-top:2px;line-height:1.4">A photo from your phone or computer</div>
+                  </div>
+                  <input type="file" accept="image/*" sc-camel-on-change="{{ onPhotoFile }}" style="display:none">
                 </label>
                 <label style="display:flex;align-items:center;gap:9px;font-size:14px;color:#e6dfd0;cursor:pointer">
                   <input type="checkbox" checked="{{ form.video }}" sc-camel-on-change="{{ onVideo }}" style="width:19px;height:19px;accent-color:#c9a24a;cursor:pointer">
@@ -319,6 +342,39 @@
               </sc-if>
             </div>
           </sc-if>
+
+          <sc-if value="{{ hasFocus }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#1e1811;border:1px solid #c9a24a;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:flex-start;gap:12px">
+                <div style="width:60px;height:70px;flex:0 0 auto;border-radius:7px;background-color:#221c15;background-image:{{ focus.photoUrl }};background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:22px;color:#4a3f31">{{ focus.photoPlaceholder }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:#a08d5f">{{ focus.tier }} · {{ focus.branchLabel }}</div>
+                  <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:17px;color:#f6f1e6;margin-top:5px">{{ focus.name }}</div>
+                  <div style="font-size:12.5px;color:#a39685;margin-top:4px;line-height:1.4">{{ focus.path }}</div>
+                  <div style="font-size:12.5px;color:#a39685;margin-top:3px">{{ focus.descendantLine }}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button sc-camel-on-click="{{ addVideo }}" style="flex:1;background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#c9a24a">+ Attach a video</button>
+                <button sc-camel-on-click="{{ addChild }}" style="flex:1;background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#c9a24a">+ Add {{ focus.firstName }}'s child</button>
+              </div>
+              <div style="font-size:12px;color:#7d7266">{{ focus.mediaLine }}</div>
+            </div>
+          </sc-if>
+
+          <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">Filter by generation</div>
+            <sc-raw-select value="{{ genFilter }}" sc-camel-on-change="{{ onGenFilter }}" style="background:#14110e;border:1px solid #3a3128;border-radius:7px;padding:10px 9px;color:#f4efe3;font-size:13.5px;outline:none">
+              <option value="">All generations</option>
+              <option value="TWIG">Children of branch</option>
+              <option value="LEAF">Grandkids</option>
+              <option value="BUD">Great-grandkids</option>
+              <option value="BUD2">Great-great-grandkids</option>
+              <option value="BUD3">Great³ grandkids</option>
+              <option value="BUD4">Great⁴ grandkids</option>
+              <option value="BUD5">Great⁵ grandkids</option>
+            </sc-raw-select>
+          </div>
 
           <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:11px">
             <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">Running total — {{ active.shortName }} downward</div>
@@ -353,50 +409,9 @@
         </div>
       </sc-if>
 
-      <sc-if value="{{ isPerson }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;flex-direction:column;gap:15px">
-          <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">{{ focus.tier }} · {{ focus.branchLabel }}</div>
-            <div style="font-family:'Libre Baskerville', Georgia, serif;font-size:19px;color:#f6f1e6;margin-top:6px">{{ focus.name }}</div>
-            <div style="font-size:13px;color:#a39685;margin-top:5px;line-height:1.45">{{ focus.path }}</div>
-            <div style="font-size:13px;color:#a39685;margin-top:4px;line-height:1.45">{{ focus.descendantLine }}</div>
-          </div>
-
-          <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:12px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">Wellness update</div>
-            <div style="font-size:12.5px;color:#a39685;line-height:1.5">One place for the whole truth — a graduation, an illness, or a passing. Only what you write here appears on their node.</div>
-            <label style="display:flex;align-items:center;gap:9px;font-size:14px;color:#e6dfd0;cursor:pointer">
-              <input type="checkbox" checked="{{ wellness.alive }}" sc-camel-on-change="{{ onWellAlive }}" style="width:19px;height:19px;accent-color:#c9a24a;cursor:pointer">
-              Living and well
-            </label>
-            <textarea value="{{ wellness.text }}" sc-camel-on-change="{{ onWellText }}" rows="3" placeholder="Write the update the family should see…" style="background:#14110e;border:1px solid #3a3128;border-radius:7px;padding:10px;color:#f4efe3;font-size:13.5px;outline:none;resize:vertical;font-family:Helvetica, Arial, sans-serif"></textarea>
-            <div style="font-size:12.5px;color:#7d7266;line-height:1.45">{{ wellness.hint }}</div>
-            <div style="display:flex;gap:9px">
-              <button sc-camel-on-click="{{ postWellness }}" style="flex:1;background:#c9a24a;border:none;color:#1a1409;border-radius:8px;padding:12px;font-size:14px;font-weight:bold;cursor:pointer" style-hover="background:#dcb45c">Post update &amp; notify {{ wellness.recipients }}</button>
-              <button sc-camel-on-click="{{ clearWellness }}" style="background:transparent;border:1px solid #3a3128;color:#a39685;border-radius:8px;padding:12px 14px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="color:#e6dfd0">Clear</button>
-            </div>
-          </div>
-
-          <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:11px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">Media &amp; memories</div>
-            <div style="display:flex;gap:11px">
-              <image-slot id="focus-{{ focus.id }}" fit="cover" style="width:96px;height:112px;flex:0 0 auto" shape="rounded" radius="7" placeholder="Drop {{ focus.firstName }}’s photo"></image-slot>
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
-                <div style="font-size:12.5px;color:#a39685;line-height:1.45">{{ focus.mediaLine }}</div>
-                <button sc-camel-on-click="{{ addVideo }}" style="background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#c9a24a">+ Attach a video</button>
-                <button sc-camel-on-click="{{ addChild }}" style="background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#c9a24a">+ Add {{ focus.firstName }}’s child</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </sc-if>
 
       <sc-if value="{{ isChat }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
-          <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:12px 14px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a08d5f">Family assistant</div>
-            <div style="font-size:12.5px;color:#a39685;margin-top:5px;line-height:1.5">Runs on-device on a small local model (Qwen) — no cloud calls, no API subscription. It reads and writes the Neo4j graph directly, and asks every question the graph needs — branch, parent, name, relationship, birth, living status, photo, video, good news — before filing anyone.</div>
-          </div>
           <div style="background:#1b1611;border:1px solid #2e2720;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:340px;overflow:auto">
             <sc-for list="{{ chatMessages }}" as="m" hint-placeholder-count="1">
               <div style="display:flex;justify-content:{{ m.align }}">
@@ -505,7 +520,6 @@ class Component extends DCLogic {
     focusId: null,
     tab: 'chat',
     chatFlow: null,
-    rootVisible: true,
     formOpen: false,
     formError: '',
     form: { parentId: '', name: '', relation: 'Child', birth: '', alive: true, photo: false, video: false, news: '' },
@@ -516,8 +530,9 @@ class Component extends DCLogic {
     outbox: [],
     activity: [],
     query: '',
+    genFilter: '',
     chatDraft: '',
-    chat: [{ from: 'bot', text: 'Hi cousin! I\u2019m the family assistant \u2014 running right on this device, no cloud needed, reading straight from the family graph. Ask "how many grandkids does Ethel have," or just say "add someone" and I\u2019ll ask everything Neo4j needs to file them correctly.' }]
+    chat: [{ from: 'bot', text: 'Hey cuz \u2014 I\u2019m Cuzzo, family on your side. Tell me who you want to add and I\u2019ll get them on the tree properly. You can also ask me things like "how many grandkids does Ethel have."' }]
   };
 
   componentDidMount() { this.centerOn(this.state.activeSlug, 'auto'); }
@@ -569,10 +584,25 @@ class Component extends DCLogic {
 
   setForm(k, v) { this.setState(s => ({ form: Object.assign({}, s.form, { [k]: v }), formError: '' })); }
 
+  // Read the chosen picture straight into the form as a data URL, so it saves
+  // with the rest of the person and survives a refresh like everything else.
+  readPhoto(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { this.setState({ formError: 'That file is not a picture. Try a JPG or PNG.' }); return; }
+    if (file.size > 4 * 1024 * 1024) { this.setState({ formError: 'That picture is over 4MB. Try a smaller one.' }); return; }
+    const reader = new FileReader();
+    reader.onload = () => this.setState(s => ({
+      form: Object.assign({}, s.form, { photo: true, photoData: reader.result, photoName: file.name }),
+      formError: ''
+    }));
+    reader.onerror = () => this.setState({ formError: 'That picture could not be read. Try another one.' });
+    reader.readAsDataURL(file);
+  }
+
   openForm(slug, parentId) {
     this.setState(s => ({
       tab: 'hub', activeSlug: slug || s.activeSlug, formOpen: true, formError: '',
-      form: Object.assign({}, s.form, { parentId: parentId || '', name: '', birth: '', news: '', photo: false, video: false, alive: true })
+      form: Object.assign({}, s.form, { parentId: parentId || '', name: '', birth: '', news: '', photo: false, photoData: null, photoName: '', video: false, alive: true })
     }));
     if (slug) this.centerOn(slug);
   }
@@ -596,7 +626,8 @@ class Component extends DCLogic {
     const person = {
       id: id, slug: slug, parentId: parentId, name: name, relation: f.relation,
       birth: (f.birth || '').trim(), alive: f.alive !== false, wellness: '',
-      photo: f.photo === true, video: f.video === true, news: (f.news || '').trim(), pending: this.props.instantPublish !== true
+      photo: f.photo === true, photoData: f.photoData || null,
+      video: f.video === true, news: (f.news || '').trim(), pending: this.props.instantPublish !== true
     };
     const tier = tierFor(depth);
     const under = parent ? parent.name.split(' ')[0] : br.name.split(' ')[0];
@@ -604,7 +635,7 @@ class Component extends DCLogic {
     this.setState(s => ({
       people: s.people.concat([person]),
       formOpen: false,
-      form: Object.assign({}, s.form, { name: '', birth: '', news: '', photo: false, video: false }),
+      form: Object.assign({}, s.form, { name: '', birth: '', news: '', photo: false, photoData: null, photoName: '', video: false }),
       outbox: mail ? [mail].concat(s.outbox).slice(0, 8) : s.outbox,
       activity: [{ text: name + ' filed as a ' + tier + ' under ' + under + (person.pending ? ' \u2014 awaiting a custodian\u2019s approval.' : '. Totals updated.') }].concat(s.activity).slice(0, 7)
     }));
@@ -616,7 +647,7 @@ class Component extends DCLogic {
     if (!n) return;
     this.setState(s => ({
       people: s.people.map(p => p.slug === slug && p.pending ? Object.assign({}, p, { pending: false }) : p),
-      activity: [{ text: n + (n === 1 ? ' addition' : ' additions') + ' approved on the ' + this.branch(slug).name.split(' ')[0] + ' branch and merged into Neo4j.' }].concat(s.activity).slice(0, 7)
+      activity: [{ text: n + (n === 1 ? ' addition' : ' additions') + ' approved on the ' + this.branch(slug).name.split(' ')[0] + ' branch.' }].concat(s.activity).slice(0, 7)
     }));
   }
 
@@ -723,7 +754,7 @@ class Component extends DCLogic {
     if (/alive|passed|wellness|deceased/.test(q)) {
       return 'Living status lives in each person\u2019s Wellness Update \u2014 open their card, then the Person tab, to check or update it.';
     }
-    return 'I\u2019m reading straight from the family graph \u2014 try \u201chow many grandkids does ' + this.active().name.split(' ')[0] + ' have,\u201d or say \u201cadd someone\u201d and I\u2019ll walk you through everything the tree needs.';
+    return 'Try \u201chow many grandkids does ' + this.active().name.split(' ')[0] + ' have,\u201d or say \u201cadd someone\u201d and I\u2019ll walk you through it.';
   }
 
   sendChat() {
@@ -787,10 +818,11 @@ class Component extends DCLogic {
           return {
             id: p.id, name: p.name, firstName: p.name.split(' ')[0], pending: p.pending,
             tier: tierFor(x.depth), wellness: p.wellness, hasPhoto: p.photo,
+            photoUrl: p.photoData ? 'url("' + p.photoData + '")' : 'none',
             indent: ((x.depth - 1) * 14) + 'px',
             meta: [p.relation, p.birth ? 'b. ' + p.birth : null, parent ? 'child of ' + parent.name.split(' ')[0] : 'child of ' + b.name.split(' ')[0]].filter(Boolean).join(' \u00b7 '),
             extras: extras.join(' \u00b7 '),
-            focus: () => this.setState({ activeSlug: p.slug, focusId: p.id, tab: 'person', wellDraft: { id: p.id, alive: p.alive !== false, text: '' } })
+            focus: () => this.setState({ activeSlug: p.slug, focusId: p.id, tab: 'hub', wellDraft: { id: p.id, alive: p.alive !== false, text: '' } })
           };
         })
       };
@@ -819,21 +851,16 @@ class Component extends DCLogic {
       showDates, columns,
       query: s.query,
       onQuery: e => this.setState({ query: e.target.value }),
-      rootVisible: s.rootVisible,
-      rootToggleLabel: s.rootVisible ? 'Hide the Trunk' : 'Show the Trunk',
-      toggleRoot: () => this.setState(st => ({ rootVisible: !st.rootVisible })),
       totalMembers: 2 + s.branches.length + treeTotal,
       trunkLine: 'Magnolia b. 1892 \u00b7 9 branches \u00b7 ' + treeTotal + ' descendants recorded so far',
       treeLine: treeParts.join(' \u00b7 '),
 
       tabs: [
-        { label: 'Branch hub', on: s.tab === 'hub', off: s.tab !== 'hub', go: () => this.setState({ tab: 'hub' }) },
-        { label: 'Person', on: s.tab === 'person', off: s.tab !== 'person', go: () => this.setState({ tab: 'person' }) },
-        { label: 'Assistant', on: s.tab === 'chat', off: s.tab !== 'chat', go: () => this.setState({ tab: 'chat' }) },
+        { label: 'Cuzzo Chat', on: s.tab === 'chat', off: s.tab !== 'chat', go: () => this.setState({ tab: 'chat' }) },
+        { label: 'Update', on: s.tab === 'hub', off: s.tab !== 'hub', go: () => this.setState({ tab: 'hub' }) },
         { label: 'Alerts', on: s.tab === 'alerts', off: s.tab !== 'alerts', go: () => this.setState({ tab: 'alerts' }) }
       ],
       isHub: s.tab === 'hub',
-      isPerson: s.tab === 'person',
       isChat: s.tab === 'chat',
       isAlerts: s.tab === 'alerts',
       chatMessages: s.chat.map(m => ({
@@ -862,21 +889,24 @@ class Component extends DCLogic {
       submitLabel: this.props.instantPublish === true ? 'Add to the tree' : 'Submit for approval',
       formOpen: s.formOpen,
       formError: s.formError,
-      form: s.form,
+      form: Object.assign({}, s.form, {
+        photoPreview: s.form.photoData ? 'url("' + s.form.photoData + '")' : 'none',
+        photoBadge: s.form.photoData ? '' : '+',
+        photoLabel: s.form.photoData ? (s.form.photoName || 'Picture chosen') + ' \u2014 tap to change' : 'Choose a picture'
+      }),
       relations: RELATIONS,
       parentOptions: [{ id: '', label: active.name + ' \u2014 BRANCH ' + active.order }]
-        .concat(activeRows.map(x => ({ id: x.p.id, label: x.p.name + ' \u2014 ' + tierFor(x.depth) }))),
+        .concat(activeRows.map(x => ({ id: x.p.id, label: x.p.name + ' \u2014 ' + TIER_LABEL[tierFor(x.depth)] }))),
       inferred: {
-        tier: fTier + ' \u00b7 ' + TIER_LABEL[fTier],
-        path: 'Big Ma & Big Papa \u2192 ' + active.name.split(' ')[0] + (fParent ? ' \u2192 ' + this.pathOf(fParent).split(' \u2192 ').slice(2).join(' \u2192 ') : '') + ' \u2192 ' + ((s.form.name || 'this person').trim() || 'this person'),
-        cypher: 'MERGE (c:Person:' + fTier + ' {name:"' + ((s.form.name || '').trim() || '\u2026') + '"}) MERGE (p:Person {name:"' + anchor + '"}) MERGE (p)-[:PARENT_OF]->(c)'
+        tier: TIER_LABEL[fTier],
+        path: 'Big Ma & Big Papa \u2192 ' + active.name.split(' ')[0] + (fParent ? ' \u2192 ' + this.pathOf(fParent).split(' \u2192 ').slice(2).join(' \u2192 ') : '') + ' \u2192 ' + ((s.form.name || 'this person').trim() || 'this person')
       },
       onName: e => this.setForm('name', e.target.value),
       onRelation: e => this.setForm('relation', e.target.value),
       onBirth: e => this.setForm('birth', e.target.value),
       onParent: e => this.setForm('parentId', e.target.value),
       onAlive: e => this.setForm('alive', e.target.checked),
-      onPhoto: e => this.setForm('photo', e.target.checked),
+      onPhotoFile: e => this.readPhoto(e.target.files && e.target.files[0]),
       onVideo: e => this.setForm('video', e.target.checked),
       onNews: e => this.setForm('news', e.target.value),
 
@@ -886,20 +916,26 @@ class Component extends DCLogic {
         label: t === 'TWIG' ? 'children of ' + active.name.split(' ')[0] : TIER_LABEL[t]
       })).concat([{ tier: active.name.split(' ')[0], value: 1, label: 'first generation, from Big Ma & Big Papa' }]),
 
+      hasFocus: !!focus,
       focus: focus ? {
         id: focus.id, name: focus.name, firstName: focus.name.split(' ')[0],
         tier: tierFor(this.depthOf(focus)),
         branchLabel: this.branch(focus.slug).name.split(' ')[0] + ' branch',
         path: this.pathOf(focus),
         descendantLine: focusKids ? focusKids + (focusKids === 1 ? ' person' : ' people') + ' recorded below them' : 'No one recorded below them yet',
-        mediaLine: [focus.photo ? 'Photo flagged for upload' : 'No photo yet', focus.video ? 'video attached' : 'no video yet'].join(' \u00b7 ')
+        mediaLine: [focus.photo ? 'Photo on file' : 'No photo yet', focus.video ? 'video attached' : 'no video yet'].join(' \u00b7 '),
+        photoUrl: focus.photoData ? 'url("' + focus.photoData + '")' : 'none',
+        photoPlaceholder: focus.photoData ? '' : '\ud83d\udc64'
       } : {
         id: 'branch-' + active.slug, name: active.name, firstName: active.name.split(' ')[0],
         tier: 'BRANCH ' + active.order, branchLabel: 'first generation',
         path: 'Big Ma & Big Papa \u2192 ' + active.name.split(' ')[0],
         descendantLine: activeRows.length + ' people recorded below her',
-        mediaLine: 'Framed portrait on file from the Space'
+        mediaLine: 'Framed portrait on file from the Space',
+        photoUrl: 'none', photoPlaceholder: '\ud83d\udc64'
       },
+      genFilter: s.genFilter,
+      onGenFilter: e => this.setState({ genFilter: e.target.value }),
       wellness: {
         alive: s.wellDraft.alive,
         text: s.wellDraft.text,
