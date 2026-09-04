@@ -139,48 +139,48 @@
         </div>
         <div style="flex:0 0 auto;display:flex;justify-content:center"><div style="width:1px;height:26px;background:#4a3f31"></div></div>
 
-      <div ref="{{ mainRef }}" style="flex:0 0 auto;overflow-x:auto;overflow-y:visible;padding:0 30px 40px">
-      <div style="display:inline-flex;flex-direction:column;align-items:center;min-width:max-content">
+      <div ref="{{ mainRef }}" style="flex:0 0 auto;overflow-x:visible;overflow-y:visible;padding:0 18px 110px">
+      <div style="display:flex;flex-direction:column;align-items:stretch;width:100%">
 
         <div style="position:relative;align-self:stretch;height:30px">
-          <div style="position:absolute;left:127px;right:127px;top:0;height:1px;background:#4a3f31"></div>
-          <div style="position:absolute;inset:0;display:flex;gap:18px">
+          <div style="position:absolute;left:6%;right:6%;top:0;height:1px;background:#4a3f31"></div>
+          <div style="position:absolute;inset:0;display:flex;gap:8px">
             <sc-for list="{{ columns }}" as="col" hint-placeholder-count="9">
-              <div style="width:236px;flex:0 0 auto;display:flex;justify-content:center">
+              <div style="flex:1 1 0;min-width:0;display:flex;justify-content:center">
                 <div style="width:1px;height:100%;background:#4a3f31"></div>
               </div>
             </sc-for>
           </div>
         </div>
 
-        <div style="display:flex;gap:18px;padding:0 0 8px;align-items:flex-start;align-self:stretch">
+        <div style="display:flex;gap:8px;padding:0 0 8px;align-items:flex-start;align-self:stretch">
           <sc-for list="{{ columns }}" as="col" hint-placeholder-count="9">
-            <div data-branch="{{ col.slug }}" data-screen-label="{{ col.shortName }}" style="width:236px;box-sizing:border-box;flex:0 0 auto;display:flex;flex-direction:column;gap:11px;background:#1b1611;border:1px solid #2e2720;border-radius:12px;padding:12px">
+            <div data-branch="{{ col.slug }}" data-screen-label="{{ col.shortName }}" style="flex:1 1 0;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;background:#1b1611;border:1px solid #2e2720;border-radius:12px;padding:9px">
 
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="width:24px;height:24px;flex:0 0 auto;border-radius:50%;background:#2b2318;border:1px solid #4a3f31;color:#d9b463;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ col.order }}</div>
-                <div style="font-size:12.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a39685;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Branch {{ col.order }} · {{ col.shortName }}</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="width:20px;height:20px;flex:0 0 auto;border-radius:50%;background:#2b2318;border:1px solid #4a3f31;color:#d9b463;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ col.order }}</div>
+                <div style="font-size:10.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:#a39685;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ col.shortName }}</div>
               </div>
 
-              <a href="/branch/{{ col.slug }}" style="display:block;text-align:center;padding:9px 10px;border:1px solid #c9a24a;border-radius:8px;background:rgba(201,162,74,.12);color:#e9cd88;font-size:11.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;text-decoration:none" style-hover="background:rgba(201,162,74,.24);color:#f6e6bd">Open branch page</a>
+              <a href="/branch/{{ col.slug }}" style="display:block;text-align:center;padding:7px 4px;border:1px solid #c9a24a;border-radius:7px;background:rgba(201,162,74,.12);color:#e9cd88;font-size:9.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="background:rgba(201,162,74,.24);color:#f6e6bd">Branch page</a>
 
               <div style="position:relative">
-                <div sc-camel-on-click="{{ col.select }}" style="position:relative;background:#f4efe3;border:1px solid #d8cfba;border-radius:10px;padding:12px 10px 11px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer" style-hover="border-color:#c9a24a">
+                <div sc-camel-on-click="{{ col.select }}" style="position:relative;background:#f4efe3;border:1px solid #d8cfba;border-radius:10px;padding:9px 7px 9px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer" style-hover="border-color:#c9a24a">
                   <sc-if value="{{ col.wellness }}" hint-placeholder-val="{{ false }}">
                     <div style="align-self:stretch;background:#eee4cd;border:1px solid #dbcba4;border-radius:7px;padding:7px 9px;text-align:left">
                       <div style="font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#7a6a45">Wellness update</div>
                       <div style="font-size:12.5px;font-weight:600;color:#3f382e;line-height:1.4;margin-top:3px">{{ col.wellness }}</div>
                     </div>
                   </sc-if>
-                  <div style="font-family:'Libre Baskerville', Georgia, serif;font-weight:700;font-size:16.5px;line-height:1.3;color:#1f1a14;text-align:center">{{ col.name }}</div>
-                  <image-slot id="portrait-{{ col.slug }}" src="{{ col.portrait }}" fit="contain" style="width:170px;height:200px;flex:0 0 auto" shape="rect" placeholder="{{ col.shortName }}"></image-slot>
-                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center">
+                  <div style="font-family:'Libre Baskerville', Georgia, serif;font-weight:700;font-size:12.5px;line-height:1.25;color:#1f1a14;text-align:center;width:100%;overflow-wrap:break-word">{{ col.name }}</div>
+                  <image-slot id="portrait-{{ col.slug }}" src="{{ col.portrait }}" fit="contain" style="width:100%;aspect-ratio:17/20;flex:0 0 auto" shape="rect" placeholder="{{ col.shortName }}"></image-slot>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;width:100%">
                     <sc-if value="{{ showDates }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:14px;font-weight:600;color:#4a4239">b. {{ col.birth }}</div>
+                      <div style="font-size:10.5px;font-weight:600;color:#4a4239">b. {{ col.birth }}</div>
                     </sc-if>
-                    <div style="font-size:13.5px;font-weight:700;color:#4a4239">{{ col.countLabel }}</div>
+                    <div style="font-size:10.5px;font-weight:700;color:#4a4239">{{ col.countLabel }}</div>
                     <sc-if value="{{ col.tierLine }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:12px;font-weight:700;letter-spacing:0.6px;color:#7a6a45">{{ col.tierLine }}</div>
+                      <div style="font-size:9.5px;font-weight:700;letter-spacing:0.3px;color:#7a6a45;line-height:1.3">{{ col.tierLine }}</div>
                     </sc-if>
                   </div>
                 </div>
@@ -190,35 +190,35 @@
               </div>
 
               <sc-if value="{{ col.isEmpty }}" hint-placeholder-val="{{ true }}">
-                <div sc-camel-on-click="{{ col.addTo }}" style="border:1px dashed #6b5a3c;border-radius:10px;padding:16px 12px;color:#d9b463;font-size:13.5px;font-weight:600;line-height:1.55;text-align:center;cursor:pointer;background:rgba(201,162,74,0.06)" style-hover="border-color:#c9a24a;background:rgba(201,162,74,0.14)">Please click here to enter {{ col.shortName }}’s children, grandchildren and beyond</div>
+                <div sc-camel-on-click="{{ col.addTo }}" style="border:1px dashed #6b5a3c;border-radius:9px;padding:10px 7px;color:#d9b463;font-size:10.5px;font-weight:600;line-height:1.45;text-align:center;cursor:pointer;background:rgba(201,162,74,0.06)" style-hover="border-color:#c9a24a;background:rgba(201,162,74,0.14)">Click to add {{ col.shortName }}’s children &amp; grandchildren</div>
               </sc-if>
 
               <sc-for list="{{ col.people }}" as="d" hint-placeholder-count="0">
                 <div style="display:flex;gap:0;align-items:stretch;padding-left:{{ d.indent }}">
-                  <div sc-camel-on-click="{{ d.focus }}" style="flex:1;min-width:0;background:#f4efe3;border:1px solid #d8cfba;border-radius:9px;padding:9px 10px;color:#1f1a14;cursor:pointer" style-hover="border-color:#c9a24a">
+                  <div sc-camel-on-click="{{ d.focus }}" style="flex:1;min-width:0;background:#f4efe3;border:1px solid #d8cfba;border-radius:8px;padding:7px;color:#1f1a14;cursor:pointer" style-hover="border-color:#c9a24a">
                     <sc-if value="{{ d.wellness }}" hint-placeholder-val="{{ false }}">
                       <div style="background:#eee4cd;border:1px solid #dbcba4;border-radius:6px;padding:6px 8px;margin-bottom:7px">
                         <div style="font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#7a6a45">Wellness update</div>
                         <div style="font-size:12px;font-weight:600;color:#3f382e;line-height:1.4;margin-top:2px">{{ d.wellness }}</div>
                       </div>
                     </sc-if>
-                    <div style="display:flex;gap:9px;align-items:flex-start">
+                    <div style="display:flex;gap:6px;align-items:flex-start">
                       <sc-if value="{{ d.hasPhoto }}" hint-placeholder-val="{{ false }}">
-                        <div style="width:44px;height:52px;flex:0 0 auto;border-radius:5px;background-color:#e6dfd0;background-image:{{ d.photoUrl }};background-size:cover;background-position:center"></div>
+                        <div style="width:30px;height:36px;flex:0 0 auto;border-radius:4px;background-color:#e6dfd0;background-image:{{ d.photoUrl }};background-size:cover;background-position:center"></div>
                       </sc-if>
                       <div style="min-width:0;flex:1">
-                        <div style="display:flex;align-items:baseline;gap:6px">
-                          <div style="font-size:14.5px;font-weight:bold;line-height:1.3;flex:1;min-width:0">{{ d.name }}</div>
+                        <div style="display:flex;align-items:baseline;gap:4px">
+                          <div style="font-size:11.5px;font-weight:bold;line-height:1.25;flex:1;min-width:0;overflow-wrap:break-word">{{ d.name }}</div>
                           <sc-if value="{{ d.pending }}" hint-placeholder-val="{{ false }}">
-                            <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8a5a12;background:#f1e0bd;border-radius:4px;padding:2px 5px;flex:0 0 auto">Pending</div>
+                            <div style="font-size:8px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:#8a5a12;background:#f1e0bd;border-radius:3px;padding:1px 3px;flex:0 0 auto">Pend</div>
                           </sc-if>
                         </div>
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">
-                          <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#6b5a2f;background:#e7dcc3;border-radius:4px;padding:2px 5px">{{ d.tier }}</div>
-                          <div style="font-size:12.5px;font-weight:600;color:#5c5347">{{ d.meta }}</div>
+                        <div style="display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap">
+                          <div style="font-size:8px;font-weight:700;letter-spacing:0.5px;color:#6b5a2f;background:#e7dcc3;border-radius:3px;padding:1px 4px">{{ d.tier }}</div>
+                          <div style="font-size:9.5px;font-weight:600;color:#5c5347;line-height:1.3">{{ d.meta }}</div>
                         </div>
                         <sc-if value="{{ d.extras }}" hint-placeholder-val="{{ false }}">
-                          <div style="font-size:12px;font-weight:600;color:#7a6a45;margin-top:4px">{{ d.extras }}</div>
+                          <div style="font-size:9px;font-weight:600;color:#7a6a45;margin-top:3px;line-height:1.35">{{ d.extras }}</div>
                         </sc-if>
                       </div>
                     </div>
@@ -226,7 +226,7 @@
                 </div>
               </sc-for>
 
-              <button sc-camel-on-click="{{ col.addTo }}" style="background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:9px;padding:11px 10px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#2b2318;border-color:#c9a24a">+ Add to the {{ col.shortName }} branch</button>
+              <button sc-camel-on-click="{{ col.addTo }}" style="background:#221c15;border:1px solid #4a3f31;color:#d9b463;border-radius:8px;padding:8px 5px;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="background:#2b2318;border-color:#c9a24a">+ Add to {{ col.shortName }}</button>
             </div>
           </sc-for>
         </div>
@@ -236,7 +236,12 @@
       </div>
     </main>
 
-    <aside style="width:376px;flex:0 0 auto;background:#17130f;border-left:1px solid #2b241c;position:sticky;top:0;max-height:100vh;overflow:auto;padding:18px 20px 40px;display:flex;flex-direction:column;gap:15px">
+    <aside style="width:376px;max-width:92vw;flex:0 0 auto;background:#17130f;border-left:1px solid #2b241c;position:fixed;right:0;top:0;height:100vh;overflow:auto;padding:18px 20px 40px;display:{{ panelDisplay }};flex-direction:column;gap:15px;z-index:400;box-shadow:-22px 0 60px rgba(0,0,0,0.6)">
+
+      <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+        <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:15px;color:#f6f1e6;flex:1">Family workspace</div>
+        <button sc-camel-on-click="{{ closePanel }}" title="Close" style="width:32px;height:32px;flex:0 0 auto;background:#221c15;border:1px solid #3a3128;border-radius:8px;color:#a39685;font-size:17px;line-height:1;cursor:pointer" style-hover="color:#f4efe3;border-color:#c9a24a">×</button>
+      </div>
 
       <div style="display:flex;gap:5px;background:#1b1611;border:1px solid #2e2720;border-radius:9px;padding:4px;flex:0 0 auto">
         <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
@@ -524,6 +529,11 @@
         </div>
       </sc-if>
     </aside>
+
+    <div style="position:fixed;right:20px;bottom:20px;z-index:390;display:{{ launcherDisplay }};flex-direction:column;gap:9px;align-items:flex-end">
+      <button sc-camel-on-click="{{ openChat }}" style="background:#1b1611;border:1px solid #4a3f31;color:#d9b463;border-radius:24px;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,0.5)" style-hover="border-color:#c9a24a;background:#221c15">💬 Cuzzo Chat</button>
+      <button sc-camel-on-click="{{ openPanel }}" style="background:#c9a24a;border:none;color:#1a1409;border-radius:24px;padding:13px 21px;font-size:14.5px;font-weight:bold;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,0.5)" style-hover="background:#dcb45c">✎ Update the tree</button>
+    </div>
   </div>
 </div>
 
@@ -587,6 +597,7 @@ class Component extends DCLogic {
     chatPhotoName: '',
     chatVideoFlag: false,
     chatDropHighlight: false,
+    panelOpen: false,
     chat: [{ from: 'bot', text: 'Hey family! \ud83c\udf33 I\u2019m Cuzzo \u2014 here to help you keep our branch of the tree updated. Who are we adding today?' }]
   };
 
@@ -656,7 +667,7 @@ class Component extends DCLogic {
 
   openForm(slug, parentId) {
     this.setState(s => ({
-      tab: 'hub', activeSlug: slug || s.activeSlug, formOpen: true, formError: '',
+      tab: 'hub', panelOpen: true, activeSlug: slug || s.activeSlug, formOpen: true, formError: '',
       form: Object.assign({}, s.form, { parentId: parentId || '', name: '', birth: '', news: '', photo: false, photoData: null, photoName: '', video: false, alive: true })
     }));
     if (slug) this.centerOn(slug);
@@ -915,7 +926,7 @@ class Component extends DCLogic {
         tierLine: parts.join(' \u00b7 '),
         isActive: b.slug === s.activeSlug,
         isEmpty: n === 0,
-        select: () => { this.setState({ activeSlug: b.slug, focusId: null, tab: 'hub' }); this.centerOn(b.slug); },
+        select: () => { this.setState({ activeSlug: b.slug, focusId: null, tab: 'hub', panelOpen: true }); },
         addTo: () => this.openForm(b.slug, ''),
         people: rows.map(x => {
           const p = x.p;
@@ -933,7 +944,7 @@ class Component extends DCLogic {
             indent: ((x.depth - 1) * 14) + 'px',
             meta: [p.relation, p.birth ? 'b. ' + p.birth : null, parent ? 'child of ' + parent.name.split(' ')[0] : 'child of ' + b.name.split(' ')[0]].filter(Boolean).join(' \u00b7 '),
             extras: extras.join(' \u00b7 '),
-            focus: () => this.setState({ activeSlug: p.slug, focusId: p.id, tab: 'hub', wellDraft: { id: p.id, alive: p.alive !== false, text: '' } })
+            focus: () => this.setState({ activeSlug: p.slug, focusId: p.id, tab: 'hub', panelOpen: true, wellDraft: { id: p.id, alive: p.alive !== false, text: '' } })
           };
         })
       };
@@ -971,6 +982,11 @@ class Component extends DCLogic {
         { label: 'Update', on: s.tab === 'hub', off: s.tab !== 'hub', go: () => this.setState({ tab: 'hub' }) },
         { label: 'Alerts', on: s.tab === 'alerts', off: s.tab !== 'alerts', go: () => this.setState({ tab: 'alerts' }) }
       ],
+      panelDisplay: s.panelOpen ? 'flex' : 'none',
+      launcherDisplay: s.panelOpen ? 'none' : 'flex',
+      openPanel: () => this.setState({ panelOpen: true, tab: 'hub' }),
+      openChat: () => this.setState({ panelOpen: true, tab: 'chat' }),
+      closePanel: () => this.setState({ panelOpen: false }),
       isHub: s.tab === 'hub',
       isChat: s.tab === 'chat',
       isAlerts: s.tab === 'alerts',
