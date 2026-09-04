@@ -210,6 +210,33 @@ async def dev_sync_key(request: Request):
     if not value:
         return JSONResponse({"error": "empty value"}, status_code=400)
 
+    # A Google service-account key is a JSON keypair, not a bare string -- it
+    # belongs in its own file that GOOGLE_APPLICATION_CREDENTIALS points at,
+    # not inlined into an env var.
+    if provider == "gcloud" and value.lstrip().startswith("{"):
+        import json as _json
+        try:
+            parsed = _json.loads(value)
+        except ValueError as exc:
+            return JSONResponse({"error": f"not valid JSON: {exc}"}, status_code=400)
+        if parsed.get("type") != "service_account":
+            return JSONResponse({"error": "JSON is not a service_account key"}, status_code=400)
+        sa_path = os.path.join(_HOME, ".config", "gcloud", "nobility-service-account.json")
+        os.makedirs(os.path.dirname(sa_path), exist_ok=True)
+        with open(sa_path, "w") as f:
+            f.write(value)
+        os.chmod(sa_path, 0o600)
+        env_path = os.path.join(_HOME, ".config", "gcloud", "nobility-api-key.env")
+        with open(env_path, "w") as f:
+            f.write(f"GOOGLE_APPLICATION_CREDENTIALS={sa_path}\n")
+        os.chmod(env_path, 0o600)
+        return JSONResponse({
+            "ok": True,
+            "path": sa_path.replace(_HOME, "~"),
+            "account": parsed.get("client_email"),
+            "project": parsed.get("project_id"),
+        })
+
     path = target["path"]
     os.makedirs(os.path.dirname(path), exist_ok=True)
     if target["fmt"] == "raw":

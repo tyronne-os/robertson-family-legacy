@@ -238,7 +238,10 @@
         <div style="display:flex;gap:8px;margin-bottom:8px;">
           <select id="renewProvider" style="flex:0 0 auto;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 10px;color:#f4efe3;font-size:12.5px;outline:none;font-family:inherit;">
             <option value="hf">Hugging Face</option>
+            <option value="gcloud">Google Cloud</option>
             <option value="github">GitHub</option>
+            <option value="nim">NVIDIA NIM</option>
+            <option value="nvent">NVIDIA Enterprise</option>
           </select>
           <input type="text" id="renewName" placeholder="Token name (e.g. STACY DIANE)" autocomplete="off"
             style="flex:1;min-width:0;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 11px;color:#f4efe3;font-size:12.5px;outline:none;">
@@ -253,6 +256,10 @@
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button id="renewOpenBtn" style="padding:9px 15px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:6px;color:#c9a24a;font-size:12px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Open Token Page ↗</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button id="renewFileBtn" style="padding:9px 15px;background:transparent;border:1px solid rgba(201,162,74,.3);border-radius:6px;color:rgba(232,215,182,.7);font-size:12px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Load from JSON file…</button>
+          <input type="file" id="renewFileInput" accept=".json,application/json" style="display:none;">
         </div>
         <div style="margin-top:10px;">
           <input type="password" id="renewPaste" placeholder="Paste the new token here" autocomplete="off"
@@ -554,10 +561,31 @@ document.querySelectorAll('.vtab').forEach(btn => {
 
 // ---- Renew / rotate a key ----
 const RENEW_TARGETS = {
-  hf:     { label:'Hugging Face', lsKey:'bigma:vault:hf_token',     verify:verifyHF, prefix:'hf_',
-            url:(name,role)=>`https://huggingface.co/settings/tokens/new?tokenType=${role}` + (name?`&displayName=${encodeURIComponent(name)}`:'') },
-  github: { label:'GitHub',       lsKey:'bigma:vault:github_token', verify:verifyGH, prefix:'gh',
-            url:(name,role)=>`https://github.com/settings/tokens/new?scopes=${role==='write'?'repo,workflow':'public_repo'}` + (name?`&description=${encodeURIComponent(name)}`:'') },
+  hf: {
+    label:'Hugging Face', lsKey:'bigma:vault:hf_token', verify:verifyHF, prefix:'hf_',
+    url:(name,role)=>`https://huggingface.co/settings/tokens/new?tokenType=${role}` + (name?`&displayName=${encodeURIComponent(name)}`:''),
+  },
+  github: {
+    label:'GitHub', lsKey:'bigma:vault:github_token', verify:verifyGH, prefix:'ghp',
+    url:(name,role)=>`https://github.com/settings/tokens/new?scopes=${role==='write'?'repo,workflow':'public_repo'}` + (name?`&description=${encodeURIComponent(name)}`:''),
+  },
+  gcloud: {
+    label:'Google Cloud', lsKey:'bigma:vault:gcloud_key', verify:null, prefix:'',
+    // A service-account JSON is a keypair and never expires; an API key does.
+    // Sending write to the service-account screen and read to API credentials.
+    url:(name,role)=> role==='write'
+      ? 'https://console.cloud.google.com/iam-admin/serviceaccounts'
+      : 'https://console.cloud.google.com/apis/credentials',
+    note:'Write opens Service Accounts (JSON keypair, never expires). Read opens API credentials.',
+  },
+  nim: {
+    label:'NVIDIA NIM', lsKey:'bigma:vault:nvidia_nim_key', verify:null, prefix:'nvapi-',
+    url:()=>'https://org.ngc.nvidia.com/setup/api-key',
+  },
+  nvent: {
+    label:'NVIDIA Enterprise', lsKey:'bigma:vault:nvidia_enterprise', verify:null, prefix:'',
+    url:()=>'https://enterprise.nvidia.com/',
+  },
 };
 
 function renewRole() {
@@ -575,6 +603,49 @@ document.getElementById('renewOpenBtn').onclick = () => {
   st.style.color = '#a08d5f';
 };
 
+// Show each provider's own guidance as the dropdown changes.
+document.getElementById('renewProvider').onchange = function() {
+  const t = RENEW_TARGETS[this.value];
+  const st = document.getElementById('renewStatus');
+  st.textContent = t.note || '';
+  st.style.color = '#a08d5f';
+};
+
+// A Google service-account key arrives as a downloaded .json file rather than
+// a pasted string, so accept the file and carry the whole document through.
+document.getElementById('renewFileBtn').onclick = () => document.getElementById('renewFileInput').click();
+
+document.getElementById('renewFileInput').onchange = async (e) => {
+  const file = e.target.files[0];
+  const st = document.getElementById('renewStatus');
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    if (parsed.type === 'service_account') {
+      document.getElementById('renewProvider').value = 'gcloud';
+      document.getElementById('renewPaste').value = text;
+      if (!document.getElementById('renewName').value.trim() && parsed.client_email) {
+        document.getElementById('renewName').value = parsed.client_email.split('@')[0];
+      }
+      st.textContent = `✓ Loaded service account ${parsed.client_email} (project ${parsed.project_id}). Click Verify & Replace Key to install it.`;
+      st.style.color = '#6ee7a0';
+    } else if (parsed.hfToken) {
+      document.getElementById('renewProvider').value = 'hf';
+      document.getElementById('renewPaste').value = parsed.hfToken;
+      st.textContent = '✓ Loaded a Hugging Face token from a vault backup. Click Verify & Replace Key.';
+      st.style.color = '#6ee7a0';
+    } else {
+      st.textContent = "That JSON isn't a service-account key or a vault backup — paste the key directly instead.";
+      st.style.color = '#f87171';
+    }
+  } catch(err) {
+    st.textContent = "Couldn't read that file as JSON: " + err.message;
+    st.style.color = '#f87171';
+  }
+  e.target.value = '';
+};
+
 document.getElementById('renewApplyBtn').onclick = async () => {
   const id = document.getElementById('renewProvider').value;
   const name = document.getElementById('renewName').value.trim();
@@ -582,31 +653,50 @@ document.getElementById('renewApplyBtn').onclick = async () => {
   const val = document.getElementById('renewPaste').value.trim();
   const t = RENEW_TARGETS[id];
   const st = document.getElementById('renewStatus');
-  if (!val) { st.textContent='Paste the new token first.'; st.style.color='#f87171'; return; }
-  if (!val.startsWith(t.prefix)) { st.textContent=`That doesn't look like a ${t.label} token (expected it to start with "${t.prefix}").`; st.style.color='#f87171'; return; }
-
-  st.textContent='Verifying the new token…'; st.style.color='#a08d5f';
-  const t0 = performance.now();
-  try {
-    const res = await t.verify(val);
-    if (!res.ok) {
-      logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
-      st.textContent = '✗ ' + res.error + ' — the old key is untouched.';
-      st.style.color = '#f87171';
-      return;
-    }
-    localStorage.setItem(t.lsKey, val);
-    const sync = await syncKeyToCli(id, val);
-    logActivity(t.label, `renew (${role})${name?' · '+name:''}`, performance.now()-t0, 'ok');
-    document.getElementById('renewPaste').value = '';
-    st.textContent = `✓ ${res.note} — key replaced${sync.ok ? ' and synced to ' + sync.path : ''}. Revoke the old one on ${t.label}.`;
-    st.style.color = '#6ee7a0';
-    renderProviders();
-  } catch(e) {
-    logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
-    st.textContent = '✗ ' + e.message + ' — the old key is untouched.';
-    st.style.color = '#f87171';
+  if (!val) { st.textContent='Paste the new key first, or load it from a JSON file.'; st.style.color='#f87171'; return; }
+  if (t.prefix && !val.startsWith(t.prefix) && !val.startsWith('{')) {
+    st.textContent=`That doesn't look like a ${t.label} key (expected it to start with "${t.prefix}").`;
+    st.style.color='#f87171';
+    return;
   }
+
+  const t0 = performance.now();
+
+  // Only some providers expose an endpoint that can confirm a key before it is
+  // installed. Where none exists, the key is installed and labelled as such
+  // rather than claiming a verification that never happened.
+  if (t.verify) {
+    st.textContent='Verifying the new key…'; st.style.color='#a08d5f';
+    try {
+      const res = await t.verify(val);
+      if (!res.ok) {
+        logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
+        st.textContent = '✗ ' + res.error + ' — the old key is untouched.';
+        st.style.color = '#f87171';
+        return;
+      }
+      localStorage.setItem(t.lsKey, val);
+      const sync = await syncKeyToCli(id, val);
+      logActivity(t.label, `renew (${role})${name?' · '+name:''}`, performance.now()-t0, 'ok');
+      document.getElementById('renewPaste').value = '';
+      st.textContent = `✓ ${res.note} — key replaced${sync.ok ? ' and synced to ' + sync.path : ''}. Revoke the old one on ${t.label}.`;
+      st.style.color = '#6ee7a0';
+      renderProviders();
+    } catch(e) {
+      logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
+      st.textContent = '✗ ' + e.message + ' — the old key is untouched.';
+      st.style.color = '#f87171';
+    }
+    return;
+  }
+
+  localStorage.setItem(t.lsKey, val);
+  const sync = await syncKeyToCli(id, val);
+  logActivity(t.label, `renew (${role})${name?' · '+name:''}`, performance.now()-t0, 'ok');
+  document.getElementById('renewPaste').value = '';
+  st.textContent = `✓ Key replaced${sync.ok ? ' and synced to ' + sync.path : ''}. ${t.label} has no verify endpoint, so this was not checked against the provider.`;
+  st.style.color = '#6ee7a0';
+  renderProviders();
 };
 
 document.getElementById('clearLogBtn').onclick = function() {
