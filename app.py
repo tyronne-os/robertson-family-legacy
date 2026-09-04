@@ -62,9 +62,14 @@ PAGES = [
     ("photo-album",       "Photo Album.dc.html"),
     ("submit-a-chapter",  "Submit a Chapter.dc.html"),
     ("branches",          "Branches - Family Tree.dc.html"),
+    ("branches-admin",    "Branches Admin.dc.html"),
 ]
 
 app = FastAPI()
+
+from backend import router as api_router, init_db
+init_db()
+app.include_router(api_router)
 
 
 def _make_page_route(filename):
