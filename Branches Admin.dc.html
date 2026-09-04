@@ -197,29 +197,89 @@
 
   <div id="vaultPanel" style="
     position: fixed; top: 0; right: 0; bottom: 0; z-index: 80;
-    width: min(440px, 96vw);
+    width: min(500px, 96vw);
     background: linear-gradient(170deg,#241610,#150c07 55%,#1f130d);
     border-left: 1px solid rgba(201,162,74,.38);
     box-shadow: -24px 0 64px rgba(0,0,0,.7);
     transform: translateX(100%); transition: transform .32s cubic-bezier(.2,.9,.25,1);
-    display: flex; flex-direction: column; overflow-y: auto;
+    display: flex; flex-direction: column;
   ">
-    <div style="display:flex; align-items:center; justify-content:space-between; padding: 22px 24px 18px; border-bottom: 1px solid rgba(201,162,74,.2);">
-      <div>
-        <div style="font-size: 10px; letter-spacing: .32em; color: #c9a24a; text-transform: uppercase;">THE VAULT</div>
-        <div style="font-family: 'Libre Baskerville', Georgia, serif; font-size: 24px; color: #e8d7b6; margin-top: 2px;">Branches Admin</div>
+    <!-- Header + tab nav -->
+    <div style="flex:0 0 auto; border-bottom: 1px solid rgba(201,162,74,.2);">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding: 20px 24px 14px;">
+        <div>
+          <div style="font-size: 10px; letter-spacing: .32em; color: #c9a24a; text-transform: uppercase;">NOBILITY DEPOSITORY</div>
+          <div style="font-family: 'Libre Baskerville', Georgia, serif; font-size: 22px; color: #e8d7b6; margin-top: 2px;">The Vault</div>
+        </div>
+        <button id="vaultCloseBtn" style="width:34px; height:34px; border-radius:50%; border:1px solid rgba(201,162,74,.3); background:transparent; color: rgba(232,215,182,.6); font-size:18px; cursor:pointer;">×</button>
       </div>
-      <button id="vaultCloseBtn" style="width:34px; height:34px; border-radius:50%; border:1px solid rgba(201,162,74,.3); background:transparent; color: rgba(232,215,182,.6); font-size:18px; cursor:pointer;">×</button>
+      <div style="display:flex; gap:0; padding: 0 24px;">
+        <button class="vtab active" data-vtab="keys" style="padding:8px 18px; background:transparent; border:none; border-bottom:2px solid #c9a24a; color:#c9a24a; font-size:12px; font-weight:700; letter-spacing:.1em; cursor:pointer; text-transform:uppercase;">Vault</button>
+        <button class="vtab" data-vtab="report" style="padding:8px 18px; background:transparent; border:none; border-bottom:2px solid transparent; color:rgba(232,215,182,.45); font-size:12px; font-weight:700; letter-spacing:.1em; cursor:pointer; text-transform:uppercase;">Report</button>
+        <button class="vtab" data-vtab="settings" style="padding:8px 18px; background:transparent; border:none; border-bottom:2px solid transparent; color:rgba(232,215,182,.45); font-size:12px; font-weight:700; letter-spacing:.1em; cursor:pointer; text-transform:uppercase;">Settings</button>
+      </div>
     </div>
 
-    <div style="padding: 26px 24px; display:flex; flex-direction:column; gap: 22px;">
+    <!-- VAULT TAB -->
+    <div id="vtab-keys" class="vtab-view" style="flex:1; overflow-y:auto; padding: 22px 24px; display:flex; flex-direction:column; gap:18px;">
 
-      <!-- Vault master key — stored in localStorage, used for all vault actions -->
-      <div>
-        <div class="section-title">VAULT ACCESS</div>
-        <div class="vault-desc" style="margin-bottom:10px;">Enter your site owner key once — saved in this browser so you never retype it.</div>
+      <div style="font-size:12px; color:rgba(232,215,182,.4); line-height:1.6; padding:10px 12px; background:rgba(201,162,74,.06); border:1px solid rgba(201,162,74,.15); border-radius:6px;">
+        Keys are saved in this browser only. To sync them to your local CLI tools (HF CLI, gh, gcloud, ngc), use the <strong style="color:#c9a24a;">Nobility Depository</strong> desktop app.
+      </div>
+
+      <div id="vaultProviderList"></div>
+
+      <!-- Renew / rotate a key -->
+      <div style="border:1px solid rgba(201,162,74,.28); border-radius:8px; padding:16px 18px; background:rgba(201,162,74,.04);">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.22em; color:#c9a24a; text-transform:uppercase; margin-bottom:4px;">Renew a Key</div>
+        <div style="font-size:11.5px;color:rgba(232,215,182,.42);line-height:1.6;margin-bottom:11px;">
+          Name it, pick its permission, and open the provider's token page. Paste the new key back here and it replaces the old one everywhere.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <select id="renewProvider" style="flex:0 0 auto;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 10px;color:#f4efe3;font-size:12.5px;outline:none;font-family:inherit;">
+            <option value="hf">Hugging Face</option>
+            <option value="github">GitHub</option>
+          </select>
+          <input type="text" id="renewName" placeholder="Token name (e.g. STACY DIANE)" autocomplete="off"
+            style="flex:1;min-width:0;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 11px;color:#f4efe3;font-size:12.5px;outline:none;">
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(232,215,182,.75);cursor:pointer;">
+            <input type="radio" name="renewRole" value="read" style="accent-color:#c9a24a;cursor:pointer;"> Read
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(232,215,182,.75);cursor:pointer;">
+            <input type="radio" name="renewRole" value="write" checked style="accent-color:#c9a24a;cursor:pointer;"> Write
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="renewOpenBtn" style="padding:9px 15px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:6px;color:#c9a24a;font-size:12px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Open Token Page ↗</button>
+        </div>
+        <div style="margin-top:10px;">
+          <input type="password" id="renewPaste" placeholder="Paste the new token here" autocomplete="off"
+            style="width:100%;box-sizing:border-box;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 11px;color:#f4efe3;font-size:12.5px;outline:none;font-family:monospace;margin-bottom:8px;">
+          <button id="renewApplyBtn" style="padding:9px 15px;background:rgba(110,231,160,.12);border:1px solid rgba(110,231,160,.45);border-radius:6px;color:#6ee7a0;font-size:12px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Verify &amp; Replace Key</button>
+        </div>
+        <div id="renewStatus" style="font-size:11.5px;margin-top:9px;line-height:1.55;color:#a08d5f;"></div>
+      </div>
+
+      <!-- Add a key -->
+      <div style="border:1px solid rgba(201,162,74,.22); border-radius:8px; padding:16px 18px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.22em; color:#c9a24a; text-transform:uppercase; margin-bottom:10px;">Add a Key</div>
+        <input type="text" id="addKeyName" placeholder="Name (e.g. STRIPE_KEY, OPENAI_KEY)" autocomplete="off"
+          style="width:100%;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 12px;color:#f4efe3;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;">
+          <input type="password" id="addKeyValue" placeholder="Value" autocomplete="off"
+            style="flex:1;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 12px;color:#f4efe3;font-size:13px;outline:none;font-family:monospace;">
+          <button type="button" id="addKeyBtn" style="padding:9px 16px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:6px;color:#c9a24a;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;white-space:nowrap;">Add Key</button>
+        </div>
+        <div id="addKeyStatus" style="font-size:12px;margin-top:6px;color:#a08d5f;"></div>
+      </div>
+
+      <!-- Site passcode -->
+      <div style="border:1px solid rgba(201,162,74,.22); border-radius:8px; padding:16px 18px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.22em; color:#c9a24a; text-transform:uppercase; margin-bottom:8px;">Site Owner Passcode</div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input type="password" id="vaultPasscodeInput" placeholder="Site owner passcode" autocomplete="current-password"
+          <input type="password" id="vaultPasscodeInput" placeholder="pinegrove2026! (or your key)" autocomplete="current-password"
             style="flex:1;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 12px;color:#f4efe3;font-size:13px;outline:none;">
           <button type="button" id="vaultPasscodeSaveBtn"
             style="padding:9px 16px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:6px;color:#c9a24a;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;white-space:nowrap;">
@@ -229,37 +289,357 @@
         <div id="vaultPasscodeStatus" style="font-size:12px;margin-top:6px;color:#a08d5f;"></div>
       </div>
 
-      <div>
-        <div class="section-title">EMAIL ACCESS — HOSTINGER SMTP</div>
-        <div class="vault-desc">Paste your Hostinger email password below. The connection is verified live, then saved for notifications. All alerts go to tjengineer@berylize.com.</div>
-        <form class="reg-form" id="smtpForm">
-          <label>Key name</label>
-          <input type="text" id="smtpUser" value="tjengineer@berylize.com" placeholder="your Hostinger email address" required>
-          <label>Password / API key (paste key)</label>
-          <input type="password" id="smtpPass" placeholder="Paste your Hostinger email password" required>
-          <input type="hidden" id="smtpHost" value="smtp.hostinger.com">
-          <input type="hidden" id="smtpPort" value="465">
-          <button type="submit" class="submit-btn">Save &amp; Verify</button>
-          <div class="form-msg" id="smtpMsg"></div>
-        </form>
+    </div>
+
+    <!-- REPORT TAB -->
+    <div id="vtab-report" class="vtab-view" style="flex:1; overflow-y:auto; padding: 22px 24px; display:none; flex-direction:column; gap:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.22em; color:#c9a24a; text-transform:uppercase;">Key Activity</div>
+        <button id="clearLogBtn" style="padding:6px 12px;background:transparent;border:1px solid rgba(248,113,113,.4);border-radius:5px;color:#f87171;font-size:11px;font-weight:700;letter-spacing:.06em;cursor:pointer;">Clear Log</button>
+      </div>
+      <div style="font-size:11.5px;color:rgba(232,215,182,.4);line-height:1.6;">
+        Every save, verify, and sync is recorded below with the device that did it.
+        <span style="color:rgba(232,215,182,.3);">MAC addresses aren't readable from a browser — device fingerprint and IP are logged instead.</span>
+      </div>
+      <div id="activityLog" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="vtab-settings" class="vtab-view" style="flex:1; overflow-y:auto; padding: 22px 24px; display:none; flex-direction:column; gap:18px;">
+      <div style="font-size:10px; font-weight:700; letter-spacing:.22em; color:#c9a24a; text-transform:uppercase; margin-bottom:4px;">Where Keys Live</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tbody id="settingsTable"></tbody>
+      </table>
+      <div style="font-size:12px;color:rgba(232,215,182,.4);line-height:1.6;margin-top:8px;">
+        Browser storage keys are per-device, per-browser. Nothing leaves this device except through the HF deploy flow.<br>
+        For CLI sync, launch <strong style="color:#c9a24a;">Nobility Depository</strong> desktop app.
       </div>
     </div>
   </div>
 
 <script>
-// Only show the Vault gear on the HF Spaces domain (huggingface.co or
-// *.hf.space), never on the public bigmaproject.family site.
-if (/(^|\.)hf\.space$/.test(location.hostname) || /(^|\.)huggingface\.co$/.test(location.hostname)) {
+// Show the Vault gear on HF Spaces domain and localhost (dev)
+if (/(^|\.)hf\.space$/.test(location.hostname) || /(^|\.)huggingface\.co$/.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
   document.getElementById('vaultGearBtn').style.display = 'flex';
 }
 
-const VAULT_PC_KEY = 'bigma:vault:passcode';
+// ---- Provider definitions ----
+const VAULT_PROVIDERS = [
+  { id:'hf',     lsKey:'bigma:vault:hf_token',            label:'Hugging Face',      placeholder:'hf_...',         verifiable:true,  verifyFn: verifyHF },
+  { id:'gcloud', lsKey:'bigma:vault:gcloud_key',          label:'Google Cloud',      placeholder:'AIza...',        verifiable:false },
+  { id:'github', lsKey:'bigma:vault:github_token',        label:'GitHub',            placeholder:'ghp_...',        verifiable:true,  verifyFn: verifyGH },
+  { id:'nim',    lsKey:'bigma:vault:nvidia_nim_key',      label:'NVIDIA NIM',        placeholder:'nvapi-...',      verifiable:false },
+  { id:'nvent',  lsKey:'bigma:vault:nvidia_enterprise',   label:'NVIDIA Enterprise', placeholder:'License key',    verifiable:false },
+];
+const PROVIDER_LS_KEYS = new Set(VAULT_PROVIDERS.map(p => p.lsKey));
 
-function vaultPasscode() {
-  return document.getElementById('vaultPasscodeInput').value ||
-         localStorage.getItem(VAULT_PC_KEY) || '';
+const EXTRA_KEY = 'bigma:vault:extra_keys'; // JSON array {name,lsKey}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ---- Local CLI sync ----
+// On localhost the key is handed to a loopback-only endpoint that writes it to
+// the file that provider's own CLI reads. The value never leaves this machine.
+const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+async function syncKeyToCli(providerId, value) {
+  if (!IS_LOCAL) return { ok:false, error:'CLI sync only runs on localhost' };
+  try {
+    const r = await fetch('/api/dev/sync-key', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ provider: providerId, value })
+    });
+    return await r.json();
+  } catch(e) { return { ok:false, error:e.message }; }
 }
 
+// ---- Key activity log ----
+const ACTIVITY_KEY = 'bigma:vault:activity';
+let _cachedIp = null;
+
+function deviceLabel() {
+  const ua = navigator.userAgent;
+  let os = 'Unknown OS';
+  if (/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+  else if (/Windows/.test(ua)) os = 'Windows';
+  else if (/Mac OS X/.test(ua)) os = 'macOS';
+  else if (/Android/.test(ua)) os = 'Android';
+  else if (/iPhone|iPad/.test(ua)) os = 'iOS';
+  else if (/Linux/.test(ua)) os = 'Linux';
+  let br = 'Unknown browser';
+  if (/Edg\//.test(ua)) br = 'Edge';
+  else if (/Chrome\//.test(ua)) br = 'Chrome';
+  else if (/Firefox\//.test(ua)) br = 'Firefox';
+  else if (/Safari\//.test(ua)) br = 'Safari';
+  const cores = navigator.hardwareConcurrency || '?';
+  return `${os} · ${br} · ${cores} cores · ${screen.width}×${screen.height}`;
+}
+
+async function publicIp() {
+  if (_cachedIp) return _cachedIp;
+  try {
+    const r = await fetch('https://api.ipify.org?format=json');
+    const j = await r.json();
+    _cachedIp = j.ip;
+  } catch { _cachedIp = 'unavailable'; }
+  return _cachedIp;
+}
+
+async function logActivity(provider, action, durationMs, outcome) {
+  const log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
+  log.unshift({
+    provider, action, outcome,
+    durationMs: Math.round(durationMs),
+    at: Date.now(),
+    device: deviceLabel(),
+    ip: await publicIp(),
+    origin: location.hostname + location.pathname,
+  });
+  localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log.slice(0, 200)));
+}
+
+function timeSince(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+function renderActivity() {
+  const el = document.getElementById('activityLog');
+  const log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
+  if (!log.length) {
+    el.innerHTML = '<div style="font-size:12.5px;color:rgba(232,215,182,.35);font-style:italic;padding:14px 0;">No key activity recorded yet. Save or verify a key and it will appear here.</div>';
+    return;
+  }
+  el.innerHTML = log.map(e => {
+    const good = e.outcome === 'ok';
+    return `<div style="border:1px solid rgba(201,162,74,.18);border-radius:7px;padding:11px 13px;background:rgba(201,162,74,.03);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;">
+        <div style="font-size:12.5px;font-weight:700;color:#F0D98C;">${esc(e.provider)} <span style="font-weight:400;color:rgba(232,215,182,.5);">· ${esc(e.action)}</span></div>
+        <div style="font-size:11px;color:${good?'#6ee7a0':'#f87171'};white-space:nowrap;">${good?'✓ ok':'✗ failed'}</div>
+      </div>
+      <div style="font-size:11px;color:rgba(232,215,182,.45);line-height:1.65;font-family:monospace;">
+        ${timeSince(e.at)} · took ${e.durationMs}ms<br>
+        ${esc(e.device)}<br>
+        IP ${esc(e.ip)} · ${esc(e.origin)}<br>
+        <span style="color:rgba(232,215,182,.28);">${new Date(e.at).toLocaleString()}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Verify helpers ----
+async function verifyHF(val) {
+  const res = await fetch('https://huggingface.co/api/whoami-v2', { headers:{ Authorization:'Bearer '+val } });
+  if (!res.ok) return { ok:false, error:'HF returned '+res.status };
+  const j = await res.json();
+  return { ok:true, note:'Signed in as ' + (j.name||j.fullname||'unknown') };
+}
+async function verifyGH(val) {
+  const res = await fetch('https://api.github.com/user', { headers:{ Authorization:'token '+val, 'User-Agent':'bigma-vault' } });
+  if (!res.ok) return { ok:false, error:'GitHub returned '+res.status };
+  const j = await res.json();
+  return { ok:true, note:'GitHub user: '+j.login };
+}
+
+// ---- Render provider cards ----
+function renderProviders() {
+  const list = document.getElementById('vaultProviderList');
+  list.innerHTML = VAULT_PROVIDERS.map(p => {
+    const saved = localStorage.getItem(p.lsKey);
+    const stateColor = saved ? '#6ee7a0' : 'rgba(232,215,182,.35)';
+    const stateText = saved ? '● key saved' : '○ not set';
+    return `<div style="border:1px solid rgba(201,162,74,.22);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:700;color:#F0D98C;">${esc(p.label)}</div>
+        <div style="font-size:11px;color:${stateColor};">${stateText}</div>
+      </div>
+      <input type="password" data-pid="${p.id}" class="pInput" placeholder="${esc(p.placeholder)}" autocomplete="off"
+        value="${saved ? esc(saved) : ''}"
+        style="width:100%;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:8px 11px;color:#f4efe3;font-size:13px;outline:none;box-sizing:border-box;font-family:monospace;margin-bottom:8px;">
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <button class="pSaveBtn" data-pid="${p.id}" style="padding:7px 13px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:5px;color:#c9a24a;font-size:11.5px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Save</button>
+        ${p.verifiable ? `<button class="pVerifyBtn" data-pid="${p.id}" style="padding:7px 13px;background:transparent;border:1px solid rgba(201,162,74,.3);border-radius:5px;color:rgba(232,215,182,.6);font-size:11.5px;font-weight:700;letter-spacing:.07em;cursor:pointer;">Verify</button>` : ''}
+      </div>
+      <div id="pStatus-${p.id}" style="font-size:11.5px;margin-top:7px;line-height:1.5;color:#a08d5f;"></div>
+    </div>`;
+  }).join('');
+
+  // Bind save
+  document.querySelectorAll('.pSaveBtn').forEach(btn => {
+    btn.onclick = async () => {
+      const p = VAULT_PROVIDERS.find(x=>x.id===btn.dataset.pid);
+      const val = document.querySelector(`.pInput[data-pid="${p.id}"]`).value.trim();
+      const st = document.getElementById('pStatus-'+p.id);
+      if (!val) { st.textContent='Paste a key first.'; st.style.color='#f87171'; return; }
+      const t0 = performance.now();
+      localStorage.setItem(p.lsKey, val);
+      const sync = await syncKeyToCli(p.id, val);
+      logActivity(p.label, 'save', performance.now()-t0, 'ok');
+      st.textContent = sync.ok ? '✓ Saved — synced to ' + sync.path : '✓ Saved in this browser.';
+      st.style.color='#6ee7a0';
+      renderProviders();
+    };
+  });
+
+  // Bind verify
+  document.querySelectorAll('.pVerifyBtn').forEach(btn => {
+    btn.onclick = async () => {
+      const p = VAULT_PROVIDERS.find(x=>x.id===btn.dataset.pid);
+      const val = document.querySelector(`.pInput[data-pid="${p.id}"]`).value.trim();
+      const st = document.getElementById('pStatus-'+p.id);
+      if (!val) { st.textContent='Paste a key first.'; st.style.color='#f87171'; return; }
+      st.textContent='Verifying…'; st.style.color='#a08d5f';
+      const t0 = performance.now();
+      try {
+        const res = await p.verifyFn(val);
+        if (res.ok) {
+          localStorage.setItem(p.lsKey, val);
+          const sync = await syncKeyToCli(p.id, val);
+          logActivity(p.label, 'verify', performance.now()-t0, 'ok');
+          st.textContent = '✓ ' + res.note + (sync.ok ? ' — synced to ' + sync.path : ' — saved.');
+          st.style.color='#6ee7a0';
+          renderProviders();
+        } else {
+          logActivity(p.label, 'verify', performance.now()-t0, 'fail');
+          st.textContent='✗ '+res.error; st.style.color='#f87171';
+        }
+      } catch(e) {
+        logActivity(p.label, 'verify', performance.now()-t0, 'fail');
+        st.textContent='✗ '+e.message; st.style.color='#f87171';
+      }
+    };
+  });
+}
+
+// ---- Settings tab: where keys live ----
+function renderSettings() {
+  const rows = [
+    ['Hugging Face',      '~/.cache/huggingface/token', 'bigma:vault:hf_token'],
+    ['Google Cloud',      '~/.config/gcloud/nobility-api-key.env', 'bigma:vault:gcloud_key'],
+    ['GitHub',            '~/.config/gh/nobility-token.env', 'bigma:vault:github_token'],
+    ['NVIDIA NIM',        '~/.ngc/config', 'bigma:vault:nvidia_nim_key'],
+    ['NVIDIA Enterprise', '~/.config/nvidia/enterprise.env', 'bigma:vault:nvidia_enterprise'],
+  ];
+  document.getElementById('settingsTable').innerHTML = rows.map(([label, path, lsKey]) => {
+    const saved = localStorage.getItem(lsKey);
+    return `<tr style="border-bottom:1px solid rgba(201,162,74,.1);">
+      <td style="padding:10px 0 10px 2px;color:rgba(232,215,182,.75);font-size:12px;width:38%;">${esc(label)}</td>
+      <td style="padding:10px 0;font-family:monospace;font-size:11px;color:rgba(232,215,182,.45);">${esc(path)}</td>
+      <td style="padding:10px 0 10px 6px;text-align:right;font-size:11px;color:${saved?'#6ee7a0':'rgba(232,215,182,.25)'};">${saved?'●':'○'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- Tab switching ----
+document.querySelectorAll('.vtab').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.vtab').forEach(b => {
+      b.style.borderBottomColor = 'transparent';
+      b.style.color = 'rgba(232,215,182,.45)';
+      b.classList.remove('active');
+    });
+    btn.style.borderBottomColor = '#c9a24a';
+    btn.style.color = '#c9a24a';
+    btn.classList.add('active');
+    const name = btn.dataset.vtab;
+    document.querySelectorAll('.vtab-view').forEach(v => v.style.display='none');
+    document.getElementById('vtab-'+name).style.display='flex';
+    if (name==='settings') renderSettings();
+    if (name==='report') renderActivity();
+  };
+});
+
+// ---- Renew / rotate a key ----
+const RENEW_TARGETS = {
+  hf:     { label:'Hugging Face', lsKey:'bigma:vault:hf_token',     verify:verifyHF, prefix:'hf_',
+            url:(name,role)=>`https://huggingface.co/settings/tokens/new?tokenType=${role}` + (name?`&displayName=${encodeURIComponent(name)}`:'') },
+  github: { label:'GitHub',       lsKey:'bigma:vault:github_token', verify:verifyGH, prefix:'gh',
+            url:(name,role)=>`https://github.com/settings/tokens/new?scopes=${role==='write'?'repo,workflow':'public_repo'}` + (name?`&description=${encodeURIComponent(name)}`:'') },
+};
+
+function renewRole() {
+  const r = document.querySelector('input[name="renewRole"]:checked');
+  return r ? r.value : 'write';
+}
+
+document.getElementById('renewOpenBtn').onclick = () => {
+  const id = document.getElementById('renewProvider').value;
+  const name = document.getElementById('renewName').value.trim();
+  const t = RENEW_TARGETS[id];
+  const st = document.getElementById('renewStatus');
+  window.open(t.url(name, renewRole()), '_blank', 'noopener');
+  st.textContent = `Opened ${t.label} in a new tab — create the ${renewRole().toUpperCase()} token${name?` named "${name}"`:''}, copy it, then paste it below.`;
+  st.style.color = '#a08d5f';
+};
+
+document.getElementById('renewApplyBtn').onclick = async () => {
+  const id = document.getElementById('renewProvider').value;
+  const name = document.getElementById('renewName').value.trim();
+  const role = renewRole();
+  const val = document.getElementById('renewPaste').value.trim();
+  const t = RENEW_TARGETS[id];
+  const st = document.getElementById('renewStatus');
+  if (!val) { st.textContent='Paste the new token first.'; st.style.color='#f87171'; return; }
+  if (!val.startsWith(t.prefix)) { st.textContent=`That doesn't look like a ${t.label} token (expected it to start with "${t.prefix}").`; st.style.color='#f87171'; return; }
+
+  st.textContent='Verifying the new token…'; st.style.color='#a08d5f';
+  const t0 = performance.now();
+  try {
+    const res = await t.verify(val);
+    if (!res.ok) {
+      logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
+      st.textContent = '✗ ' + res.error + ' — the old key is untouched.';
+      st.style.color = '#f87171';
+      return;
+    }
+    localStorage.setItem(t.lsKey, val);
+    const sync = await syncKeyToCli(id, val);
+    logActivity(t.label, `renew (${role})${name?' · '+name:''}`, performance.now()-t0, 'ok');
+    document.getElementById('renewPaste').value = '';
+    st.textContent = `✓ ${res.note} — key replaced${sync.ok ? ' and synced to ' + sync.path : ''}. Revoke the old one on ${t.label}.`;
+    st.style.color = '#6ee7a0';
+    renderProviders();
+  } catch(e) {
+    logActivity(t.label, `renew (${role})`, performance.now()-t0, 'fail');
+    st.textContent = '✗ ' + e.message + ' — the old key is untouched.';
+    st.style.color = '#f87171';
+  }
+};
+
+document.getElementById('clearLogBtn').onclick = function() {
+  if (this.textContent !== 'Confirm?') {
+    this.textContent = 'Confirm?';
+    setTimeout(() => { if (this.textContent === 'Confirm?') this.textContent = 'Clear Log'; }, 4000);
+    return;
+  }
+  this.textContent = 'Clear Log';
+  localStorage.removeItem(ACTIVITY_KEY);
+  renderActivity();
+};
+
+// ---- Add key ----
+document.getElementById('addKeyBtn').onclick = () => {
+  const name = document.getElementById('addKeyName').value.trim();
+  const val  = document.getElementById('addKeyValue').value.trim();
+  const st   = document.getElementById('addKeyStatus');
+  if (!name||!val) { st.textContent='Enter a name and value.'; st.style.color='#f87171'; return; }
+  const lsKey = 'bigma:vault:custom:'+name;
+  localStorage.setItem(lsKey, val);
+  // persist key list
+  const extra = JSON.parse(localStorage.getItem(EXTRA_KEY)||'[]').filter(x=>x.name!==name);
+  extra.push({name, lsKey});
+  localStorage.setItem(EXTRA_KEY, JSON.stringify(extra));
+  document.getElementById('addKeyName').value='';
+  document.getElementById('addKeyValue').value='';
+  st.textContent='✓ '+name+' saved.'; st.style.color='#6ee7a0';
+};
+
+// ---- Passcode ----
+const VAULT_PC_KEY = 'bigma:vault:passcode';
+function vaultPasscode() { return document.getElementById('vaultPasscodeInput').value || localStorage.getItem(VAULT_PC_KEY) || ''; }
 function loadVaultPasscode() {
   const saved = localStorage.getItem(VAULT_PC_KEY);
   if (saved) {
@@ -268,21 +648,18 @@ function loadVaultPasscode() {
     document.getElementById('vaultPasscodeStatus').style.color = '#6ee7a0';
   }
 }
-
 document.getElementById('vaultPasscodeSaveBtn').addEventListener('click', () => {
   const val = document.getElementById('vaultPasscodeInput').value.trim();
-  if (!val) {
-    document.getElementById('vaultPasscodeStatus').textContent = 'Enter a passcode first.';
-    document.getElementById('vaultPasscodeStatus').style.color = '#f87171';
-    return;
-  }
+  if (!val) { document.getElementById('vaultPasscodeStatus').textContent='Enter a passcode first.'; document.getElementById('vaultPasscodeStatus').style.color='#f87171'; return; }
   localStorage.setItem(VAULT_PC_KEY, val);
   document.getElementById('vaultPasscodeStatus').textContent = '✓ Saved — you won\'t need to retype this.';
   document.getElementById('vaultPasscodeStatus').style.color = '#6ee7a0';
 });
 
+// ---- Open/close ----
 document.getElementById('vaultGearBtn').addEventListener('click', () => {
   loadVaultPasscode();
+  renderProviders();
   document.getElementById('vaultBackdrop').style.display = 'block';
   document.getElementById('vaultPanel').style.transform = 'translateX(0)';
 });
@@ -437,37 +814,6 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (tab.dataset.tab === 'admins') loadAdmins();
     if (tab.dataset.tab === 'notify') { loadServerStatus(); loadNotifications(); }
   });
-});
-
-// Email Access (SMTP) form — verify live, stage server-side, never localStorage
-document.getElementById('smtpForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const msg = document.getElementById('smtpMsg');
-  const pc = vaultPasscode();
-  if (!pc) {
-    msg.textContent = 'Enter your site owner passcode in the Vault Access section above first.';
-    msg.className = 'form-msg err';
-    return;
-  }
-  msg.textContent = 'Verifying…'; msg.className = 'form-msg';
-  try {
-    const result = await api('/secrets/smtp/submit', {
-      method: 'POST',
-      headers: { 'X-Admin-Passcode': pc },
-      body: JSON.stringify({
-        host: document.getElementById('smtpHost').value,
-        port: parseInt(document.getElementById('smtpPort').value, 10) || 465,
-        user: document.getElementById('smtpUser').value,
-        password: document.getElementById('smtpPass').value,
-      }),
-    });
-    msg.textContent = result.message + (result.ok ? ' Staged for activation.' : '');
-    msg.className = 'form-msg ' + (result.ok ? 'ok' : 'err');
-    if (result.ok) document.getElementById('smtpPass').value = '';
-  } catch (err) {
-    msg.textContent = 'Failed: ' + err.message;
-    msg.className = 'form-msg err';
-  }
 });
 
 // Registration form

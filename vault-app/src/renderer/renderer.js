@@ -4,22 +4,184 @@ let clearTimer = null
 
 const $ = (id) => document.getElementById(id)
 
+// Default providers, always shown even before a key is saved. `key` is the
+// vault entry name each one reads/writes under — kept out of the free-form
+// "Other stored keys" list below so nothing shows twice.
+const PROVIDERS = [
+  { id: 'hf', key: 'HF_TOKEN', label: 'Hugging Face', dest: '~/.cache/huggingface/token', kind: 'hf' },
+  { id: 'gcloud', key: 'GOOGLE_CLOUD_KEY', label: 'Google Cloud', dest: '~/.config/gcloud/nobility-api-key.env (or gcloud CLI, for a service-account JSON)', kind: 'gcloud' },
+  { id: 'github', key: 'GITHUB_TOKEN', label: 'GitHub', dest: 'gh CLI auth (via `gh auth login`)', kind: 'github' },
+  { id: 'nim', key: 'NVIDIA_NIM_KEY', label: 'NVIDIA NIM', dest: '~/.ngc/config', kind: 'nim' },
+  { id: 'nvent', key: 'NVIDIA_ENTERPRISE_KEY', label: 'NVIDIA Enterprise', dest: 'no universal CLI location — stored + copyable export line', kind: 'enterprise' },
+]
+const PROVIDER_KEYS = new Set(PROVIDERS.map((p) => p.key))
+
 function fmtTime(iso) {
   if (!iso) return 'not yet saved'
   return new Date(iso).toLocaleString()
 }
 
-function render() {
-  $('savedAtLabel').textContent = `Universal credential vault for all projects · last saved ${fmtTime(vault.savedAt)}`
+function escapeHtml(s) {
+  const d = document.createElement('div')
+  d.textContent = s
+  return d.innerHTML
+}
 
+function entryFor(name) {
+  return vault.entries.find((e) => e.name === name)
+}
+
+function upsertEntry(name, value) {
+  vault.entries = vault.entries.filter((e) => e.name !== name)
+  vault.entries.push({ name, value, addedAt: new Date().toISOString() })
+}
+
+// ---- nav ----
+
+document.querySelectorAll('.navItem').forEach((item) => {
+  item.onclick = () => showView(item.dataset.view)
+})
+$('gotoVaultBtn').onclick = () => showView('vault')
+
+function showView(name) {
+  document.querySelectorAll('.navItem').forEach((n) => n.classList.toggle('active', n.dataset.view === name))
+  document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${name}`))
+}
+
+// ---- provider cards ----
+
+function renderProviders() {
+  const grid = $('providerGrid')
+  grid.innerHTML = ''
+  PROVIDERS.forEach((p) => {
+    const entry = entryFor(p.key)
+    const card = document.createElement('div')
+    card.className = 'provider-card'
+    card.innerHTML = `
+      <div class="pname">${escapeHtml(p.label)}</div>
+      <div class="pdest">→ ${escapeHtml(p.dest)}</div>
+      <div class="pstate ${entry ? 'set' : 'unset'}">${entry ? '● key saved in vault' : '○ no key saved yet'}</div>
+      <div class="row">
+        <input type="password" class="pInput" data-id="${p.id}" placeholder="Paste ${escapeHtml(p.label)} key" value="${entry ? escapeHtml(entry.value) : ''}">
+      </div>
+      <div class="toolbar">
+        <button class="small pSaveBtn" data-id="${p.id}">Save</button>
+        ${p.kind !== 'enterprise' ? `<button class="small ghost pVerifyBtn" data-id="${p.id}">Verify</button>` : ''}
+        <button class="small pSyncBtn" data-id="${p.id}">${p.kind === 'enterprise' ? 'Copy Export Line' : 'Sync'}</button>
+      </div>
+      <div class="status" id="pStatus-${p.id}"></div>
+    `
+    grid.appendChild(card)
+  })
+
+  document.querySelectorAll('.pSaveBtn').forEach((btn) => {
+    btn.onclick = async () => {
+      const p = PROVIDERS.find((x) => x.id === btn.dataset.id)
+      const input = document.querySelector(`.pInput[data-id="${p.id}"]`)
+      const val = input.value.trim()
+      const statusEl = $(`pStatus-${p.id}`)
+      if (!val) {
+        statusEl.className = 'status err'
+        statusEl.textContent = 'Paste a key first.'
+        return
+      }
+      upsertEntry(p.key, val)
+      vault = await window.vaultApi.save(vault)
+      statusEl.className = 'status ok'
+      statusEl.textContent = '✓ Saved to vault.'
+      renderProviders()
+      renderOtherKeys()
+    }
+  })
+
+  document.querySelectorAll('.pVerifyBtn').forEach((btn) => {
+    btn.onclick = async () => {
+      const p = PROVIDERS.find((x) => x.id === btn.dataset.id)
+      const val = document.querySelector(`.pInput[data-id="${p.id}"]`).value.trim()
+      const statusEl = $(`pStatus-${p.id}`)
+      if (!val) {
+        statusEl.className = 'status err'
+        statusEl.textContent = 'Paste a key first.'
+        return
+      }
+      statusEl.className = 'status'
+      statusEl.textContent = 'Verifying…'
+      let res
+      if (p.kind === 'hf') res = await window.vaultApi.hfVerify(val)
+      else if (p.kind === 'github') res = await window.vaultApi.ghVerify(val)
+      else {
+        statusEl.className = 'status err'
+        statusEl.textContent = 'No independent verify for this provider — try Sync directly.'
+        return
+      }
+      if (res.ok) {
+        statusEl.className = 'status ok'
+        statusEl.textContent = p.kind === 'hf'
+          ? `✓ Valid — signed in as ${res.name} (${res.type}), role: ${res.scopes}`
+          : `✓ Valid — GitHub user ${res.login}`
+      } else {
+        statusEl.className = 'status err'
+        statusEl.textContent = `✗ ${res.error}`
+      }
+    }
+  })
+
+  document.querySelectorAll('.pSyncBtn').forEach((btn) => {
+    btn.onclick = async () => {
+      const p = PROVIDERS.find((x) => x.id === btn.dataset.id)
+      const val = document.querySelector(`.pInput[data-id="${p.id}"]`).value.trim()
+      const statusEl = $(`pStatus-${p.id}`)
+      if (!val) {
+        statusEl.className = 'status err'
+        statusEl.textContent = 'Paste a key first.'
+        return
+      }
+
+      if (p.kind === 'enterprise') {
+        await navigator.clipboard.writeText(`export NVIDIA_ENTERPRISE_LICENSE=${val}`)
+        upsertEntry(p.key, val)
+        vault = await window.vaultApi.save(vault)
+        statusEl.className = 'status ok'
+        statusEl.textContent = '✓ Saved, and an export line is on your clipboard — there is no single standard CLI location for this one.'
+        renderProviders()
+        return
+      }
+
+      statusEl.className = 'status'
+      statusEl.textContent = 'Syncing…'
+      let res
+      if (p.kind === 'hf') res = await window.vaultApi.hfSyncToCli(val)
+      else if (p.kind === 'github') res = await window.vaultApi.ghSyncToCli(val)
+      else if (p.kind === 'gcloud') res = await window.vaultApi.gcloudSyncToCli(val)
+      else if (p.kind === 'nim') res = await window.vaultApi.nvidiaNimSync(val)
+
+      if (res.ok) {
+        upsertEntry(p.key, val)
+        vault = await window.vaultApi.save(vault)
+        statusEl.className = 'status ok'
+        statusEl.textContent = `✓ ${res.note || 'Synced.'}${res.path ? ' (' + res.path + ')' : ''}`
+        renderProviders()
+      } else {
+        statusEl.className = 'status err'
+        statusEl.textContent = `✗ ${res.error} — nothing was installed.`
+      }
+    }
+  })
+}
+
+// ---- other (non-provider) stored keys ----
+
+function renderOtherKeys() {
   const list = $('entryList')
   const empty = $('emptyMsg')
+  const others = vault.entries.filter((e) => !PROVIDER_KEYS.has(e.name))
   list.innerHTML = ''
-  if (!vault.entries.length) {
+  if (!others.length) {
     empty.style.display = 'block'
   } else {
     empty.style.display = 'none'
-    vault.entries.forEach((e, i) => {
+    others.forEach((e) => {
+      const i = vault.entries.indexOf(e)
       const row = document.createElement('div')
       row.className = 'entry'
       row.innerHTML = `
@@ -55,12 +217,6 @@ function render() {
   })
 }
 
-function escapeHtml(s) {
-  const d = document.createElement('div')
-  d.textContent = s
-  return d.innerHTML
-}
-
 async function deleteEntry(i, btn) {
   if (btn.textContent !== 'Confirm?') {
     btn.textContent = 'Confirm?'
@@ -71,7 +227,14 @@ async function deleteEntry(i, btn) {
   }
   vault.entries.splice(i, 1)
   vault = await window.vaultApi.save(vault)
-  render()
+  renderOtherKeys()
+  renderProviders()
+}
+
+function render() {
+  $('savedAtLabel').textContent = `Universal credential vault for all projects · last saved ${fmtTime(vault.savedAt)}`
+  renderProviders()
+  renderOtherKeys()
 }
 
 $('toggleVisBtn').onclick = () => {
@@ -85,54 +248,11 @@ $('addBtn').onclick = async () => {
   const name = $('newName').value.trim()
   const value = $('newValue').value
   if (!name || !value) return
-  vault.entries = vault.entries.filter((e) => e.name !== name)
-  vault.entries.push({ name, value, addedAt: new Date().toISOString() })
+  upsertEntry(name, value)
   vault = await window.vaultApi.save(vault)
   $('newName').value = ''
   $('newValue').value = ''
   render()
-}
-
-$('hfVerifyBtn').onclick = async () => {
-  const keyName = $('hfKeySelect').value.trim()
-  const entry = vault.entries.find((e) => e.name === keyName)
-  const statusEl = $('hfStatus')
-  if (!entry) {
-    statusEl.className = 'status err'
-    statusEl.textContent = `No stored key named "${keyName}". Add it above first.`
-    return
-  }
-  statusEl.className = 'status'
-  statusEl.textContent = 'Verifying…'
-  const res = await window.vaultApi.hfVerify(entry.value)
-  if (res.ok) {
-    statusEl.className = 'status ok'
-    statusEl.textContent = `✓ Valid — signed in as ${res.name} (${res.type}), role: ${res.scopes}`
-  } else {
-    statusEl.className = 'status err'
-    statusEl.textContent = `✗ ${res.error}`
-  }
-}
-
-$('hfSyncBtn').onclick = async () => {
-  const keyName = $('hfKeySelect').value.trim()
-  const entry = vault.entries.find((e) => e.name === keyName)
-  const statusEl = $('hfStatus')
-  if (!entry) {
-    statusEl.className = 'status err'
-    statusEl.textContent = `No stored key named "${keyName}". Add it above first.`
-    return
-  }
-  statusEl.className = 'status'
-  statusEl.textContent = 'Syncing to CLI…'
-  const res = await window.vaultApi.hfSyncToCli(entry.value)
-  if (res.ok) {
-    statusEl.className = 'status ok'
-    statusEl.textContent = `✓ Installed to ${res.path} — verified as ${res.name}. Any Claude Code session on this machine can now use it.`
-  } else {
-    statusEl.className = 'status err'
-    statusEl.textContent = `✗ ${res.error} — nothing was installed (never overwrites with a dead token).`
-  }
 }
 
 $('exportBtn').onclick = async () => {

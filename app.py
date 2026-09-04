@@ -37,7 +37,8 @@ import os
 from urllib.parse import quote
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse, Response
+from fastapi.exceptions import HTTPException as StarletteHTTPException
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
@@ -160,6 +161,69 @@ async def branch_social(slug: str):
     )
 
 
+@app.post("/api/dev/set-hf-token")
+async def dev_set_hf_token(request: Request):
+    """Local-only: saves an HF token to ~/.cache/huggingface/token so deploy scripts can use it."""
+    from fastapi.responses import JSONResponse
+    host = request.client.host if request.client else ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        return JSONResponse({"error": "local only"}, status_code=403)
+    data = await request.json()
+    token = (data.get("token") or "").strip()
+    if not token.startswith("hf_"):
+        return JSONResponse({"error": "not an HF token"}, status_code=400)
+    token_dir = os.path.join(os.path.expanduser("~"), ".cache", "huggingface")
+    os.makedirs(token_dir, exist_ok=True)
+    path = os.path.join(token_dir, "token")
+    with open(path, "w") as f:
+        f.write(token)
+    os.chmod(path, 0o600)
+    return JSONResponse({"ok": True, "path": path})
+
+
+# Where each provider's key belongs on this machine, so a key pasted into the
+# Vault lands in the file its own CLI already reads -- no copy/paste, and the
+# value never leaves localhost.
+_HOME = os.path.expanduser("~")
+CLI_KEY_TARGETS = {
+    "hf":     {"path": os.path.join(_HOME, ".cache", "huggingface", "token"), "fmt": "raw"},
+    "gcloud": {"path": os.path.join(_HOME, ".config", "gcloud", "nobility-api-key.env"), "fmt": "env", "var": "GOOGLE_API_KEY"},
+    "github": {"path": os.path.join(_HOME, ".config", "gh", "nobility-token.env"), "fmt": "env", "var": "GITHUB_TOKEN"},
+    "nim":    {"path": os.path.join(_HOME, ".ngc", "config"), "fmt": "ngc"},
+    "nvent":  {"path": os.path.join(_HOME, ".config", "nvidia", "enterprise.env"), "fmt": "env", "var": "NVIDIA_ENTERPRISE_LICENSE"},
+}
+
+
+@app.post("/api/dev/sync-key")
+async def dev_sync_key(request: Request):
+    """Local-only: writes any vault provider key to the location its CLI reads."""
+    from fastapi.responses import JSONResponse
+    host = request.client.host if request.client else ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        return JSONResponse({"error": "local only"}, status_code=403)
+    data = await request.json()
+    provider = (data.get("provider") or "").strip()
+    value = (data.get("value") or "").strip()
+    target = CLI_KEY_TARGETS.get(provider)
+    if not target:
+        return JSONResponse({"error": f"unknown provider {provider!r}"}, status_code=400)
+    if not value:
+        return JSONResponse({"error": "empty value"}, status_code=400)
+
+    path = target["path"]
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if target["fmt"] == "raw":
+        body = value
+    elif target["fmt"] == "env":
+        body = f'{target["var"]}={value}\n'
+    else:  # ngc
+        body = f"[CURRENT]\napikey = {value}\nformat_type = ascii\n"
+    with open(path, "w") as f:
+        f.write(body)
+    os.chmod(path, 0o600)
+    return JSONResponse({"ok": True, "path": path.replace(_HOME, "~")})
+
+
 @app.get("/sitemap.xml")
 async def sitemap():
     urls = [BASE_URL + "/"]
@@ -177,6 +241,31 @@ async def robots():
     return PlainTextResponse(
         f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n"
     )
+
+
+NOT_FOUND_HTML = """<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — The Big Ma Project</title>
+<style>
+  html,body{margin:0;background:#14110e;color:#f4efe3;font-family:Helvetica,Arial,sans-serif;
+    height:100%;display:flex;align-items:center;justify-content:center;text-align:center}
+  a{color:#d9b463;text-decoration:none;font-weight:700}
+  a:hover{color:#e9cd88}
+  .wrap{padding:24px}
+  h1{font-family:Georgia,serif;font-size:26px;margin:0 0 10px;color:#f6f1e6}
+  p{font-size:15px;color:#a39685;margin:0 0 22px}
+</style></head><body><div class="wrap">
+  <h1>That page doesn't exist</h1>
+  <p>The link may be old or mistyped. Here's where you can go instead.</p>
+  <p><a href="/">Home</a> &nbsp;·&nbsp; <a href="/branches">Branches</a> &nbsp;·&nbsp; <a href="/photo-album">Photo Album</a></p>
+</div></body></html>"""
+
+
+@app.exception_handler(StarletteHTTPException)
+async def not_found_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return HTMLResponse(NOT_FOUND_HTML, status_code=404)
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
 # everything else (images, audio, narrator.js, index.html, uploads/*, the

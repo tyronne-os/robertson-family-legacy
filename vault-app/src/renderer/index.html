@@ -5,18 +5,69 @@
 <title>Nobility Depository</title>
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
+  html, body { margin: 0; padding: 0; height: 100%; }
   body {
     background: #0B0705;
     color: #E8D7B6;
     font-family: Georgia, 'EB Garamond', serif;
     -webkit-user-select: none;
     user-select: none;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
   }
   input, textarea, button { -webkit-user-select: text; user-select: text; }
+
+  /* ---- left panel menu ---- */
+  .sidebar {
+    width: 190px;
+    flex: 0 0 auto;
+    background: #100a06;
+    border-right: 1px solid rgba(201,162,39,.22);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar .brand {
+    padding: 0 20px 18px;
+    border-bottom: 1px solid rgba(201,162,39,.18);
+    margin-bottom: 10px;
+  }
+  .sidebar .brand h1 {
+    font-size: 15px;
+    letter-spacing: .16em;
+    color: #F0D98C;
+    margin: 0 0 3px;
+  }
+  .sidebar .brand p { margin: 0; font-size: 11px; color: rgba(232,215,182,.45); }
+  .navItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 20px;
+    font-size: 13px;
+    letter-spacing: .04em;
+    color: rgba(232,215,182,.65);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+  }
+  .navItem:hover { background: rgba(240,217,140,.05); color: #F0D98C; }
+  .navItem.active {
+    background: rgba(240,217,140,.08);
+    color: #F0D98C;
+    border-left-color: #C9A227;
+  }
+  .navItem .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; flex: 0 0 auto; }
+
+  /* ---- main area ---- */
+  .main { flex: 1; min-width: 0; overflow-y: auto; }
   .titlebar {
     padding: 20px 28px 14px;
     border-bottom: 1px solid rgba(201,162,39,.22);
+    position: sticky;
+    top: 0;
+    background: #0B0705;
+    z-index: 5;
   }
   .titlebar h1 {
     font-family: Georgia, serif;
@@ -27,7 +78,10 @@
     margin: 0 0 4px;
   }
   .titlebar p { margin: 0; font-size: 13px; color: rgba(232,215,182,.55); }
-  .wrap { padding: 22px 28px 40px; max-width: 760px; }
+  .wrap { padding: 22px 28px 40px; max-width: 820px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
   .card {
     background: rgba(240,217,140,.04);
     border: 1px solid rgba(201,162,39,.28);
@@ -39,9 +93,27 @@
     font-size: 13px;
     letter-spacing: .22em;
     color: #C9A227;
-    margin: 0 0 14px;
+    margin: 0 0 4px;
     text-transform: uppercase;
   }
+  .card .provider-sub { margin: 0 0 14px; font-size: 12px; color: rgba(232,215,182,.5); }
+  .provider-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 620px) { .provider-grid { grid-template-columns: 1fr; } }
+  .provider-card {
+    background: rgba(240,217,140,.03);
+    border: 1px solid rgba(201,162,39,.22);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .provider-card .pname { font-size: 13px; font-weight: 700; color: #F0D98C; margin-bottom: 2px; }
+  .provider-card .pdest { font-size: 11px; color: rgba(232,215,182,.42); margin-bottom: 10px; font-family: monospace; }
+  .provider-card .pstate { font-size: 11.5px; margin-bottom: 8px; }
+  .provider-card .pstate.set { color: #8FD19E; }
+  .provider-card .pstate.unset { color: rgba(232,215,182,.4); }
   .row { display: flex; gap: 10px; margin-bottom: 10px; }
   input[type=text], input[type=password] {
     flex: 1;
@@ -69,6 +141,7 @@
   button.danger { border-color: rgba(242,133,122,.6); color: #F2857A; }
   button.danger:hover { background: rgba(242,133,122,.12); }
   button.ghost { background: transparent; }
+  button.small { padding: 6px 11px; font-size: 12px; }
   button:disabled { opacity: .4; cursor: default; }
   .entry {
     display: flex;
@@ -89,63 +162,110 @@
     white-space: nowrap;
   }
   .muted { color: rgba(232,215,182,.5); font-size: 12px; }
-  .status { font-size: 13px; margin-top: 10px; }
+  .status { font-size: 12.5px; margin-top: 8px; line-height: 1.5; }
   .status.ok { color: #8FD19E; }
   .status.err { color: #F2857A; }
-  .toolbar { display: flex; gap: 10px; margin-top: 6px; }
+  .toolbar { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
   .empty { color: rgba(232,215,182,.4); font-style: italic; font-size: 13px; padding: 6px 0; }
+  .settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(201,162,39,.12);
+    font-size: 13px;
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .label { color: rgba(232,215,182,.75); }
+  .settings-row .value { font-family: monospace; font-size: 12px; color: rgba(232,215,182,.5); }
 </style>
 </head>
 <body>
-  <div class="titlebar">
-    <h1>NOBILITY DEPOSITORY</h1>
-    <p id="savedAtLabel">Universal credential vault for all projects · not yet saved</p>
+
+  <div class="sidebar">
+    <div class="brand">
+      <h1>NOBILITY<br/>DEPOSITORY</h1>
+      <p>credential vault</p>
+    </div>
+    <div class="navItem active" data-view="vault"><span class="dot"></span> Vault</div>
+    <div class="navItem" data-view="settings"><span class="dot"></span> Settings</div>
   </div>
 
-  <div class="wrap">
-    <div class="card">
-      <h2>Add a key</h2>
-      <div class="row">
-        <input type="text" id="newName" placeholder="Name (e.g. HF_TOKEN, GCP_MIRANDA)" />
+  <div class="main">
+
+    <!-- ============ VAULT VIEW ============ -->
+    <div class="view active" id="view-vault">
+      <div class="titlebar">
+        <h1>THE VAULT</h1>
+        <p id="savedAtLabel">Universal credential vault for all projects · not yet saved</p>
       </div>
-      <div class="row">
-        <input type="password" id="newValue" placeholder="Value" />
-        <button id="toggleVisBtn" class="ghost">Show</button>
-      </div>
-      <div class="toolbar">
-        <button id="addBtn">Add Key</button>
+      <div class="wrap">
+
+        <div class="card">
+          <h2>Providers</h2>
+          <p class="provider-sub">Paste a key and sync it — each one writes to the real place that provider's CLI/SDK actually reads from on this machine.</p>
+          <div class="provider-grid" id="providerGrid"></div>
+        </div>
+
+        <div class="card">
+          <h2>Add a key</h2>
+          <div class="row">
+            <input type="text" id="newName" placeholder="Name (e.g. STRIPE_KEY, GCP_MIRANDA)" />
+          </div>
+          <div class="row">
+            <input type="password" id="newValue" placeholder="Value" />
+            <button id="toggleVisBtn" class="ghost">Show</button>
+          </div>
+          <div class="toolbar">
+            <button id="addBtn">Add Key</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Other stored keys</h2>
+          <div id="entryList"></div>
+          <div id="emptyMsg" class="empty" style="display:none;">No other keys stored.</div>
+        </div>
+
+        <div class="card">
+          <h2>Backup</h2>
+          <p class="muted">Export writes a plain JSON file you choose the location for. Import restores from one. Nothing is ever cleared without a two-step confirmation.</p>
+          <div class="toolbar">
+            <button id="exportBtn">Export Backup…</button>
+            <button id="importBtn">Import Backup…</button>
+            <button id="clearBtn" class="danger">Clear All…</button>
+          </div>
+          <div id="backupStatus" class="status"></div>
+        </div>
+
       </div>
     </div>
 
-    <div class="card">
-      <h2>Stored keys</h2>
-      <div id="entryList"></div>
-      <div id="emptyMsg" class="empty" style="display:none;">No keys stored yet.</div>
+    <!-- ============ SETTINGS VIEW ============ -->
+    <div class="view" id="view-settings">
+      <div class="titlebar">
+        <h1>SETTINGS</h1>
+        <p>Where things live on this machine</p>
+      </div>
+      <div class="wrap">
+        <div class="card">
+          <h2>Storage</h2>
+          <div class="settings-row"><div class="label">Vault file</div><div class="value" id="pathVault">~/.config/nobility-depository/vault.json</div></div>
+          <div class="settings-row"><div class="label">Hugging Face CLI token</div><div class="value">~/.cache/huggingface/token</div></div>
+          <div class="settings-row"><div class="label">NVIDIA NGC CLI config</div><div class="value">~/.ngc/config</div></div>
+          <div class="settings-row"><div class="label">Google Cloud API key env</div><div class="value">~/.config/gcloud/nobility-api-key.env</div></div>
+          <div class="settings-row"><div class="label">GitHub CLI</div><div class="value">via `gh auth login` (its own config)</div></div>
+        </div>
+        <div class="card">
+          <h2>Vault</h2>
+          <p class="muted">Your stored keys live in the Vault section of this panel menu — click <strong>Vault</strong> on the left.</p>
+          <div class="toolbar">
+            <button id="gotoVaultBtn">Open Vault</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>Hugging Face access</h2>
-      <p class="muted">Verify a token's real granted scope, and optionally install it to the CLI cache (<code>~/.cache/huggingface/token</code>) so any Claude Code session on this machine can use it.</p>
-      <div class="row">
-        <input type="text" id="hfKeySelect" placeholder="Type the exact key Name above holding your HF token (e.g. HF_TOKEN)" />
-      </div>
-      <div class="toolbar">
-        <button id="hfVerifyBtn">Verify Token</button>
-        <button id="hfSyncBtn">Sync to CLI</button>
-      </div>
-      <div id="hfStatus" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h2>Backup</h2>
-      <p class="muted">Export writes a plain JSON file you choose the location for. Import restores from one. Nothing is ever cleared without a two-step confirmation.</p>
-      <div class="toolbar">
-        <button id="exportBtn">Export Backup…</button>
-        <button id="importBtn">Import Backup…</button>
-        <button id="clearBtn" class="danger">Clear All…</button>
-      </div>
-      <div id="backupStatus" class="status"></div>
-    </div>
   </div>
 
   <script src="renderer.js"></script>
