@@ -72,6 +72,15 @@ from backend import router as api_router, init_db
 init_db()
 app.include_router(api_router)
 
+# Branch social layer -- feed, chat, DMs, and the tree itself. Its storage is a
+# private HF Dataset rather than local disk, because this Space runs on
+# cpu-basic and loses its filesystem on every restart.
+import social
+from cuzzo import router as cuzzo_router
+social.start_background()
+app.include_router(social.router)
+app.include_router(cuzzo_router)
+
 
 # Owner-only Vault gear -- injected into every HTML page so it's always
 # reachable no matter which page you're on. Hidden by default; JS reveals it
@@ -136,6 +145,18 @@ for slug, filename in PAGES:
 
 # the home page used to be a differently-named file -- redirect that old URL too
 app.add_api_route("/Magnolia Book Landing.dc.html", _make_redirect_route(""), methods=["GET"])
+
+
+# Each branch gets its own social page at /branch/<slug>. One file serves all
+# nine; the page reads the slug off its own URL and loads that branch's people,
+# feed, and chat. Registered before the static mount so it wins the path.
+@app.get("/branch/{slug}")
+async def branch_social(slug: str):
+    if slug not in social.BRANCH_SLUGS:
+        return RedirectResponse(url="/branches", status_code=307)
+    return FileResponse(
+        os.path.join(ROOT, "Branch Social.dc.html"), media_type="text/html"
+    )
 
 
 @app.get("/sitemap.xml")

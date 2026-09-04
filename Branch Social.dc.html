@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Branch — The Big Ma Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:      #0B0705;
+    --panel:      #150E08;
+    --panel-2:    #1E1409;
+    --rule:       rgba(201,162,39,.20);
+    --rule-soft:  rgba(201,162,39,.11);
+    --gold:       #C9A227;
+    --gold-hi:    #F0D98C;
+    --gold-deep:  #8A6A1F;
+    --parchment:  #E8D7B6;
+    --dim:        rgba(232,215,182,.58);
+    --dimmer:     rgba(232,215,182,.34);
+    --ok:         #7FCF9B;
+    --rose:       #C98A78;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--black); color: var(--parchment);
+    font-family: 'EB Garamond', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #35291a; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a3a24; }
+  a { color: var(--gold); text-decoration: none; }
+  button { font-family: inherit; }
+  input, textarea { font-family: inherit; }
+
+  .cz { font-family: 'Cinzel', serif; }
+  .label {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .3em;
+    text-transform: uppercase; color: var(--gold);
+  }
+
+  /* ---------------------------------------------------------- app shell */
+  .app { height: 100vh; display: flex; flex-direction: column; }
+
+  header {
+    flex: 0 0 auto; display: flex; align-items: center; gap: 20px;
+    padding: 13px 22px; background: var(--panel);
+    border-bottom: 1px solid var(--rule);
+  }
+  header .home { font-family:'Cinzel',serif; font-size: 12px; letter-spacing: .22em; color: var(--parchment); }
+  header .home:hover { color: var(--gold-hi); }
+  .branch-title { font-family: 'Cinzel', serif; font-size: 19px; color: var(--gold-hi); letter-spacing: .04em; }
+  .branch-sub { font-family: 'Pinyon Script', cursive; font-size: 17px; color: var(--gold); margin-left: -4px; }
+  header .grow { flex: 1; }
+
+  .whoami {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; color: var(--dim);
+  }
+  .whoami .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(150deg, var(--gold), var(--gold-deep));
+    color: #241708; display: grid; place-items: center;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 13px;
+  }
+  .whoami button {
+    background: none; border: 1px solid var(--rule); color: var(--dim);
+    border-radius: 20px; padding: 5px 12px; font-size: 11px; cursor: pointer;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .whoami button:hover { border-color: var(--gold); color: var(--gold-hi); }
+
+  .cols { flex: 1; display: flex; min-height: 0; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .col-left  { flex: 0 0 330px; border-right: 1px solid var(--rule-soft); background: var(--panel); }
+  .col-mid   { flex: 1; min-width: 0; overflow-y: auto; }
+  .col-right { flex: 0 0 300px; border-left: 1px solid var(--rule-soft); background: var(--panel); }
+
+  .col-head {
+    flex: 0 0 auto; padding: 13px 16px; border-bottom: 1px solid var(--rule-soft);
+    display: flex; align-items: center; gap: 9px;
+  }
+  .col-body { flex: 1; overflow-y: auto; min-height: 0; }
+
+  /* ---------------------------------------------------------- cuzzo */
+  .cuzzo-badge {
+    width: 30px; height: 30px; border-radius: 50%; flex: 0 0 auto;
+    background: radial-gradient(circle at 35% 30%, #F5E0A4, var(--gold) 55%, var(--gold-deep));
+    display: grid; place-items: center; color: #2A1B08;
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 14px;
+    box-shadow: 0 0 14px rgba(240,217,140,.3);
+  }
+  .cuzzo-name { font-family:'Cinzel',serif; font-size: 15px; color: var(--gold-hi); }
+  .cuzzo-role { font-size: 12.5px; color: var(--dimmer); font-style: italic; }
+
+  .msgs { padding: 14px; display: flex; flex-direction: column; gap: 11px; }
+  .bubble {
+    max-width: 88%; padding: 10px 13px; border-radius: 13px;
+    font-size: 15px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;
+  }
+  .bubble.them {
+    align-self: flex-start; background: var(--panel-2);
+    border: 1px solid var(--rule-soft); border-bottom-left-radius: 4px;
+  }
+  .bubble.me {
+    align-self: flex-end; background: rgba(201,162,39,.15);
+    border: 1px solid var(--rule); border-bottom-right-radius: 4px; color: #F7EBCF;
+  }
+  .bubble.sys {
+    align-self: center; background: rgba(127,207,155,.09);
+    border: 1px solid rgba(127,207,155,.3); color: var(--ok);
+    font-size: 13px; text-align: center; max-width: 95%;
+  }
+  .typing { align-self: flex-start; display: flex; gap: 4px; padding: 12px 14px; }
+  .typing i {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+    animation: blink 1.3s infinite; display: block;
+  }
+  .typing i:nth-child(2) { animation-delay: .18s; }
+  .typing i:nth-child(3) { animation-delay: .36s; }
+  @keyframes blink { 0%,60%,100%{opacity:.25} 30%{opacity:1} }
+
+  .composer {
+    flex: 0 0 auto; padding: 11px; border-top: 1px solid var(--rule-soft);
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  .composer textarea {
+    flex: 1; resize: none; background: var(--black); color: var(--parchment);
+    border: 1px solid var(--rule); border-radius: 10px; padding: 9px 11px;
+    font-size: 15px; line-height: 1.45; max-height: 110px; outline: none;
+  }
+  .composer textarea:focus { border-color: var(--gold); }
+  .send {
+    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(150deg, var(--gold-hi), var(--gold));
+    border: none; color: #241708; font-size: 16px; cursor: pointer;
+  }
+  .send:hover { filter: brightness(1.12); }
+  .send:disabled { opacity: .4; cursor: default; }
+
+  /* ---------------------------------------------------------- stories */
+  .stories {
+    display: flex; gap: 13px; padding: 15px 20px 4px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .stories::-webkit-scrollbar { display: none; }
+  .story { flex: 0 0 auto; width: 74px; text-align: center; cursor: pointer; }
+  .story .ring {
+    width: 68px; height: 68px; border-radius: 50%; padding: 2.5px;
+    background: linear-gradient(145deg, var(--gold-hi), var(--gold-deep));
+    margin: 0 auto 6px;
+  }
+  .story .ring img, .story .ring .ph {
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    border: 2.5px solid var(--black); background: var(--panel-2);
+    display: block;
+  }
+  .story .ph {
+    display: grid; place-items: center; color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 20px;
+  }
+  .story.add .ring { background: none; border: 2px dashed var(--rule); }
+  .story .cap {
+    font-size: 12px; color: var(--dim); overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------------- hero */
+  .hero {
+    display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 24px; padding: 18px 22px 6px; align-items: start;
+  }
+  @media (max-width: 1180px) { .hero { grid-template-columns: 1fr; } }
+
+  .frame-wrap { position: relative; text-align: center; }
+  .frame-wrap .glow {
+    position: absolute; inset: -12%; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(240,217,140,.20), rgba(240,217,140,0) 68%);
+    filter: blur(22px);
+  }
+  .frame-wrap img {
+    position: relative; width: 100%; max-width: 320px; display: block;
+    margin: 0 auto; filter: drop-shadow(0 20px 38px rgba(0,0,0,.72));
+  }
+  .frame-name {
+    font-family:'Cinzel',serif; font-size: 21px; color: var(--gold-hi);
+    margin-top: 10px; letter-spacing: .04em;
+  }
+  .frame-count { font-size: 14px; color: var(--dim); font-style: italic; }
+
+  /* ---------------------------------------------------------- news */
+  .news-card {
+    background: linear-gradient(165deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--rule); border-radius: 4px;
+    padding: 16px 18px; min-height: 190px;
+    display: flex; flex-direction: column;
+  }
+  .news-head {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--rule-soft); padding-bottom: 9px; margin-bottom: 12px;
+  }
+  .news-slot { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .news-item { animation: newsIn .5s ease both; }
+  @keyframes newsIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+  .news-kind {
+    display: inline-block; font-family:'Cinzel',serif; font-size: 9.5px;
+    letter-spacing: .2em; text-transform: uppercase; padding: 3px 9px;
+    border-radius: 2px; margin-bottom: 9px;
+  }
+  .news-kind.birth   { background: rgba(127,207,155,.14); color: var(--ok);   border: 1px solid rgba(127,207,155,.34); }
+  .news-kind.passing { background: rgba(201,138,120,.13); color: var(--rose); border: 1px solid rgba(201,138,120,.32); }
+  .news-text { font-size: 16.5px; line-height: 1.5; color: var(--parchment); }
+  .news-meta { font-size: 12.5px; color: var(--dimmer); margin-top: 8px; }
+  .news-dots { display: flex; gap: 5px; justify-content: center; margin-top: 12px; }
+  .news-dots i {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--rule);
+    display: block; cursor: pointer; transition: background .2s;
+  }
+  .news-dots i.on { background: var(--gold); }
+  .news-empty { color: var(--dimmer); font-style: italic; font-size: 14.5px; text-align: center; }
+
+  /* ---------------------------------------------------------- nodes */
+  .section { padding: 20px 22px 0; }
+  .section-head {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 13px;
+  }
+  .section-head .rule { flex: 1; height: 1px; background: var(--rule-soft); }
+
+  .btn-gold {
+    background: linear-gradient(92deg, rgba(201,162,39,.14), rgba(240,217,140,.24), rgba(201,162,39,.14));
+    border: 1px solid rgba(232,197,92,.7); color: var(--gold-hi);
+    font-family:'Cinzel',serif; font-size: 12px; letter-spacing: .16em;
+    text-transform: uppercase; padding: 11px 20px; border-radius: 2px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .btn-gold:hover { color: #FFF0C4; border-color: var(--gold-hi); box-shadow: 0 0 18px rgba(240,217,140,.25); }
+  .btn-gold.big { padding: 14px 26px; font-size: 13px; }
+
+  .nodes { display: flex; flex-wrap: wrap; gap: 11px; }
+  .node {
+    background: var(--panel); border: 1px solid var(--rule-soft);
+    border-radius: 3px; padding: 11px 15px; min-width: 158px; cursor: pointer;
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+  }
+  .node:hover {
+    border-color: var(--gold); transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.5);
+  }
+  .node .n { font-family:'Cinzel',serif; font-size: 14.5px; color: var(--gold-hi); }
+  .node .y { font-size: 13px; color: var(--dimmer); margin-top: 2px; }
+  .node .p { font-size: 12.5px; color: var(--dim); font-style: italic; margin-top: 3px; }
+  .nodes-empty {
+    border: 1px dashed var(--rule); border-radius: 3px; padding: 26px 20px;
+    text-align: center; color: var(--dimmer); font-style: italic; width: 100%;
+  }
+
+  /* ---------------------------------------------------------- feed */
+  .post {
+    background: var(--panel); border: 1px solid var(--rule-soft);
+    border-radius: 3px; padding: 15px 17px; margin-bottom: 13px;
+  }
+  .post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .post-av {
+    width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
+    background: linear-gradient(150deg, var(--gold), var(--gold-deep));
+    color: #241708; display: grid; place-items: center;
+    font-family:'Cinzel',serif; font-weight: 700; font-size: 14px;
+  }
+  .post-who { font-family:'Cinzel',serif; font-size: 14px; color: var(--parchment); }
+  .post-when { font-size: 12.5px; color: var(--dimmer); }
+  .post-text { font-size: 16px; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+  .post-media {
+    margin-top: 11px; border-radius: 3px; overflow: hidden;
+    border: 1px solid var(--rule-soft); background: var(--black);
+  }
+  .post-media img, .post-media video { width: 100%; display: block; max-height: 460px; object-fit: contain; }
+  .post-acts { display: flex; gap: 16px; margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--rule-soft); }
+  .post-acts button {
+    background: none; border: none; color: var(--dim); cursor: pointer;
+    font-size: 13.5px; padding: 0; display: flex; align-items: center; gap: 5px;
+  }
+  .post-acts button:hover { color: var(--gold-hi); }
+
+  .composer-post {
+    background: var(--panel); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .composer-post textarea {
+    width: 100%; background: var(--black); color: var(--parchment);
+    border: 1px solid var(--rule-soft); border-radius: 3px; padding: 11px;
+    font-size: 15.5px; line-height: 1.5; resize: vertical; min-height: 66px; outline: none;
+  }
+  .composer-post textarea:focus { border-color: var(--gold); }
+  .composer-post .row { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+  .composer-post .row .grow { flex: 1; }
+  .attach {
+    border: 1px solid var(--rule); background: none; color: var(--dim);
+    border-radius: 2px; padding: 9px 14px; font-size: 12.5px; cursor: pointer;
+  }
+  .attach:hover { border-color: var(--gold); color: var(--gold-hi); }
+  .preview { margin-top: 10px; position: relative; display: none; }
+  .preview img, .preview video { max-height: 190px; border-radius: 3px; display: block; border: 1px solid var(--rule-soft); }
+  .preview button {
+    position: absolute; top: 6px; left: 6px; width: 26px; height: 26px;
+    border-radius: 50%; background: rgba(11,7,5,.85); border: 1px solid var(--rule);
+    color: var(--parchment); cursor: pointer; font-size: 14px;
+  }
+
+  /* ---------------------------------------------------------- right rail */
+  .tabs { display: flex; border-bottom: 1px solid var(--rule-soft); flex: 0 0 auto; }
+  .tabs button {
+    flex: 1; background: none; border: none; padding: 12px 6px; cursor: pointer;
+    font-family:'Cinzel',serif; font-size: 10.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--dimmer); border-bottom: 2px solid transparent;
+  }
+  .tabs button.on { color: var(--gold-hi); border-bottom-color: var(--gold); }
+  .chat-line { padding: 7px 14px; font-size: 15px; line-height: 1.45; }
+  .chat-line .who { font-family:'Cinzel',serif; font-size: 12.5px; color: var(--gold); margin-right: 6px; }
+  .chat-line .txt { color: var(--parchment); word-wrap: break-word; }
+  .chat-line.mine .who { color: var(--gold-hi); }
+  .dm-person {
+    padding: 11px 14px; border-bottom: 1px solid var(--rule-soft); cursor: pointer;
+    display: flex; align-items: center; gap: 9px; font-size: 14.5px;
+  }
+  .dm-person:hover { background: var(--panel-2); }
+  .dm-person .post-av { width: 28px; height: 28px; font-size: 12px; }
+
+  /* ---------------------------------------------------------- modal */
+  .backdrop {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(5,3,2,.78); align-items: center; justify-content: center; padding: 20px;
+  }
+  .backdrop.on { display: flex; }
+  .modal {
+    background: linear-gradient(168deg, #241610, #150C07 58%, #1F130D);
+    border: 1px solid var(--rule); border-radius: 4px;
+    width: min(460px, 96vw); max-height: 92vh; overflow-y: auto;
+    box-shadow: 0 30px 70px rgba(0,0,0,.75);
+  }
+  .modal-head { padding: 20px 22px 14px; border-bottom: 1px solid var(--rule-soft); }
+  .modal-head h3 { font-family:'Cinzel',serif; font-size: 20px; color: var(--gold-hi); margin: 4px 0 0; font-weight: 600; }
+  .modal-head p { font-size: 14.5px; color: var(--dim); margin: 7px 0 0; line-height: 1.5; }
+  .modal-body { padding: 18px 22px 22px; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-family:'Cinzel',serif; font-size: 10.5px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; background: var(--black); color: var(--parchment);
+    border: 1px solid var(--rule); border-radius: 2px; padding: 11px 12px;
+    font-size: 15.5px; outline: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
+  .field .hint { font-size: 12.5px; color: var(--dimmer); margin-top: 5px; font-style: italic; }
+  .modal-msg { font-size: 14px; margin-top: 11px; min-height: 19px; }
+  .modal-msg.err { color: #E88; }
+  .modal-msg.ok { color: var(--ok); }
+
+  .toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--panel-2); border: 1px solid var(--gold); color: var(--gold-hi);
+    padding: 12px 22px; border-radius: 3px; font-size: 14.5px; z-index: 200;
+    transition: transform .3s cubic-bezier(.2,.9,.25,1); box-shadow: 0 12px 32px rgba(0,0,0,.6);
+  }
+  .toast.on { transform: translateX(-50%) translateY(0); }
+
+  /* ---------------------------------------------------------- mobile */
+  .mobile-tabs { display: none; }
+  @media (max-width: 900px) {
+    .cols { display: block; overflow-y: auto; }
+    .col-left, .col-right, .col-mid { display: none; flex: none; border: none; height: auto; }
+    .col.show { display: flex; }
+    .col-mid.show { display: block; }
+    .col-left, .col-right { height: calc(100vh - 118px); }
+    .mobile-tabs {
+      display: flex; flex: 0 0 auto; border-top: 1px solid var(--rule);
+      background: var(--panel); position: sticky; bottom: 0; z-index: 50;
+    }
+    .mobile-tabs button {
+      flex: 1; background: none; border: none; padding: 13px 4px; cursor: pointer;
+      font-family:'Cinzel',serif; font-size: 10px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--dimmer);
+    }
+    .mobile-tabs button.on { color: var(--gold-hi); }
+    .hero { grid-template-columns: 1fr; }
+    header { flex-wrap: wrap; gap: 10px 16px; padding: 11px 15px; }
+    .branch-title { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <a class="home" href="/">&#8592; HOME</a>
+    <a class="home" href="/branches">ALL BRANCHES</a>
+    <div>
+      <div class="branch-title" id="branchTitle">&nbsp;</div>
+      <div class="branch-sub">a branch of Big Ma&rsquo;s tree</div>
+    </div>
+    <div class="grow"></div>
+    <div class="whoami">
+      <div class="avatar" id="meAvatar">?</div>
+      <span id="meName">Not signed in</span>
+      <button id="changeNameBtn">Change</button>
+    </div>
+  </header>
+
+  <div class="cols">
+
+    <!-- ============================================= LEFT: CUZZO -->
+    <div class="col col-left" id="colCuzzo">
+      <div class="col-head">
+        <div class="cuzzo-badge">C</div>
+        <div>
+          <div class="cuzzo-name">Cuzzo</div>
+          <div class="cuzzo-role">your cousin on the inside</div>
+        </div>
+      </div>
+      <div class="col-body msgs" id="cuzzoMsgs"></div>
+      <div class="composer">
+        <textarea id="cuzzoInput" rows="1" placeholder="Tell Cuzzo who to add&hellip;"></textarea>
+        <button class="send" id="cuzzoSend">&#10148;</button>
+      </div>
+    </div>
+
+    <!-- ============================================= CENTER -->
+    <div class="col-mid show" id="colMain">
+
+      <div class="stories" id="stories"></div>
+
+      <div class="hero">
+        <div class="frame-wrap">
+          <div class="glow"></div>
+          <img id="branchPortrait" alt="">
+          <div class="frame-name" id="frameName">&nbsp;</div>
+          <div class="frame-count" id="frameCount">&nbsp;</div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-head">
+            <span class="label">Family News</span>
+            <span class="label" style="color:var(--dimmer)" id="newsCounter"></span>
+          </div>
+          <div class="news-slot" id="newsSlot">
+            <div class="news-empty">No births or passings recorded yet.<br>They&rsquo;ll appear here as the family adds them.</div>
+          </div>
+          <div class="news-dots" id="newsDots"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <span class="label">The Leaves</span>
+          <span class="rule"></span>
+          <button class="btn-gold" id="addPersonBtn">+ Add a family member</button>
+        </div>
+        <div class="nodes" id="nodes"></div>
+      </div>
+
+      <div class="section" style="padding-bottom: 40px;">
+        <div class="section-head">
+          <span class="label">The Wall</span>
+          <span class="rule"></span>
+        </div>
+
+        <div class="composer-post">
+          <textarea id="postText" placeholder="Share something with the family&hellip;"></textarea>
+          <div class="preview" id="postPreview"></div>
+          <div class="row">
+            <button class="attach" id="attachBtn">&#128247; Photo or video</button>
+            <input type="file" id="fileInput" accept="image/*,video/*" style="display:none">
+            <span class="grow"></span>
+            <span style="font-size:13px;color:var(--dimmer)" id="postStatus"></span>
+            <button class="btn-gold" id="postBtn">Post</button>
+          </div>
+        </div>
+
+        <div id="feed"></div>
+      </div>
+    </div>
+
+    <!-- ============================================= RIGHT: CHAT -->
+    <div class="col col-right" id="colChat">
+      <div class="tabs">
+        <button class="on" data-rail="room">Branch Chat</button>
+        <button data-rail="dm">Private</button>
+      </div>
+
+      <div class="col-body" id="railRoom"></div>
+
+      <div class="col-body" id="railDm" style="display:none">
+        <div id="dmList"></div>
+        <div id="dmThread" style="display:none">
+          <div class="col-head" style="border-bottom:1px solid var(--rule-soft)">
+            <button id="dmBack" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:15px">&#8592;</button>
+            <span class="cuzzo-name" id="dmWith"></span>
+          </div>
+          <div id="dmMsgs"></div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <textarea id="chatInput" rows="1" placeholder="Say something&hellip;"></textarea>
+        <button class="send" id="chatSend">&#10148;</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mobile-tabs">
+    <button data-m="cuzzo">Cuzzo</button>
+    <button class="on" data-m="main">Branch</button>
+    <button data-m="chat">Chat</button>
+  </div>
+</div>
+
+<!-- ============================================= MODALS -->
+<div class="backdrop" id="nameBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="label">Welcome, cousin</span>
+      <h3>What should the family call you?</h3>
+      <p>No password, no account to set up. Your name stays in this browser so
+         your cousins know who posted.</p>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Tyronne" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email <span style="color:var(--dimmer);letter-spacing:0;text-transform:none;font-size:11px">(optional)</span></label>
+        <input type="email" id="emailInput" placeholder="so we can reach you about the tree" autocomplete="email">
+        <div class="hint">Only used for the updates you pick below. Never shared.</div>
+      </div>
+      <div class="field">
+        <label>Tell me about</label>
+        <select id="scopeInput">
+          <option value="branch">Just this branch</option>
+          <option value="all">Every branch of the family</option>
+          <option value="none">Nothing &mdash; I&rsquo;ll check in myself</option>
+        </select>
+      </div>
+      <button class="btn-gold big" id="nameSave" style="width:100%">Continue</button>
+      <div class="modal-msg" id="nameMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="backdrop" id="personBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="label">Add to the tree</span>
+      <h3>Who are we adding?</h3>
+      <p>Only the name is required. If you don&rsquo;t know a date, leave it blank &mdash;
+         someone else can fill it in later. Or ask Cuzzo on the left and he&rsquo;ll
+         walk you through it.</p>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Their name</label>
+        <input type="text" id="pName" placeholder="Full name">
+      </div>
+      <div class="field">
+        <label>Whose child are they?</label>
+        <select id="pParent"></select>
+        <div class="hint">Leave as &ldquo;first generation&rdquo; if they&rsquo;re a direct child of this branch.</div>
+      </div>
+      <div class="field">
+        <label>Born</label>
+        <input type="text" id="pBirth" placeholder="Year, if you know it">
+      </div>
+      <div class="field">
+        <label>Photo</label>
+        <button class="attach" id="pPhotoBtn" style="width:100%">&#128247; Choose a photo</button>
+        <input type="file" id="pPhotoInput" accept="image/*" style="display:none">
+        <div class="preview" id="pPhotoPreview"></div>
+      </div>
+      <div class="field">
+        <label>Anything else</label>
+        <textarea id="pNote" rows="2" placeholder="Optional"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-gold" id="pCancel" style="flex:0 0 auto">Cancel</button>
+        <button class="btn-gold big" id="pSave" style="flex:1">Add to the tree</button>
+      </div>
+      <div class="modal-msg" id="pMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------- setup
+  var slug = (location.pathname.split('/').filter(Boolean).pop() || '').toLowerCase();
+  var NAME_KEY = 'bigma:me';
+  var EMAIL_KEY = 'bigma:email';
+  var SCOPE_KEY = 'bigma:scope';
+  var me = localStorage.getItem(NAME_KEY) || '';
+  var myEmail = localStorage.getItem(EMAIL_KEY) || '';
+  var myScope = localStorage.getItem(SCOPE_KEY) || 'branch';
+  var streamAt = 0;
+  var people = [], feed = [], newsItems = [], newsIdx = 0, newsTimer = null;
+  var lastChatAt = 0, lastDmAt = 0, dmWith = '';
+  var pendingMedia = null, pendingPhoto = null;
+  var cuzzoHistory = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  };
+  var initial = function (s) { return (s || '?').trim().charAt(0).toUpperCase() || '?'; };
+
+  function ago(ts) {
+    var s = Math.floor(Date.now() / 1000 - (ts || 0));
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+    return new Date((ts || 0) * 1000).toLocaleDateString();
+  }
+
+  function toast(text) {
+    var t = $('toast');
+    t.textContent = text;
+    t.classList.add('on');
+    setTimeout(function () { t.classList.remove('on'); }, 2600);
+  }
+
+  async function api(path, opts) {
+    opts = opts || {};
+    var res = await fetch('/api/social' + path, {
+      method: opts.method || 'GET',
+      headers: opts.body ? { 'Content-Type': 'application/json' } : {},
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    var data = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(data.detail || ('request failed (' + res.status + ')'));
+    return data;
+  }
+
+  // ------------------------------------------------------------- identity
+  function paintMe() {
+    $('meName').textContent = me || 'Not signed in';
+    $('meAvatar').textContent = initial(me);
+  }
+  function askName() {
+    $('nameBackdrop').classList.add('on');
+    $('nameInput').value = me;
+    $('emailInput').value = myEmail;
+    $('scopeInput').value = myScope;
+    setTimeout(function () { $('nameInput').focus(); }, 60);
+  }
+  $('nameSave').addEventListener('click', async function () {
+    var v = $('nameInput').value.trim();
+    var msg = $('nameMsg');
+    if (!v) { msg.textContent = 'Please enter a name.'; msg.className = 'modal-msg err'; return; }
+    var email = $('emailInput').value.trim();
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      msg.textContent = 'That email doesn’t look right.'; msg.className = 'modal-msg err'; return;
+    }
+    me = v; myEmail = email; myScope = $('scopeInput').value;
+    localStorage.setItem(NAME_KEY, me);
+    localStorage.setItem(EMAIL_KEY, myEmail);
+    localStorage.setItem(SCOPE_KEY, myScope);
+    paintMe();
+    $('nameBackdrop').classList.remove('on');
+    msg.textContent = '';
+
+    // Registering is what lets alerts and the saved Cuzzo transcript follow
+    // this person across devices; without an email there's nothing to key on.
+    if (myEmail) {
+      try {
+        await api('/identity', { method: 'POST', body: {
+          email: myEmail, name: me, branch_slug: slug, notify_scope: myScope
+        }});
+      } catch (e) { /* the page works fine unregistered; don't block on it */ }
+    }
+  });
+  $('nameInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') $('nameSave').click();
+  });
+  $('changeNameBtn').addEventListener('click', askName);
+
+  // ------------------------------------------------------------- tree
+  function paintNodes() {
+    var box = $('nodes');
+    if (!people.length) {
+      box.innerHTML = '<div class="nodes-empty">Nobody has been added to this branch yet.<br>'
+        + 'Use <strong>Add a family member</strong> above, or just tell Cuzzo who belongs here.</div>';
+    } else {
+      var byId = {};
+      people.forEach(function (p) { byId[p.id] = p; });
+      box.innerHTML = people.map(function (p) {
+        var parent = byId[p.parent_id] ? byId[p.parent_id].name : '';
+        var years = [p.birth_year, p.death_year].filter(Boolean).join(' – ');
+        return '<div class="node" data-id="' + esc(p.id) + '">'
+          + '<div class="n">' + esc(p.name) + '</div>'
+          + (years ? '<div class="y">' + esc(years) + '</div>' : '')
+          + (parent ? '<div class="p">child of ' + esc(parent) + '</div>' : '')
+          + (p.generation ? '<div class="p" style="color:var(--gold);font-style:normal;font-size:11.5px;letter-spacing:.06em">'
+              + esc(p.generation) + ' of Big Ma</div>' : '')
+          + '</div>';
+      }).join('');
+    }
+    $('frameCount').textContent = people.length
+      ? people.length + (people.length === 1 ? ' person recorded' : ' people recorded')
+      : 'no one recorded yet';
+
+    var sel = $('pParent');
+    sel.innerHTML = '<option value="">— first generation —</option>'
+      + people.map(function (p) {
+          return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
+        }).join('');
+    paintStories();
+  }
+
+  function paintStories() {
+    var html = '<div class="story add" id="storyAdd">'
+      + '<div class="ring"><div class="ph">+</div></div>'
+      + '<div class="cap">Add</div></div>';
+    html += people.slice(0, 24).map(function (p) {
+      var inner = p.photo_url
+        ? '<img src="' + esc(p.photo_url) + '" alt="">'
+        : '<div class="ph">' + esc(initial(p.name)) + '</div>';
+      return '<div class="story"><div class="ring">' + inner + '</div>'
+        + '<div class="cap">' + esc((p.name || '').split(' ')[0]) + '</div></div>';
+    }).join('');
+    $('stories').innerHTML = html;
+    var add = $('storyAdd');
+    if (add) add.addEventListener('click', openPerson);
+  }
+
+  async function loadPeople() {
+    try {
+      var d = await api('/' + slug + '/people');
+      people = d.people || [];
+      $('branchTitle').textContent = d.branch_name || '';
+      $('frameName').textContent = d.branch_name || '';
+      document.title = (d.branch_name || 'Branch') + ' — The Big Ma Project';
+      $('branchPortrait').src = 'uploads/' + slug + '.png';
+      $('branchPortrait').alt = d.branch_name || '';
+      paintNodes();
+    } catch (e) { console.error(e); }
+  }
+
+  // ------------------------------------------------------------- feed
+  function paintFeed() {
+    if (!feed.length) {
+      $('feed').innerHTML = '<div class="nodes-empty">Nothing on the wall yet. '
+        + 'Be the first to share a photo or a memory.</div>';
+      return;
+    }
+    $('feed').innerHTML = feed.map(function (p) {
+      var media = '';
+      if (p.media_url) {
+        media = p.media_type === 'video'
+          ? '<div class="post-media"><video src="' + esc(p.media_url) + '" controls playsinline></video></div>'
+          : '<div class="post-media"><img src="' + esc(p.media_url) + '" alt="" loading="lazy"></div>';
+      }
+      var hearts = (p.reactions && p.reactions.heart) || 0;
+      return '<div class="post">'
+        + '<div class="post-head">'
+        +   '<div class="post-av">' + esc(initial(p.author)) + '</div>'
+        +   '<div><div class="post-who">' + esc(p.author || 'Someone') + '</div>'
+        +   '<div class="post-when">' + esc(ago(p.created_at)) + '</div></div>'
+        + '</div>'
+        + (p.text ? '<div class="post-text">' + esc(p.text) + '</div>' : '')
+        + media
+        + '<div class="post-acts">'
+        +   '<button data-heart="' + esc(p.id) + '">♡ ' + hearts + '</button>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  async function loadFeed() {
+    try {
+      var d = await api('/' + slug + '/feed');
+      feed = d.posts || [];
+      paintFeed();
+    } catch (e) { console.error(e); }
+  }
+
+  $('feed').addEventListener('click', async function (e) {
+    var btn = e.target.closest('[data-heart]');
+    if (!btn) return;
+    var id = btn.getAttribute('data-heart');
+    try {
+      var fd = new FormData(); fd.append('emoji', 'heart');
+      var res = await fetch('/api/social/' + slug + '/feed/' + id + '/react', { method: 'POST', body: fd });
+      var d = await res.json();
+      if (d.reactions) btn.textContent = '♡ ' + (d.reactions.heart || 0);
+    } catch (err) { /* a failed heart is not worth interrupting anyone */ }
+  });
+
+  // ------------------------------------------------------------- media
+  async function uploadFile(file, statusEl) {
+    var fd = new FormData();
+    fd.append('file', file);
+    if (statusEl) statusEl.textContent = 'Uploading…';
+    var res = await fetch('/api/social/upload', { method: 'POST', body: fd });
+    var d = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(d.detail || 'upload failed');
+    if (statusEl) statusEl.textContent = '';
+    return d;
+  }
+
+  $('attachBtn').addEventListener('click', function () { $('fileInput').click(); });
+  $('fileInput').addEventListener('change', async function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    try {
+      var d = await uploadFile(f, $('postStatus'));
+      pendingMedia = d;
+      var pv = $('postPreview');
+      pv.style.display = 'block';
+      pv.innerHTML = (d.media_type === 'video'
+        ? '<video src="' + esc(d.url) + '" controls></video>'
+        : '<img src="' + esc(d.url) + '" alt="">')
+        + '<button id="pvClear">&times;</button>';
+      $('pvClear').addEventListener('click', function () {
+        pendingMedia = null; pv.style.display = 'none'; pv.innerHTML = '';
+      });
+    } catch (e) {
+      $('postStatus').textContent = '';
+      toast(e.message);
+    }
+    this.value = '';
+  });
+
+  $('postBtn').addEventListener('click', async function () {
+    if (!me) { askName(); return; }
+    var text = $('postText').value.trim();
+    if (!text && !pendingMedia) { toast('Write something or add a photo.'); return; }
+    this.disabled = true;
+    try {
+      await api('/' + slug + '/feed', { method: 'POST', body: {
+        author: me, text: text,
+        media_url: pendingMedia ? pendingMedia.url : '',
+        media_type: pendingMedia ? pendingMedia.media_type : ''
+      }});
+      $('postText').value = '';
+      pendingMedia = null;
+      $('postPreview').style.display = 'none';
+      $('postPreview').innerHTML = '';
+      await loadFeed();
+      toast('Posted to the wall.');
+    } catch (e) { toast(e.message); }
+    this.disabled = false;
+  });
+
+  // ------------------------------------------------------------- add person
+  function openPerson() {
+    if (!me) { askName(); return; }
+    $('personBackdrop').classList.add('on');
+    setTimeout(function () { $('pName').focus(); }, 60);
+  }
+  $('addPersonBtn').addEventListener('click', openPerson);
+  $('pCancel').addEventListener('click', function () {
+    $('personBackdrop').classList.remove('on');
+  });
+  $('pPhotoBtn').addEventListener('click', function () { $('pPhotoInput').click(); });
+  $('pPhotoInput').addEventListener('change', async function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    try {
+      var d = await uploadFile(f, $('pMsg'));
+      pendingPhoto = d;
+      var pv = $('pPhotoPreview');
+      pv.style.display = 'block';
+      pv.innerHTML = '<img src="' + esc(d.url) + '" alt="">';
+      $('pMsg').textContent = '';
+    } catch (e) { $('pMsg').textContent = e.message; $('pMsg').className = 'modal-msg err'; }
+    this.value = '';
+  });
+
+  $('pSave').addEventListener('click', async function () {
+    var name = $('pName').value.trim();
+    var msg = $('pMsg');
+    if (!name) { msg.textContent = 'A name is needed.'; msg.className = 'modal-msg err'; return; }
+    this.disabled = true;
+    try {
+      await api('/' + slug + '/people', { method: 'POST', body: {
+        name: name,
+        parent_id: $('pParent').value || null,
+        birth_year: $('pBirth').value.trim(),
+        note: $('pNote').value.trim(),
+        photo_url: pendingPhoto ? pendingPhoto.url : '',
+        added_by: me
+      }});
+      $('pName').value = ''; $('pBirth').value = ''; $('pNote').value = '';
+      $('pPhotoPreview').style.display = 'none'; $('pPhotoPreview').innerHTML = '';
+      pendingPhoto = null;
+      msg.textContent = '';
+      $('personBackdrop').classList.remove('on');
+      await loadPeople(); await loadFeed(); await loadNews();
+      toast(name + ' was added to the branch.');
+    } catch (e) { msg.textContent = e.message; msg.className = 'modal-msg err'; }
+    this.disabled = false;
+  });
+
+  // ------------------------------------------------------------- news
+  function paintNews() {
+    var slot = $('newsSlot'), dots = $('newsDots');
+    if (!newsItems.length) {
+      slot.innerHTML = '<div class="news-empty">No births or passings recorded yet.<br>'
+        + 'They&rsquo;ll appear here as the family adds them.</div>';
+      dots.innerHTML = ''; $('newsCounter').textContent = '';
+      return;
+    }
+    var n = newsItems[newsIdx % newsItems.length];
+    var kind = n.kind === 'passing' ? 'passing' : 'birth';
+    slot.innerHTML = '<div class="news-item">'
+      + '<span class="news-kind ' + kind + '">' + (kind === 'passing' ? 'In Memoriam' : 'New Arrival') + '</span>'
+      + '<div class="news-text">' + esc(n.text) + '</div>'
+      + '<div class="news-meta">' + esc(n.branch_name || '') + ' · ' + esc(ago(n.created_at)) + '</div>'
+      + '</div>';
+    dots.innerHTML = newsItems.slice(0, 8).map(function (_, i) {
+      return '<i class="' + (i === (newsIdx % newsItems.length) ? 'on' : '') + '" data-i="' + i + '"></i>';
+    }).join('');
+    $('newsCounter').textContent = ((newsIdx % newsItems.length) + 1) + ' / ' + newsItems.length;
+  }
+  $('newsDots').addEventListener('click', function (e) {
+    var d = e.target.closest('[data-i]');
+    if (!d) return;
+    newsIdx = parseInt(d.getAttribute('data-i'), 10);
+    paintNews();
+  });
+  async function loadNews() {
+    try {
+      var d = await api('/news');
+      newsItems = d.news || [];
+      paintNews();
+    } catch (e) { console.error(e); }
+  }
+  newsTimer = setInterval(function () {
+    if (newsItems.length > 1) { newsIdx++; paintNews(); }
+  }, 7000);
+
+  // ------------------------------------------------------------- chat
+  function chatLine(m) {
+    var mine = (m.author || '').toLowerCase() === me.toLowerCase();
+    return '<div class="chat-line' + (mine ? ' mine' : '') + '">'
+      + '<span class="who">' + esc(m.author) + '</span>'
+      + '<span class="txt">' + esc(m.text) + '</span></div>';
+  }
+  async function pollChat() {
+    try {
+      var d = await api('/' + slug + '/chat?since=' + lastChatAt);
+      var msgs = d.messages || [];
+      if (msgs.length) {
+        var box = $('railRoom');
+        var atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+        box.insertAdjacentHTML('beforeend', msgs.map(chatLine).join(''));
+        lastChatAt = msgs[msgs.length - 1].created_at;
+        if (atBottom) box.scrollTop = box.scrollHeight;
+      }
+    } catch (e) { /* transient poll failures are expected; next tick retries */ }
+  }
+  async function pollDm() {
+    if (!dmWith) return;
+    try {
+      var d = await api('/dm/' + encodeURIComponent(me) + '/' + encodeURIComponent(dmWith) + '?since=' + lastDmAt);
+      var msgs = d.messages || [];
+      if (msgs.length) {
+        $('dmMsgs').insertAdjacentHTML('beforeend', msgs.map(chatLine).join(''));
+        lastDmAt = msgs[msgs.length - 1].created_at;
+        $('dmMsgs').scrollTop = $('dmMsgs').scrollHeight;
+      }
+    } catch (e) { /* same */ }
+  }
+
+  async function sendChat() {
+    if (!me) { askName(); return; }
+    var input = $('chatInput');
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    try {
+      if (dmWith) {
+        await api('/dm', { method: 'POST', body: { sender: me, recipient: dmWith, text: text } });
+        await pollDm();
+      } else {
+        await api('/' + slug + '/chat', { method: 'POST', body: { author: me, text: text } });
+        await pollChat();
+      }
+    } catch (e) { toast(e.message); }
+  }
+  $('chatSend').addEventListener('click', sendChat);
+  $('chatInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  });
+
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rail]');
+    if (!b) return;
+    document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    var isDm = b.getAttribute('data-rail') === 'dm';
+    $('railRoom').style.display = isDm ? 'none' : 'block';
+    $('railDm').style.display = isDm ? 'block' : 'none';
+    if (isDm) paintDmList();
+  });
+
+  function paintDmList() {
+    $('dmThread').style.display = 'none';
+    $('dmList').style.display = 'block';
+    dmWith = '';
+    var names = {};
+    feed.forEach(function (p) { if (p.author && p.author !== me) names[p.author] = 1; });
+    people.forEach(function (p) { if (p.added_by && p.added_by !== me) names[p.added_by] = 1; });
+    var list = Object.keys(names);
+    $('dmList').innerHTML = list.length
+      ? list.map(function (n) {
+          return '<div class="dm-person" data-dm="' + esc(n) + '">'
+            + '<div class="post-av">' + esc(initial(n)) + '</div>' + esc(n) + '</div>';
+        }).join('')
+      : '<div style="padding:20px;color:var(--dimmer);font-style:italic;font-size:14px;text-align:center">'
+        + 'Once cousins start posting, you can message them privately here.</div>';
+  }
+  $('dmList').addEventListener('click', function (e) {
+    var d = e.target.closest('[data-dm]');
+    if (!d) return;
+    dmWith = d.getAttribute('data-dm');
+    lastDmAt = 0;
+    $('dmWith').textContent = dmWith;
+    $('dmMsgs').innerHTML = '';
+    $('dmList').style.display = 'none';
+    $('dmThread').style.display = 'block';
+    pollDm();
+  });
+  $('dmBack').addEventListener('click', paintDmList);
+
+  // ------------------------------------------------------------- cuzzo
+  //
+  // Cuzzo runs entirely in this browser -- no model, no API call, no cost.
+  // For the one job he has (getting a person onto the tree correctly) the
+  // questions genuinely don't vary, so a state machine answers as well as a
+  // language model would and never goes down, costs nothing, and replies
+  // instantly. What he does need to be good at is the parts that actually
+  // corrupt a family tree: catching duplicates before they're created, and
+  // resolving "whose child?" against people already recorded.
+
+  function cuzzoBubble(cls, text) {
+    var box = $('cuzzoMsgs');
+    var d = document.createElement('div');
+    d.className = 'bubble ' + cls;
+    d.textContent = text;
+    box.appendChild(d);
+    box.scrollTop = box.scrollHeight;
+    return d;
+  }
+
+  function cuzzoSays(text, delay) {
+    // A beat before replying; instant text reads as a form, not a person.
+    var box = $('cuzzoMsgs');
+    var t = document.createElement('div');
+    t.className = 'typing'; t.innerHTML = '<i></i><i></i><i></i>';
+    box.appendChild(t);
+    box.scrollTop = box.scrollHeight;
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        t.remove();
+        cuzzoBubble('them', text);
+        czLog('cuzzo', text);
+        resolve();
+      }, delay || 420);
+    });
+  }
+
+  var YES  = /^(y|ya|yes|yeah|yep|yup|sure|ok|okay|correct|right|that'?s right|do it|go ahead|please)\b/i;
+  var NO   = /^(n|no|nope|nah|not quite|wrong|incorrect)\b/i;
+  var SKIP = /^(skip|pass|dunno|idk|no idea|not sure|don'?t know|dont know|unknown|no)\b/i;
+
+  // Filler people naturally put around a name: "add my son Marcus" -> "Marcus"
+  var FILLER = new RegExp(
+    '^(?:can you |could you |please |i want to |i need to |lets |let\'s |go ahead and )?' +
+    '(?:add |put |include |register )?' +
+    '(?:my |our |his |her |their |the )?' +
+    '(?:son|daughter|child|kid|boy|girl|grandson|granddaughter|grandchild|grandkid|' +
+    'baby|wife|husband|spouse|brother|sister|cousin|nephew|niece)?' +
+    '(?:[\'’]s)?\\s*(?:named |name is |called )?', 'i');
+
+  var RELATIONS = ['grandson','granddaughter','grandchild','daughter','son','wife',
+                   'husband','spouse','nephew','niece','cousin','brother','sister','child'];
+
+  function extractYear(t) {
+    var m = String(t).match(/\b(1[89]\d{2}|20\d{2})\b/);
+    return m ? m[1] : '';
+  }
+
+  function extractRelation(t) {
+    var low = ' ' + String(t).toLowerCase() + ' ';
+    for (var i = 0; i < RELATIONS.length; i++) {
+      if (low.indexOf(' ' + RELATIONS[i]) !== -1) return RELATIONS[i];
+    }
+    return '';
+  }
+
+  function extractName(t) {
+    var s = String(t).trim();
+    s = s.replace(/,?\s*(born|b\.?|birth year|dob)\s*:?\s*(1[89]\d{2}|20\d{2}).*$/i, '');
+    s = s.replace(/\b(1[89]\d{2}|20\d{2})\b/g, '');
+    s = s.replace(FILLER, '');
+    s = s.replace(/[.,;!?]+$/, '').replace(/\s+/g, ' ').trim();
+    // Keep it to a plausible name rather than a whole sentence.
+    var words = s.split(' ').filter(Boolean).slice(0, 4);
+    return words.join(' ');
+  }
+
+  function findSimilar(name) {
+    var t = String(name).trim().toLowerCase();
+    if (!t) return null;
+    var first = t.split(' ')[0];
+    for (var i = 0; i < people.length; i++) {
+      var n = (people[i].name || '').trim().toLowerCase();
+      if (n === t) return people[i];
+      if (n.split(' ')[0] === first && first.length > 2) return people[i];
+    }
+    return null;
+  }
+
+  function findParent(text) {
+    var t = String(text).trim().toLowerCase();
+    if (!t) return null;
+    var exact = null, loose = null;
+    for (var i = 0; i < people.length; i++) {
+      var n = (people[i].name || '').trim().toLowerCase();
+      if (n === t) { exact = people[i]; break; }
+      if (!loose && (n.indexOf(t) !== -1 || t.indexOf(n.split(' ')[0]) !== -1)) loose = people[i];
+    }
+    return exact || loose;
+  }
+
+  var cz = { step: 'idle', slots: {} };
+  var czHistory = [];
+
+  function czReset() { cz = { step: 'idle', slots: {} }; }
+
+  // Kept in the dataset alongside the tree. When two cousins disagree later
+  // about a spelling or a date, the transcript is what settles it -- who said
+  // what, and when. Fire-and-forget: a failed log must never cost a message.
+  function czLog(role, text) {
+    if (!text) return;
+    api('/cuzzo-log', { method: 'POST', body: {
+      email: myEmail, speaker: me, branch_slug: slug, role: role, text: text
+    }}).catch(function () {});
+  }
+
+  // When the script genuinely stalls -- an unusual phrasing, a relationship the
+  // state machine has no branch for -- this hands that single turn to the model
+  // instead of replying "I didn't understand" at someone trying to record their
+  // own family. It fires rarely, so the running cost stays near zero while the
+  // hard cases still get a real answer.
+  async function czFallback(text) {
+    var box = $('cuzzoMsgs');
+    var t = document.createElement('div');
+    t.className = 'typing'; t.innerHTML = '<i></i><i></i><i></i>';
+    box.appendChild(t);
+    box.scrollTop = box.scrollHeight;
+    try {
+      var res = await fetch('/api/cuzzo/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          branch_slug: slug,
+          message: text,
+          history: czHistory.slice(-10),
+          speaker: me
+        })
+      });
+      var d = await res.json().catch(function () { return {}; });
+      t.remove();
+      if (!res.ok) throw new Error(d.detail || 'unavailable');
+
+      if (d.reply) {
+        cuzzoBubble('them', d.reply);
+        czHistory.push({ role: 'assistant', content: d.reply });
+      }
+      if (d.added && d.added.length) {
+        d.added.forEach(function (p) {
+          cuzzoBubble('sys', '✓ ' + p.name + ' added to the tree');
+        });
+        await loadPeople(); await loadFeed(); await loadNews();
+        toast(d.added[0].name + ' was added to the branch.');
+        czReset();
+      }
+      return true;
+    } catch (e) {
+      t.remove();
+      return false;
+    }
+  }
+
+  // How many "greats" the person said, so "my great-great-grandbaby" lands at
+  // the right depth instead of at the top of the branch.
+  function greatsIn(text) {
+    var m = String(text).toLowerCase().replace(/[-\s]+/g, ' ');
+    var run = m.match(/((?:great\s+)+)grand/);
+    if (run) return (run[1].match(/great/g) || []).length;
+    if (/\bgrand(child|son|daughter|kid|baby)\b/.test(m)) return 0;
+    return -1;   // no generation language at all
+  }
+
+  function depthOf(p) { return (p && typeof p.depth === 'number') ? p.depth : 0; }
+
+  function findParentById(id) {
+    for (var i = 0; i < people.length; i++) if (people[i].id === id) return people[i];
+    return null;
+  }
+
+  function peopleAtDepth(d) {
+    return people.filter(function (p) { return depthOf(p) === d; });
+  }
+
+  function branchRootName() { return $('frameName').textContent || 'this branch'; }
+
+  function parentPrompt() {
+    if (!people.length) {
+      return "Got it. This branch is empty so far, so I'll put them in as a direct "
+           + "child of " + branchRootName() + ". Do you know what year they were born?";
+    }
+    // If they told us the generation, only offer the people who could actually
+    // be the parent -- one rung above. That's what keeps a great-great-grandchild
+    // from being hung off the wrong person.
+    var want = cz.slots.target_depth;
+    var pool = (typeof want === 'number' && want > 0) ? peopleAtDepth(want - 1) : people;
+    if (!pool.length) pool = people;
+
+    var names = pool.slice(0, 8).map(function (p) { return p.name; }).join(', ');
+    var lead = (typeof want === 'number' && want > 0 && pool.length < people.length)
+      ? "Whose child are they? At that generation it'd be one of these: "
+      : "Whose child are they? So far I have: ";
+    return lead + names
+         + (pool.length > 8 ? ', and others' : '')
+         + ". Type a name, or say \"first generation\" if they're a direct child of "
+         + branchRootName() + ".";
+  }
+
+  async function commitPerson() {
+    var s = cz.slots;
+    try {
+      await api('/' + slug + '/people', { method: 'POST', body: {
+        name: s.name,
+        parent_id: s.parent_id || null,
+        birth_year: s.birth_year || '',
+        relation: s.relation || '',
+        note: s.note || '',
+        added_by: me
+      }});
+      cuzzoBubble('sys', '✓ ' + s.name + ' added to the tree');
+      await loadPeople(); await loadFeed(); await loadNews();
+      toast(s.name + ' was added to the branch.');
+      czReset();
+      await cuzzoSays("Done — " + s.name + " is on the tree. Anyone else you want to add?");
+    } catch (e) {
+      czReset();
+      await cuzzoSays("I couldn't save that one: " + e.message + " Want to try again?");
+    }
+  }
+
+  async function cuzzoTurn(text) {
+    var s = cz.slots;
+
+    // "start over" works from anywhere; people get stuck and need an exit.
+    if (/^(start over|restart|cancel|never ?mind|forget it)\b/i.test(text)) {
+      czReset();
+      await cuzzoSays("No problem, we'll start fresh. Who do you want to add?");
+      cz.step = 'name';
+      return;
+    }
+
+    switch (cz.step) {
+
+      case 'idle': {
+        var name = extractName(text);
+        var year = extractYear(text);
+        var rel  = extractRelation(text);
+        var g0 = greatsIn(text);
+        if (g0 >= 0) s.target_depth = g0;
+        if (!name) {
+          cz.step = 'name';
+          await cuzzoSays("Happy to help. What's their name?");
+          return;
+        }
+        s.name = name; s.birth_year = year; s.relation = rel;
+        var dupe = findSimilar(name);
+        if (dupe) {
+          cz.step = 'dupe'; s.dupe = dupe;
+          await cuzzoSays("Hold on — I've already got " + dupe.name
+            + " on this branch. Is that the same person?");
+          return;
+        }
+        cz.step = 'parent';
+        await cuzzoSays(parentPrompt());
+        if (!people.length) cz.step = 'birth';
+        return;
+      }
+
+      case 'name': {
+        var nm = extractName(text);
+        if (!nm) {
+          if (await czFallback(text)) return;
+          await cuzzoSays("I didn't catch a name there — what should I call them?");
+          return;
+        }
+        s.name = nm;
+        s.birth_year = s.birth_year || extractYear(text);
+        s.relation = s.relation || extractRelation(text);
+        var g1 = greatsIn(text);
+        if (g1 >= 0 && typeof s.target_depth !== 'number') s.target_depth = g1;
+        var d2 = findSimilar(nm);
+        if (d2) {
+          cz.step = 'dupe'; s.dupe = d2;
+          await cuzzoSays("I've already got " + d2.name + " here. Same person?");
+          return;
+        }
+        cz.step = people.length ? 'parent' : 'birth';
+        await cuzzoSays(people.length ? parentPrompt()
+          : "Got it. Do you know what year they were born?");
+        return;
+      }
+
+      case 'dupe': {
+        if (YES.test(text)) {
+          czReset();
+          await cuzzoSays("Then they're already on the tree — no need to add them twice. "
+            + "Anyone else?");
+          return;
+        }
+        cz.step = people.length ? 'parent' : 'birth';
+        await cuzzoSays("Understood, a different person with a similar name. "
+          + (people.length ? parentPrompt() : "What year were they born?"));
+        return;
+      }
+
+      case 'parent': {
+        if (/first ?gen|direct|no one|nobody|none|top/i.test(text)) {
+          s.parent_id = null;
+        } else {
+          var p = findParent(text);
+          if (!p) {
+            if (await czFallback(text)) return;
+            await cuzzoSays("I don't have anyone by that name on this branch yet. "
+              + "Try another spelling, or say \"first generation\" and we can "
+              + "connect them properly later.");
+            return;
+          }
+          s.parent_id = p.id;
+          s.parent_name = p.name;
+        }
+        cz.step = 'birth';
+        await cuzzoSays("Good. What year were they born? Say \"skip\" if you're not sure.");
+        return;
+      }
+
+      case 'birth': {
+        if (!SKIP.test(text)) {
+          var y = extractYear(text);
+          if (!y && /\d/.test(text)) {
+            await cuzzoSays("I need a four-digit year like 1987 — or say \"skip\".");
+            return;
+          }
+          s.birth_year = y || s.birth_year || '';
+        }
+        cz.step = 'confirm';
+        var bits = [s.name];
+        if (s.parent_name) bits.push('child of ' + s.parent_name);
+        else bits.push('a direct child of ' + branchRootName());
+        if (s.birth_year) bits.push('born ' + s.birth_year);
+
+        // Say the generation back to them. It's the one part they can check at
+        // a glance, and getting it wrong is the mistake worth catching here.
+        var pd = s.parent_id ? depthOf(findParentById(s.parent_id)) + 1 : 0;
+        var gl = pd === 0 ? 'grandchild' : new Array(pd + 1).join('great-') + 'grandchild';
+        bits.push('making them Big Ma’s ' + gl);
+
+        await cuzzoSays("Here's what I have: " + bits.join(', ') + ". Add them to the tree?");
+        return;
+      }
+
+      case 'confirm': {
+        if (NO.test(text)) {
+          czReset(); cz.step = 'name';
+          await cuzzoSays("Let's redo it. What's their name?");
+          return;
+        }
+        if (!YES.test(text)) {
+          if (await czFallback(text)) return;
+          await cuzzoSays("Just say yes and I'll add them, or no to start over.");
+          return;
+        }
+        await commitPerson();
+        return;
+      }
+    }
+  }
+
+  async function askCuzzo() {
+    if (!me) { askName(); return; }
+    var input = $('cuzzoInput');
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+    cuzzoBubble('me', text);
+    czHistory.push({ role: 'user', content: text });
+    if (czHistory.length > 20) czHistory = czHistory.slice(-20);
+    czLog('user', text);
+    $('cuzzoSend').disabled = true;
+    try {
+      await cuzzoTurn(text);
+    } catch (e) {
+      cuzzoBubble('sys', 'Something went wrong there — say "start over" to reset.');
+    }
+    $('cuzzoSend').disabled = false;
+    input.focus();
+  }
+
+  $('cuzzoSend').addEventListener('click', askCuzzo);
+  $('cuzzoInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askCuzzo(); }
+  });
+  $('cuzzoInput').addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 110) + 'px';
+  });
+
+  // ------------------------------------------------------------- mobile
+  document.querySelector('.mobile-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]');
+    if (!b) return;
+    document.querySelectorAll('.mobile-tabs button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    var which = b.getAttribute('data-m');
+    $('colCuzzo').classList.toggle('show', which === 'cuzzo');
+    $('colMain').classList.toggle('show', which === 'main');
+    $('colChat').classList.toggle('show', which === 'chat');
+  });
+
+  // ------------------------------------------------------------- live stream
+  //
+  // Cuzzo stays current on what the rest of the family is doing. Whoever's
+  // scope is "all" hears about every branch; the default is just this one.
+  // He speaks up only for people added -- posts would make him chatty.
+  async function pollStream() {
+    if (myScope === 'none') return;
+    try {
+      var q = '/stream?since=' + streamAt + (myScope === 'all' ? '' : '&slug=' + slug);
+      var d = await api(q);
+      var first = streamAt === 0;
+      streamAt = d.now || streamAt;
+      if (first) return;   // don't narrate history on the first poll
+
+      var mine = (me || '').toLowerCase();
+      var fresh = (d.people || []).filter(function (p) {
+        return (p.added_by || '').toLowerCase() !== mine;
+      });
+      if (!fresh.length) return;
+
+      fresh.slice(-3).forEach(function (p) {
+        var where = (myScope === 'all' && p.branch !== slug)
+          ? ' on the ' + p.branch_name + ' branch' : '';
+        cuzzoBubble('sys', '✦ ' + (p.added_by || 'Someone') + ' just added '
+          + p.name + where);
+      });
+      await loadPeople();
+      if (myScope === 'all') await loadNews();
+    } catch (e) { /* the next tick retries */ }
+  }
+
+  // ------------------------------------------------------------- boot
+  paintMe();
+  if (!me) askName();
+
+  (function greet() {
+    var who = me ? (', ' + me.split(' ')[0]) : '';
+    cuzzoBubble('them',
+      "Hey cuz" + who + " — I'm Cuzzo, family on your side. "
+      + "Tell me who you want to add and I'll get them on the tree properly. "
+      + "Something like \"my great-grandson Marcus, born 2015\" is plenty — "
+      + "I'll work out where he belongs.");
+  })();
+
+  loadPeople().then(loadFeed).then(loadNews).then(pollChat).then(pollStream);
+  setInterval(pollChat, 3500);
+  setInterval(function () { if (dmWith) pollDm(); }, 3500);
+  setInterval(pollStream, 12000);
+  setInterval(loadFeed, 30000);
+})();
+</script>
+</body>
+</html>
