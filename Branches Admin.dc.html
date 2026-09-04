@@ -213,18 +213,32 @@
     </div>
 
     <div style="padding: 26px 24px; display:flex; flex-direction:column; gap: 22px;">
+
+      <!-- Vault master key — stored in localStorage, used for all vault actions -->
+      <div>
+        <div class="section-title">VAULT ACCESS</div>
+        <div class="vault-desc" style="margin-bottom:10px;">Enter your site owner key once — saved in this browser so you never retype it.</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" id="vaultPasscodeInput" placeholder="Site owner passcode" autocomplete="current-password"
+            style="flex:1;background:#100d0a;border:1px solid #332b22;border-radius:6px;padding:9px 12px;color:#f4efe3;font-size:13px;outline:none;">
+          <button type="button" id="vaultPasscodeSaveBtn"
+            style="padding:9px 16px;background:rgba(201,162,74,.15);border:1px solid rgba(201,162,74,.5);border-radius:6px;color:#c9a24a;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;white-space:nowrap;">
+            Remember
+          </button>
+        </div>
+        <div id="vaultPasscodeStatus" style="font-size:12px;margin-top:6px;color:#a08d5f;"></div>
+      </div>
+
       <div>
         <div class="section-title">EMAIL ACCESS — HOSTINGER SMTP</div>
-        <div class="vault-desc">Enter the mailbox name and paste the key. It's verified live against Hostinger, then saved for every notification going forward — nothing here stays in this browser.</div>
+        <div class="vault-desc">Paste your Hostinger email password below. The connection is verified live, then saved for notifications. All alerts go to tjengineer@berylize.com.</div>
         <form class="reg-form" id="smtpForm">
-          <label>SMTP Host</label>
-          <input type="text" id="smtpHost" placeholder="smtp.hostinger.com" required>
-          <label>SMTP Port</label>
-          <input type="number" id="smtpPort" placeholder="465" value="465" required>
-          <label>Mailbox address (key name)</label>
-          <input type="email" id="smtpUser" placeholder="notifications@bigmaproject.family" required>
+          <label>Key name</label>
+          <input type="text" id="smtpUser" value="tjengineer@berylize.com" placeholder="your Hostinger email address" required>
           <label>Password / API key (paste key)</label>
-          <input type="password" id="smtpPass" required>
+          <input type="password" id="smtpPass" placeholder="Paste your Hostinger email password" required>
+          <input type="hidden" id="smtpHost" value="smtp.hostinger.com">
+          <input type="hidden" id="smtpPort" value="465">
           <button type="submit" class="submit-btn">Save &amp; Verify</button>
           <div class="form-msg" id="smtpMsg"></div>
         </form>
@@ -239,7 +253,36 @@ if (/(^|\.)hf\.space$/.test(location.hostname) || /(^|\.)huggingface\.co$/.test(
   document.getElementById('vaultGearBtn').style.display = 'flex';
 }
 
+const VAULT_PC_KEY = 'bigma:vault:passcode';
+
+function vaultPasscode() {
+  return document.getElementById('vaultPasscodeInput').value ||
+         localStorage.getItem(VAULT_PC_KEY) || '';
+}
+
+function loadVaultPasscode() {
+  const saved = localStorage.getItem(VAULT_PC_KEY);
+  if (saved) {
+    document.getElementById('vaultPasscodeInput').value = saved;
+    document.getElementById('vaultPasscodeStatus').textContent = '✓ Passcode remembered in this browser.';
+    document.getElementById('vaultPasscodeStatus').style.color = '#6ee7a0';
+  }
+}
+
+document.getElementById('vaultPasscodeSaveBtn').addEventListener('click', () => {
+  const val = document.getElementById('vaultPasscodeInput').value.trim();
+  if (!val) {
+    document.getElementById('vaultPasscodeStatus').textContent = 'Enter a passcode first.';
+    document.getElementById('vaultPasscodeStatus').style.color = '#f87171';
+    return;
+  }
+  localStorage.setItem(VAULT_PC_KEY, val);
+  document.getElementById('vaultPasscodeStatus').textContent = '✓ Saved — you won\'t need to retype this.';
+  document.getElementById('vaultPasscodeStatus').style.color = '#6ee7a0';
+});
+
 document.getElementById('vaultGearBtn').addEventListener('click', () => {
+  loadVaultPasscode();
   document.getElementById('vaultBackdrop').style.display = 'block';
   document.getElementById('vaultPanel').style.transform = 'translateX(0)';
 });
@@ -400,11 +443,17 @@ document.querySelectorAll('.tab').forEach(tab => {
 document.getElementById('smtpForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = document.getElementById('smtpMsg');
+  const pc = vaultPasscode();
+  if (!pc) {
+    msg.textContent = 'Enter your site owner passcode in the Vault Access section above first.';
+    msg.className = 'form-msg err';
+    return;
+  }
   msg.textContent = 'Verifying…'; msg.className = 'form-msg';
   try {
     const result = await api('/secrets/smtp/submit', {
       method: 'POST',
-      headers: { 'X-Admin-Passcode': passcode() },
+      headers: { 'X-Admin-Passcode': pc },
       body: JSON.stringify({
         host: document.getElementById('smtpHost').value,
         port: parseInt(document.getElementById('smtpPort').value, 10) || 465,

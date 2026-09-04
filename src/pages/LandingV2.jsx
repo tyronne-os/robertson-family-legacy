@@ -125,7 +125,7 @@ export default function LandingV2() {
           <div
             style={{
               position: 'relative',
-              width: 'min(360px, 62vw)',
+              width: 'min(479px, 82vw)',
               marginBottom: 44,
               animation: 'riseIn 1.5s ease .9s both',
             }}
