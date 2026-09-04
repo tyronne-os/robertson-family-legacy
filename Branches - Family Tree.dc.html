@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script type="module" src="./starter.js"></script>
 </head>
 <body>
 <x-dc>
@@ -473,7 +474,7 @@ const CHILDREN = [
   { order: 9, slug: 'susianna-robertson', name: 'Susianna Robertson', birth: 'June 14, 1931' }
 ];
 
-function portraitUrl(slug) { return 'uploads/' + slug + '.webp'; }
+function portraitUrl(slug) { return 'uploads/' + slug + '.jpeg'; }
 
 const RELATIONS = ['Child', 'Spouse / married in', 'Adopted / raised as ours', 'Stepchild', 'Sibling remembered'];
 const SCOPES = ['My branch only', 'All nine branches'];
