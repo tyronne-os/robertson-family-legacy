@@ -99,3 +99,75 @@ storage, new machine).
 
 See `~/.claude/vault-pattern.md` for the reusable version of this pattern —
 this project is the reference implementation.
+
+---
+
+# Update — 2026-09-04
+
+Two things changed today: the Vault grew into the **Nobility Depository**,
+and the Branches page stopped being empty.
+
+## The Vault is now the Nobility Depository
+
+The old panel only knew about Hostinger SMTP. It now carries five providers
+— Hugging Face, Google Cloud, GitHub, NVIDIA NIM, NVIDIA Enterprise — each
+with Save, and Verify where the provider actually exposes a way to check.
+
+New in this pass:
+
+- **Renew, per provider.** Name the key, pick read or write, and a button
+  opens that provider's own token page. Paste the new key back and the old
+  one is replaced *only after* the new one verifies. Providers block token
+  creation over their API, so this opens their page rather than pretending
+  to mint one silently.
+- **Load from JSON file.** Recognizes a Google service-account key and routes
+  it to the Google Cloud slot automatically. A service-account key is a
+  keypair, not an expiring token — it stays valid until revoked.
+- **Report tab.** Every save, verify, and renew is logged with a device
+  fingerprint, IP, duration, and how long ago. Note: a browser cannot read a
+  MAC address. The fingerprint is the honest substitute.
+- **Settings tab** showing where each key lives on disk.
+- **Loopback-only sync.** `/api/dev/sync-key` and `/api/dev/set-hf-token`
+  refuse any request that is not from 127.0.0.1, and write each key to the
+  file that provider's own CLI already reads. This is how a token gets
+  rotated without its value ever passing through a chat window.
+
+### Reaching the keys from Kiro (or any shell)
+
+`~/.bashrc` now sources the vault's env files on every shell start, so Kiro's
+terminal — and anything launched from it — inherits the keys:
+
+    HUGGING_FACE_HUB_TOKEN / HF_TOKEN   ~/.cache/huggingface/token
+    GOOGLE_APPLICATION_CREDENTIALS      ~/.config/gcloud/nobility-api-key.env
+    GITHUB_TOKEN                        ~/.config/gh/nobility-token.env
+    NGC_API_KEY                         ~/.ngc/config
+    NVIDIA_ENTERPRISE_LICENSE           ~/.config/nvidia/enterprise.env
+
+Each line is guarded by a file-exists check, so a provider you have not set
+up yet is skipped rather than erroring.
+
+## Branches now opens with the family already in it
+
+All nine branches used to start empty, which asked families to begin from
+nothing. Each sibling's chapter page already names their children, so those
+**57 names are now seeded in** as the starting point.
+
+- Clicking a branch portrait — or the prompt under it — opens that sibling's
+  children in a parallel row of editable cards: photo, name, contact, short
+  bio, video link, and a status.
+- Status starts at **unconfirmed** wherever the chapter did not say outright
+  whether someone is living. It is not a guess dressed up as a record.
+- Each card opens **its own** children, one generation per row, so a family
+  can work down from a grandchild to a great-grandchild without leaving the
+  page.
+- Chapter Eight names three of Lamar's five children. His row says so, rather
+  than quietly showing a short count.
+
+Every edit saves to the visitor's own browser as they type. The DC runtime
+never calls `componentDidUpdate`, so each mutation persists itself
+explicitly — worth knowing before adding another state field.
+
+**Still true:** there is no shared server behind this. One family member's
+additions do not reach another's browser. Export/Import remains the only way
+to move or back up that work, and the same rule applies as for keys — the
+export file is the insurance policy.

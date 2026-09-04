@@ -273,10 +273,13 @@
 
                       <label style="position:relative;display:block;width:100%;aspect-ratio:17/20;border-radius:7px;background-color:#e6dfd0;background-image:{{ k.photoUrl }};background-size:cover;background-position:center;border:1px dashed #c2b699;cursor:pointer;overflow:hidden">
                         <input type="file" accept="image/*" sc-camel-on-change="{{ k.onPhoto }}" style="display:none">
-                        <sc-if value="{{ k.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                        <sc-if value="{{ k.hasArt }}" hint-placeholder-val="{{ true }}">
                           <div style="position:absolute;right:5px;bottom:5px;background:rgba(20,17,14,.72);color:#e9cd88;font-size:9px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Change</div>
                         </sc-if>
-                        <sc-if value="{{ !k.hasPhoto }}" hint-placeholder-val="{{ true }}">
+                        <sc-if value="{{ k.isDoll }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute;left:5px;top:5px;background:rgba(20,17,14,.72);color:#a39685;font-size:8px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Stand-in</div>
+                        </sc-if>
+                        <sc-if value="{{ !k.hasArt }}" hint-placeholder-val="{{ false }}">
                           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8d8168;text-align:center;padding:6px">
                             <div style="font-size:19px;line-height:1">&#128247;</div>
                             <div style="font-size:9.5px;font-weight:700;letter-spacing:0.3px;line-height:1.3">Add a photo</div>
@@ -628,51 +631,51 @@ const CHILDREN = [
 // still has to tell us, and the UI says so rather than guessing.
 const SEED_CHILDREN = {
   'ethel-robertson': [
-    { name: 'Edna' }, { name: 'Josh' }, { name: 'Anniebelle' }, { name: 'Oliver' },
-    { name: 'Lottie' }, { name: 'Alcee', note: 'known to everybody as T-man' },
-    { name: 'Irene' }, { name: 'Evelina' },
-    { name: 'Gladys', alive: true, note: 'narrates Chapter One' },
-    { name: 'Brenda' }, { name: 'Ernest' }
+    { name: 'Edna', sex: 'f' }, { name: 'Josh', sex: 'm' }, { name: 'Anniebelle', sex: 'f' }, { name: 'Oliver', sex: 'm' },
+    { name: 'Lottie', sex: 'f' }, { name: 'Alcee', sex: 'm', note: 'known to everybody as T-man' },
+    { name: 'Irene', sex: 'f' }, { name: 'Evelina', sex: 'f' },
+    { name: 'Gladys', sex: 'f', alive: true, note: 'narrates Chapter One' },
+    { name: 'Brenda', sex: 'f' }, { name: 'Ernest', sex: 'm' }
   ],
   'leola-robertson': [
-    { name: 'Kenneth Wayne Howard', note: 'adopted and reared in Baton Rouge' }
+    { name: 'Kenneth Wayne Howard', sex: 'm', note: 'adopted and reared in Baton Rouge' }
   ],
   'johnnie-robertson': [
-    { name: 'Allen' }, { name: 'James' }, { name: 'Jannie' }, { name: 'Leroy' },
-    { name: 'Louis' }, { name: 'Shirley' }, { name: 'Leann' }, { name: 'Eloise' },
-    { name: 'Howard' }
+    { name: 'Allen', sex: 'm' }, { name: 'James', sex: 'm' }, { name: 'Jannie', sex: 'f' }, { name: 'Leroy', sex: 'm' },
+    { name: 'Louis', sex: 'm' }, { name: 'Shirley', sex: 'f' }, { name: 'Leann', sex: 'f' }, { name: 'Eloise', sex: 'f' },
+    { name: 'Howard', sex: 'm' }
   ],
   'mary-robertson': [
-    { name: 'Nelson' }, { name: 'Bertha Lee' }, { name: 'Walter' },
-    { name: 'Mary Ethel', note: 'named for Mary and her older sister Ethel' },
-    { name: 'Raymond' }, { name: 'Alfred' }, { name: 'Clarence' },
-    { name: 'Catherine', alive: true, note: 'narrates Chapter Four' }
+    { name: 'Nelson', sex: 'm' }, { name: 'Bertha Lee', sex: 'f' }, { name: 'Walter', sex: 'm' },
+    { name: 'Mary Ethel', sex: 'f', note: 'named for Mary and her older sister Ethel' },
+    { name: 'Raymond', sex: 'm' }, { name: 'Alfred', sex: 'm' }, { name: 'Clarence', sex: 'm' },
+    { name: 'Catherine', sex: 'f', alive: true, note: 'narrates Chapter Four' }
   ],
   'beulah-robertson': [
-    { name: 'Beverly' }, { name: 'Betty' }, { name: 'Catherine' }, { name: 'Edgar' },
-    { name: 'Larry' }, { name: 'Kevin' }, { name: 'Marshall' }, { name: 'Wilbert' }
+    { name: 'Beverly', sex: 'f' }, { name: 'Betty', sex: 'f' }, { name: 'Catherine', sex: 'f' }, { name: 'Edgar', sex: 'm' },
+    { name: 'Larry', sex: 'm' }, { name: 'Kevin', sex: 'm' }, { name: 'Marshall', sex: 'm' }, { name: 'Wilbert', sex: 'm' }
   ],
   'lydia-robertson': [
-    { name: 'Gloria Williams', alive: true, note: 'narrates Chapter Six' },
-    { name: 'Delores Brown', alive: true },
-    { name: 'Arelita Griffin', alive: true },
-    { name: 'Patricia Brown', alive: false }
+    { name: 'Gloria Williams', sex: 'f', alive: true, note: 'narrates Chapter Six' },
+    { name: 'Delores Brown', sex: 'f', alive: true },
+    { name: 'Arelita Griffin', sex: 'f', alive: true },
+    { name: 'Patricia Brown', sex: 'f', alive: false }
   ],
   'beatrice-robertson': [
-    { name: 'Pete' }, { name: 'Donald Wayne' }, { name: 'Torrence' },
-    { name: 'Brenda' }, { name: 'Patricia' }, { name: 'Diane' },
-    { name: 'Stacey' }, { name: 'Regina' }
+    { name: 'Pete', sex: 'm' }, { name: 'Donald Wayne', sex: 'm' }, { name: 'Torrence', sex: 'm' },
+    { name: 'Brenda', sex: 'f' }, { name: 'Patricia', sex: 'f' }, { name: 'Diane', sex: 'f' },
+    { name: 'Stacey', sex: 'f' }, { name: 'Regina', sex: 'f' }
   ],
   'lemar-robertson': [
-    { name: 'Betty Butler', alive: true, note: 'narrates Chapter Eight' },
-    { name: 'Marie', alive: false }, { name: 'James', alive: false }
+    { name: 'Betty Butler', sex: 'f', alive: true, note: 'narrates Chapter Eight' },
+    { name: 'Marie', sex: 'f', alive: false }, { name: 'James', sex: 'm', alive: false }
   ],
   'susianna-robertson': [
-    { name: 'Jaqueline', alive: false },
-    { name: 'Charles Duchane Jr.' },
-    { name: 'Carolyn', alive: true, note: 'narrates Chapter Nine' },
-    { name: 'Michael' },
-    { name: 'Jackie', note: 'mother of Alfreneisha, Cordell and Cleo' }
+    { name: 'Jaqueline', sex: 'f', alive: false },
+    { name: 'Charles Duchane Jr.', sex: 'm' },
+    { name: 'Carolyn', sex: 'f', alive: true, note: 'narrates Chapter Nine' },
+    { name: 'Michael', sex: 'm' },
+    { name: 'Jackie', sex: 'f', note: 'mother of Alfreneisha, Cordell and Cleo' }
   ]
 };
 
@@ -680,13 +683,29 @@ const SEED_CHILDREN = {
 // on purpose -- the two missing names are for his family to fill in.
 const SEED_SHORTFALL = { 'lemar-robertson': 5 };
 
+// Stand-in portraits until a family member uploads a real photo. The doll is
+// picked from the person's own id, so it stays the same on every visit rather
+// than reshuffling on each render.
+const DOLLS = {
+  f: ['f1.png', 'f2.jpeg', 'f3.jpeg', 'f4.jpeg', 'f5.jpg'],
+  m: ['m1.jpg', 'm2.jpeg', 'm3.jpeg', 'm4.jpeg', 'm5.jpeg', 'm6.jpeg', 'm7.jpeg']
+};
+
+function dollFor(person) {
+  const set = DOLLS[person.sex];
+  if (!set) return null;
+  let h = 0;
+  for (let i = 0; i < person.id.length; i++) h = (h * 31 + person.id.charCodeAt(i)) >>> 0;
+  return 'avatar-dolls/' + set[h % set.length];
+}
+
 function seedPeople() {
   const out = [];
   Object.keys(SEED_CHILDREN).forEach(slug => {
     SEED_CHILDREN[slug].forEach((c, i) => {
       out.push({
         id: 'seed_' + slug + '_' + i, slug: slug, parentId: null,
-        name: c.name, relation: 'Child', birth: '',
+        name: c.name, relation: 'Child', birth: '', sex: c.sex || null,
         alive: c.alive === undefined ? null : c.alive,
         wellness: '', photo: false, photoData: null, video: false,
         news: c.note || '', contact: '', seeded: true, pending: false
@@ -1244,7 +1263,9 @@ class Component extends DCLogic {
               bio: p.bio || '',
               videoUrl: p.videoUrl || '',
               hasPhoto: !!p.photoData,
-              photoUrl: p.photoData ? 'url("' + p.photoData + '")' : 'none',
+              hasArt: !!(p.photoData || dollFor(p)),
+              isDoll: !p.photoData && !!dollFor(p),
+              photoUrl: p.photoData ? 'url("' + p.photoData + '")' : (dollFor(p) ? 'url("' + dollFor(p) + '")' : 'none'),
               statusLabel: p.alive === true ? 'Living' : (p.alive === false ? 'Passed on' : 'Unconfirmed'),
               statusColor: p.alive === true ? '#2f6d3f' : (p.alive === false ? '#6b5a3c' : '#8a5a12'),
               isOpen: drill[i] === p.id,
