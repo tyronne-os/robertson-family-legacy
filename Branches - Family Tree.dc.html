@@ -244,10 +244,10 @@
           <div style="font-family:'Libre Baskerville',Georgia,serif;font-size:21px;color:#f6f1e6">Family Workspace</div>
           <div style="font-size:13px;color:#a39685;font-style:italic">Everything you need to add to the tree and keep the family updated</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(330px, 1fr));gap:18px;align-items:start">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(330px, 1fr));gap:18px;align-items:stretch">
 
           <div style="order:2;display:flex;flex-direction:column;gap:12px;min-width:0">
-            <div style="display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid #2b241c"><div style="font-size:17px;flex:0 0 auto">&#9998;</div><div style="min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d9b463">Update the tree</div><div style="font-size:11.5px;color:#7d7266;margin-top:2px">Add a descendant, filter, and see totals</div></div></div>
+            <div style="display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid #2b241c"><div style="font-size:17px;flex:0 0 auto">&#9998;</div><div style="min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d9b463">Update your family tree</div><div style="font-size:11.5px;color:#7d7266;margin-top:2px">Add a descendant, filter, and see totals</div></div></div>
         <div style="display:flex;flex-direction:column;gap:15px">
 
           <div style="background:#1e1811;border:1px solid #332b22;border-radius:11px;padding:14px">
@@ -408,11 +408,11 @@
 
           <div style="order:1;display:flex;flex-direction:column;gap:12px;min-width:0">
             <div style="display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid #2b241c"><div style="font-size:17px;flex:0 0 auto">&#128172;</div><div style="min-width:0"><div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d9b463">Cuzzo Chat</div><div style="font-size:11.5px;color:#7d7266;margin-top:2px">Ask anything, or add someone by conversation</div></div></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-height:0">
 
           <!-- chat messages / drop zone -->
           <div
-            style="background:#1b1611;border:2px solid {{ chatDropBorder }};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:auto;transition:border-color 0.15s"
+            style="background:#1b1611;border:2px solid {{ chatDropBorder }};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:150px;overflow:auto;transition:border-color 0.15s"
             sc-camel-on-drag-over="{{ onChatDragOver }}"
             sc-camel-on-drag-leave="{{ onChatDragLeave }}"
             sc-camel-on-drop="{{ onChatDrop }}"
