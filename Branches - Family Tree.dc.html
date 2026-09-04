@@ -475,7 +475,7 @@
               <div style="width:1px;height:20px;background:#2b241c;margin:0 4px;flex:0 0 auto"></div>
               <button sc-camel-on-click="{{ toggleMic }}" title="{{ micTitle }}" style="width:36px;height:36px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:7px;font-size:17px;border:1px solid {{ micBorder }};background:{{ micBg }};color:{{ micColor }};transition:background 0.12s">&#127908;</button>
               <div style="flex:1"></div>
-              <div style="font-size:11px;color:{{ micHintColor }};letter-spacing:0.5px;font-weight:{{ micHintWeight }}">{{ composerHint }}</div>
+              <div style="font-size:12px;color:{{ micHintColor }};letter-spacing:0.5px;font-weight:{{ micHintWeight }}">{{ composerHint }}</div>
             </div>
             <div style="display:flex;gap:0">
               <input type="text" value="{{ chatDraft }}" sc-camel-on-change="{{ onChatDraft }}" sc-camel-on-key-down="{{ onChatKey }}" placeholder="Message Cuzzo…" style="flex:1;background:transparent;border:none;padding:12px 14px;color:#f4efe3;font-size:14px;outline:none">
@@ -1053,8 +1053,8 @@ class Component extends DCLogic {
       micBg: s.micOn ? '#c9a24a' : 'transparent',
       micColor: s.micOn ? '#1a1409' : '#7d7266',
       micBorder: s.micOn ? '#c9a24a' : 'transparent',
-      micHintColor: s.micOn ? '#d9b463' : '#4a3f31',
-      micHintWeight: s.micOn ? '700' : '400',
+      micHintColor: s.micOn ? '#d9b463' : '#f4efe3',
+      micHintWeight: s.micOn ? '700' : '600',
       composerHint: s.micOn ? 'listening\u2026 speak now' : 'drag & drop above',
       toggleMic: () => this.toggleMic(),
       chatDropActive: s.chatDropHighlight,
