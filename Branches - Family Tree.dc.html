@@ -411,18 +411,68 @@
 
 
       <sc-if value="{{ isChat }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
-          <div style="background:#1b1611;border:1px solid #2e2720;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:340px;overflow:auto">
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-height:0">
+
+          <!-- chat messages / drop zone -->
+          <div
+            style="background:#1b1611;border:2px solid {{ chatDropBorder }};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:auto;transition:border-color 0.15s"
+            sc-camel-on-drag-over="{{ onChatDragOver }}"
+            sc-camel-on-drag-leave="{{ onChatDragLeave }}"
+            sc-camel-on-drop="{{ onChatDrop }}"
+          >
             <sc-for list="{{ chatMessages }}" as="m" hint-placeholder-count="1">
-              <div style="display:flex;justify-content:{{ m.align }}">
-                <div style="max-width:86%;background:{{ m.bg }};color:{{ m.fg }};border-radius:10px;padding:9px 11px;font-size:13.5px;line-height:1.45">{{ m.text }}</div>
+              <div style="display:flex;justify-content:{{ m.align }};flex-direction:column;align-items:{{ m.alignSelf }}">
+                <sc-if value="{{ m.hasImage }}" hint-placeholder-val="{{ false }}">
+                  <div style="width:120px;height:140px;border-radius:9px;background-image:{{ m.imageUrl }};background-size:cover;background-position:center;border:2px solid #3a3128;margin-bottom:4px"></div>
+                </sc-if>
+                <sc-if value="{{ m.hasVideo }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#221c15;border:1px solid #4a3f31;border-radius:9px;padding:9px 12px;font-size:13px;color:#d9b463;margin-bottom:4px">🎬 Video attached — will be linked to their record</div>
+                </sc-if>
+                <sc-if value="{{ m.hasText }}" hint-placeholder-val="{{ true }}">
+                  <div style="max-width:86%;background:{{ m.bg }};color:{{ m.fg }};border-radius:10px;padding:9px 11px;font-size:13.5px;line-height:1.45">{{ m.text }}</div>
+                </sc-if>
               </div>
             </sc-for>
+            <sc-if value="{{ chatDropActive }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:18px;font-size:13px;color:#d9b463;font-weight:600;letter-spacing:0.5px">Drop photo or video here</div>
+            </sc-if>
             <div ref="{{ chatEndRef }}"></div>
           </div>
-          <div style="display:flex;gap:8px">
-            <input type="text" value="{{ chatDraft }}" sc-camel-on-change="{{ onChatDraft }}" sc-camel-on-key-down="{{ onChatKey }}" placeholder="Ask about the family tree…" style="flex:1;background:#14110e;border:1px solid #3a3128;border-radius:8px;padding:12px;color:#f4efe3;font-size:14px;outline:none">
-            <button sc-camel-on-click="{{ sendChat }}" style="background:#c9a24a;border:none;color:#1a1409;border-radius:8px;padding:0 16px;font-size:14px;font-weight:bold;cursor:pointer" style-hover="background:#dcb45c">Send</button>
+
+          <!-- photo upload prompt (when flow asks for photo) -->
+          <sc-if value="{{ chatPhotoPrompt }}" hint-placeholder-val="{{ false }}">
+            <label style="display:flex;align-items:center;gap:11px;background:#1e1811;border:1px solid #c9a24a;border-radius:10px;padding:11px 13px;cursor:pointer">
+              <div style="width:48px;height:56px;flex:0 0 auto;border-radius:7px;background-color:#14110e;background-image:{{ chatPhotoPreview }};background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:22px;color:#4a3f31">{{ chatPhotoBadge }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13.5px;font-weight:600;color:#d9b463">{{ chatPhotoLabel }}</div>
+                <div style="font-size:12px;color:#7d7266;margin-top:2px">JPG or PNG · under 4MB · or drag into the chat above</div>
+              </div>
+              <input type="file" accept="image/*" sc-camel-on-change="{{ onChatPhotoFile }}" style="display:none">
+            </label>
+          </sc-if>
+
+          <!-- composer toolbar + input -->
+          <div style="background:#1a1510;border:1px solid #2e2720;border-radius:11px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid #221c15;padding:4px 8px">
+              <label title="Add a photo" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:7px;font-size:18px;color:#7d7266;transition:color 0.1s" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#7d7266'">
+                📷
+                <input type="file" accept="image/*" sc-camel-on-change="{{ onChatPhotoFile }}" style="display:none">
+              </label>
+              <label title="Add a video" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:7px;font-size:18px;color:#7d7266;transition:color 0.1s" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#7d7266'">
+                🎬
+                <input type="file" accept="video/*" sc-camel-on-change="{{ onChatVideoFile }}" style="display:none">
+              </label>
+              <label title="Any file" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:7px;font-size:18px;color:#7d7266;transition:color 0.1s" onmouseover="this.style.color='#d9b463'" onmouseout="this.style.color='#7d7266'">
+                📎
+                <input type="file" accept="image/*,video/*" sc-camel-on-change="{{ onChatAnyFile }}" style="display:none">
+              </label>
+              <div style="flex:1"></div>
+              <div style="font-size:11px;color:#4a3f31;letter-spacing:0.5px">drag &amp; drop above</div>
+            </div>
+            <div style="display:flex;gap:0">
+              <input type="text" value="{{ chatDraft }}" sc-camel-on-change="{{ onChatDraft }}" sc-camel-on-key-down="{{ onChatKey }}" placeholder="Message Cuzzo…" style="flex:1;background:transparent;border:none;padding:12px 14px;color:#f4efe3;font-size:14px;outline:none">
+              <button sc-camel-on-click="{{ sendChat }}" style="background:#c9a24a;border:none;color:#1a1409;padding:0 18px;font-size:14px;font-weight:bold;cursor:pointer" style-hover="background:#dcb45c">Send</button>
+            </div>
           </div>
         </div>
       </sc-if>
@@ -532,6 +582,11 @@ class Component extends DCLogic {
     query: '',
     genFilter: '',
     chatDraft: '',
+    chatPhotoPrompt: false,
+    chatPhotoData: null,
+    chatPhotoName: '',
+    chatVideoFlag: false,
+    chatDropHighlight: false,
     chat: [{ from: 'bot', text: 'Hey cuz \u2014 I\u2019m Cuzzo, family on your side. Tell me who you want to add and I\u2019ll get them on the tree properly. You can also ask me things like "how many grandkids does Ethel have."' }]
   };
 
@@ -678,8 +733,8 @@ class Component extends DCLogic {
       { key: 'relation', ask: 'Relationship \u2014 child, spouse/married in, adopted, stepchild, or a sibling being remembered?' },
       { key: 'birth', ask: 'Birth year or date (say "skip" if unknown)?' },
       { key: 'alive', ask: 'Living and well? (yes/no)' },
-      { key: 'photo', ask: 'Do you have a photo to add for them? (yes/no)' },
-      { key: 'video', ask: 'Any video to attach \u2014 reunion, wedding, homegoing? (yes/no)' },
+      { key: 'photo', ask: 'Would you like to add a photo? Tap yes and I\u2019ll open the upload right here in the chat \u2014 or drag a photo straight into the message area.' },
+      { key: 'video', ask: 'Any video to attach \u2014 reunion, wedding, homegoing? Tap yes and I\u2019ll open the upload, or drag a video into the chat.' },
       { key: 'news', ask: 'Any good news to share \u2014 graduation, new baby, move? (say "none" to skip)' }
     ];
   }
@@ -690,11 +745,62 @@ class Component extends DCLogic {
     return steps[0].ask;
   }
 
+  readChatPhoto(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { this.setState(s => ({ chat: s.chat.concat([{ from: 'bot', text: 'That file isn\'t a picture. Try a JPG or PNG.' }]) })); return; }
+    if (file.size > 4 * 1024 * 1024) { this.setState(s => ({ chat: s.chat.concat([{ from: 'bot', text: 'That picture is over 4MB — try a smaller one.' }]) })); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const flow = this.state.chatFlow;
+      const steps = this.flowSteps();
+      const data = Object.assign({}, flow && flow.data || {}, { photoData: reader.result, photo: 'yes' });
+      const next = flow ? flow.i + 1 : null;
+      const photoMsg = { from: 'user', imageData: reader.result };
+      if (flow && next !== null && next < steps.length) {
+        const reply = 'Perfect — photo saved. ' + steps[next].ask;
+        this.setState(s => ({
+          chatFlow: { i: next, data },
+          chatPhotoPrompt: false, chatPhotoData: reader.result, chatPhotoName: file.name,
+          chat: s.chat.concat([photoMsg, { from: 'bot', text: reply }])
+        }));
+      } else if (flow) {
+        this.setState(s => ({
+          chatFlow: null, chatPhotoPrompt: false, chatPhotoData: null, chatPhotoName: '',
+          chat: s.chat.concat([photoMsg, { from: 'bot', text: this.finishFlow(data) }])
+        }));
+      } else {
+        this.setState(s => ({
+          chatPhotoData: reader.result, chatPhotoName: file.name,
+          chat: s.chat.concat([photoMsg, { from: 'bot', text: 'Photo saved — say "add someone" to file a new family member with this photo.' }])
+        }));
+      }
+      setTimeout(() => { if (this.chatEndRef.current) this.chatEndRef.current.scrollIntoView({ block: 'nearest' }); }, 30);
+    };
+    reader.readAsDataURL(file);
+  }
+
   advanceFlow(answer) {
     const steps = this.flowSteps();
     const flow = this.state.chatFlow;
     const step = steps[flow.i];
     const data = Object.assign({}, flow.data, { [step.key]: answer.trim() });
+    if (step.key === 'photo' && /^y/i.test(answer.trim())) {
+      this.setState(s => ({
+        chatFlow: { i: flow.i, data },
+        chatPhotoPrompt: true,
+        chat: s.chat.concat([{ from: 'bot', text: 'Tap the 📷 box below to pick their picture, or drag a photo straight into the message area above.' }])
+      }));
+      setTimeout(() => { if (this.chatEndRef.current) this.chatEndRef.current.scrollIntoView({ block: 'nearest' }); }, 30);
+      return null;
+    }
+    if (step.key === 'video' && /^y/i.test(answer.trim())) {
+      this.setState(s => ({
+        chatFlow: { i: next < steps.length ? next : flow.i, data },
+        chat: s.chat.concat([{ from: 'bot', text: 'Tap the 🎬 button in the toolbar below or drag a video into the chat. I\'ll attach it when we\'re done.' + (next < steps.length ? ' ' + steps[next].ask : '') }])
+      }));
+      setTimeout(() => { if (this.chatEndRef.current) this.chatEndRef.current.scrollIntoView({ block: 'nearest' }); }, 30);
+      return null;
+    }
     const next = flow.i + 1;
     if (next < steps.length) {
       this.setState({ chatFlow: { i: next, data: data } });
@@ -719,7 +825,8 @@ class Component extends DCLogic {
       relation: /spouse|marri/i.test(data.relation) ? 'Spouse / married in' : /adopt/i.test(data.relation) ? 'Adopted / raised as ours' : /step/i.test(data.relation) ? 'Stepchild' : /sibling/i.test(data.relation) ? 'Sibling remembered' : 'Child',
       birth: /skip/i.test(data.birth) ? '' : data.birth.trim(),
       alive: !(/^n/i.test((data.alive || '').trim())),
-      wellness: '', photo: yes(data.photo), video: yes(data.video),
+      wellness: '', photo: yes(data.photo) || !!data.photoData, photoData: data.photoData || null,
+      video: yes(data.video) || this.state.chatVideoFlag,
       news: /none/i.test(data.news) ? '' : data.news.trim(), pending: this.props.instantPublish !== true
     };
     const under = parentMatch ? parentMatch.name.split(' ')[0] : branch.name.split(' ')[0];
@@ -761,7 +868,11 @@ class Component extends DCLogic {
     const text = this.state.chatDraft.trim();
     if (!text) return;
     const reply = this.answerChat(text);
-    this.setState(s => ({ chat: s.chat.concat([{ from: 'user', text: text }, { from: 'bot', text: reply }]), chatDraft: '' }));
+    if (reply === null) {
+      this.setState(s => ({ chat: s.chat.concat([{ from: 'user', text: text }]), chatDraft: '' }));
+    } else {
+      this.setState(s => ({ chat: s.chat.concat([{ from: 'user', text: text }, { from: 'bot', text: reply }]), chatDraft: '' }));
+    }
     setTimeout(() => { if (this.chatEndRef.current) this.chatEndRef.current.scrollIntoView({ block: 'nearest' }); }, 30);
   }
 
@@ -864,8 +975,13 @@ class Component extends DCLogic {
       isChat: s.tab === 'chat',
       isAlerts: s.tab === 'alerts',
       chatMessages: s.chat.map(m => ({
-        text: m.text,
+        text: m.text || '',
+        hasText: !!(m.text),
+        hasImage: !!(m.imageData),
+        hasVideo: !!(m.video),
+        imageUrl: m.imageData ? 'url("' + m.imageData + '")' : 'none',
         align: m.from === 'user' ? 'flex-end' : 'flex-start',
+        alignSelf: m.from === 'user' ? 'flex-end' : 'flex-start',
         bg: m.from === 'user' ? '#c9a24a' : '#241d14',
         fg: m.from === 'user' ? '#1a1409' : '#e6dfd0'
       })),
@@ -874,6 +990,25 @@ class Component extends DCLogic {
       sendChat: () => this.sendChat(),
       onChatKey: e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendChat(); } },
       chatEndRef: this.chatEndRef,
+      chatPhotoPrompt: s.chatPhotoPrompt,
+      chatPhotoPreview: s.chatPhotoData ? 'url("' + s.chatPhotoData + '")' : 'none',
+      chatPhotoBadge: s.chatPhotoData ? '' : '📷',
+      chatPhotoLabel: s.chatPhotoData ? (s.chatPhotoName || 'Photo chosen') + ' — tap to change' : 'Choose their photo',
+      chatDropActive: s.chatDropHighlight,
+      chatDropBorder: s.chatDropHighlight ? '#c9a24a' : '#2e2720',
+      onChatPhotoFile: e => this.readChatPhoto(e.target.files && e.target.files[0]),
+      onChatVideoFile: e => { const f = e.target.files && e.target.files[0]; if (!f) return; this.setState(st => ({ chatVideoFlag: true, chat: st.chat.concat([{ from: 'user', video: true }, { from: 'bot', text: 'Video saved — I\'ll attach it to their record when we finish.' }]) })); },
+      onChatAnyFile: e => { const f = e.target.files && e.target.files[0]; if (!f) return; if (/^image\//.test(f.type)) this.readChatPhoto(f); else if (/^video\//.test(f.type)) this.setState(st => ({ chatVideoFlag: true, chat: st.chat.concat([{ from: 'user', video: true }, { from: 'bot', text: 'Video saved — I\'ll attach it to their record when we finish.' }]) })); },
+      onChatDragOver: e => { e.preventDefault(); this.setState({ chatDropHighlight: true }); },
+      onChatDragLeave: () => this.setState({ chatDropHighlight: false }),
+      onChatDrop: e => {
+        e.preventDefault();
+        this.setState({ chatDropHighlight: false });
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!f) return;
+        if (/^image\//.test(f.type)) this.readChatPhoto(f);
+        else if (/^video\//.test(f.type)) this.setState(st => ({ chatVideoFlag: true, chat: st.chat.concat([{ from: 'user', video: true }, { from: 'bot', text: 'Got the video — I\'ll attach it to their record when we finish.' }]) }));
+      },
 
       active: {
         name: active.name,
