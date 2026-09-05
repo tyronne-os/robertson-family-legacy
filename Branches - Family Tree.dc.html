@@ -269,33 +269,38 @@
 
                 <div style="display:flex;gap:10px;overflow-x:auto;padding:14px 2px 4px;align-items:stretch">
                   <sc-for list="{{ row.kids }}" as="k" hint-placeholder-count="4">
-                    <div style="flex:0 0 178px;box-sizing:border-box;background:#f4efe3;border:1px solid {{ k.cardBorder }};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px">
+                    <div style="flex:0 0 178px;width:178px;min-width:0;max-width:178px;box-sizing:border-box;background:#f4efe3;border:1px solid {{ k.cardBorder }};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px">
 
-                      <label style="position:relative;display:block;width:100%;aspect-ratio:17/20;border-radius:7px;background-color:#e6dfd0;background-image:{{ k.photoUrl }};background-size:cover;background-position:center;border:1px dashed #c2b699;cursor:pointer;overflow:hidden">
-                        <input type="file" accept="image/*" sc-camel-on-change="{{ k.onPhoto }}" style="display:none">
+                      <div style="position:relative;width:100%">
+                        <label style="position:relative;display:block;width:100%;aspect-ratio:17/20;border-radius:7px;background-color:#e6dfd0;background-image:{{ k.photoUrl }};background-size:cover;background-position:center;border:1px dashed #c2b699;cursor:pointer;overflow:hidden">
+                          <input type="file" accept="image/*" sc-camel-on-change="{{ k.onPhoto }}" style="display:none">
+                          <sc-if value="{{ k.isDoll }}" hint-placeholder-val="{{ true }}">
+                            <div style="position:absolute;left:0;right:0;bottom:16%;text-align:center;color:#f2f2f2;opacity:0.5;font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.55);pointer-events:none;line-height:1.3;padding:0 6px">Waiting on real image</div>
+                          </sc-if>
+                          <sc-if value="{{ k.hasArt }}" hint-placeholder-val="{{ true }}">
+                            <div style="position:absolute;right:5px;bottom:5px;background:rgba(20,17,14,.72);color:#e9cd88;font-size:9px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Change</div>
+                          </sc-if>
+                          <sc-if value="{{ !k.hasArt }}" hint-placeholder-val="{{ false }}">
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8d8168;text-align:center;padding:6px">
+                              <div style="font-size:19px;line-height:1">&#128247;</div>
+                              <div style="font-size:9.5px;font-weight:700;letter-spacing:0.3px;line-height:1.3">Add a photo</div>
+                            </div>
+                          </sc-if>
+                        </label>
                         <sc-if value="{{ k.hasArt }}" hint-placeholder-val="{{ true }}">
-                          <div style="position:absolute;right:5px;bottom:5px;background:rgba(20,17,14,.72);color:#e9cd88;font-size:9px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Change</div>
+                          <button sc-camel-on-click="{{ k.clearPhoto }}" title="{{ k.clearTitle }}" style="position:absolute;top:5px;right:5px;z-index:2;width:20px;height:20px;padding:0;line-height:1;border-radius:50%;background:rgba(20,17,14,.78);border:1px solid rgba(233,205,136,.45);color:#e9cd88;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#a4443a;border-color:#a4443a;color:#fff">&#215;</button>
                         </sc-if>
-                        <sc-if value="{{ k.isDoll }}" hint-placeholder-val="{{ false }}">
-                          <div style="position:absolute;left:5px;top:5px;background:rgba(20,17,14,.72);color:#a39685;font-size:8px;font-weight:700;letter-spacing:0.4px;border-radius:4px;padding:2px 5px">Stand-in</div>
-                        </sc-if>
-                        <sc-if value="{{ !k.hasArt }}" hint-placeholder-val="{{ false }}">
-                          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8d8168;text-align:center;padding:6px">
-                            <div style="font-size:19px;line-height:1">&#128247;</div>
-                            <div style="font-size:9.5px;font-weight:700;letter-spacing:0.3px;line-height:1.3">Add a photo</div>
-                          </div>
-                        </sc-if>
-                      </label>
+                      </div>
 
-                      <input type="text" value="{{ k.name }}" sc-camel-on-change="{{ k.onName }}" placeholder="Name" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:7px 8px;color:#1f1a14;font-size:12.5px;font-weight:700;outline:none;font-family:'Libre Baskerville', Georgia, serif">
+                      <input type="text" value="{{ k.name }}" sc-camel-on-change="{{ k.onName }}" placeholder="Name" style="width:100%;min-width:0;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:7px 8px;color:#1f1a14;font-size:12.5px;font-weight:700;outline:none;font-family:'Libre Baskerville', Georgia, serif">
 
-                      <input type="text" value="{{ k.contact }}" sc-camel-on-change="{{ k.onContact }}" placeholder="Phone or email" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10.5px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+                      <input type="text" value="{{ k.contact }}" sc-camel-on-change="{{ k.onContact }}" placeholder="Phone or email" style="width:100%;min-width:0;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10.5px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
 
-                      <textarea value="{{ k.bio }}" sc-camel-on-change="{{ k.onBio }}" rows="3" placeholder="A short bio — where they live, what they do, who they married" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;resize:vertical;line-height:1.45;font-family:Helvetica, Arial, sans-serif"></textarea>
+                      <textarea value="{{ k.bio }}" sc-camel-on-change="{{ k.onBio }}" rows="3" placeholder="A short bio — where they live, what they do, who they married" style="width:100%;min-width:0;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;resize:vertical;line-height:1.45;font-family:Helvetica, Arial, sans-serif"></textarea>
 
-                      <input type="text" value="{{ k.videoUrl }}" sc-camel-on-change="{{ k.onVideo }}" placeholder="YouTube or video link" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+                      <input type="text" value="{{ k.videoUrl }}" sc-camel-on-change="{{ k.onVideo }}" placeholder="YouTube or video link" style="width:100%;min-width:0;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#3f382e;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
 
-                      <input type="text" value="{{ k.note }}" sc-camel-on-change="{{ k.onNote }}" placeholder="A note about them" style="width:100%;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#5c5347;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
+                      <input type="text" value="{{ k.note }}" sc-camel-on-change="{{ k.onNote }}" placeholder="A note about them" style="width:100%;min-width:0;box-sizing:border-box;background:#fffdf7;border:1px solid #d8cfba;border-radius:6px;padding:6px 8px;color:#5c5347;font-size:10px;font-weight:600;outline:none;font-family:Helvetica, Arial, sans-serif">
 
                       <div style="display:flex;gap:6px;align-items:center;margin-top:1px">
                         <button sc-camel-on-click="{{ k.cycleStatus }}" style="flex:1;min-width:0;background:transparent;border:1px solid {{ k.statusColor }};color:{{ k.statusColor }};border-radius:5px;padding:5px 4px;font-size:9.5px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ k.statusLabel }}</button>
@@ -696,7 +701,7 @@ function dollFor(person) {
   if (!set) return null;
   let h = 0;
   for (let i = 0; i < person.id.length; i++) h = (h * 31 + person.id.charCodeAt(i)) >>> 0;
-  return 'avatar-dolls/' + set[h % set.length];
+  return 'avatar-dolls/' + set[(h + (person.dollOffset || 0)) % set.length];
 }
 
 function seedPeople() {
@@ -907,6 +912,19 @@ class Component extends DCLogic {
       people: s.people.map(p => p.id === id ? Object.assign({}, p, { photoData: r.result, photo: true }) : p)
     }), this.persist);
     r.readAsDataURL(file);
+  }
+
+  // The X on a portrait clears a real photo back to the stand-in; on a
+  // stand-in it deals the next doll, so nobody is stuck with one they dislike.
+  clearPhoto(id) {
+    this.setState(s => ({
+      people: s.people.map(p => {
+        if (p.id !== id) return p;
+        return p.photoData
+          ? Object.assign({}, p, { photoData: null, photo: false })
+          : Object.assign({}, p, { dollOffset: (p.dollOffset || 0) + 1 });
+      })
+    }), this.persist);
   }
 
   addChildTo(slug, parentId) {
@@ -1280,6 +1298,8 @@ class Component extends DCLogic {
               onBio: e => this.editChild(p.id, 'bio', e.target.value),
               onVideo: e => this.editChild(p.id, 'videoUrl', e.target.value),
               onPhoto: e => this.childPhoto(p.id, e.target.files && e.target.files[0]),
+              clearPhoto: () => this.clearPhoto(p.id),
+              clearTitle: p.photoData ? 'Remove this photo' : 'Try a different stand-in',
               cycleStatus: () => this.editChild(p.id, 'alive', p.alive === true ? false : (p.alive === false ? null : true)),
               remove: () => this.removeChild(p.id)
             };
