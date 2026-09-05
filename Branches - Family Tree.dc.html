@@ -260,9 +260,6 @@
                     <div style="font-size:9.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#8a7c62">{{ row.genLabel }}</div>
                     <div style="font-family:'Libre Baskerville', Georgia, serif;font-size:16px;font-weight:700;color:#f6e6bd;line-height:1.3;margin-top:3px">{{ row.heading }}</div>
                     <div style="font-size:11.5px;font-weight:600;color:#a39685;margin-top:4px;letter-spacing:0.3px">{{ row.tally }}</div>
-                    <sc-if value="{{ row.shortNote }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:11px;font-weight:600;color:#d9b463;margin-top:6px;line-height:1.45">{{ row.shortNote }}</div>
-                    </sc-if>
                   </div>
                   <button sc-camel-on-click="{{ row.add }}" style="flex:0 0 auto;background:#2b2318;border:1px solid #c9a24a;color:#e9cd88;border-radius:8px;padding:8px 13px;font-size:11.5px;font-weight:700;cursor:pointer" style-hover="background:#3a2f1f">{{ row.addLabel }}</button>
                 </div>
@@ -648,7 +645,8 @@ const SEED_CHILDREN = {
   'johnnie-robertson': [
     { name: 'Allen', sex: 'm' }, { name: 'James', sex: 'm' }, { name: 'Jannie', sex: 'f' }, { name: 'Leroy', sex: 'm' },
     { name: 'Louis', sex: 'm' }, { name: 'Shirley', sex: 'f' }, { name: 'Leann', sex: 'f' }, { name: 'Eloise', sex: 'f' },
-    { name: 'Howard', sex: 'm' }
+    { name: 'Howard', sex: 'm' },
+    { name: '', sex: 'm', note: '10th child — name to be confirmed by family' }
   ],
   'mary-robertson': [
     { name: 'Nelson', sex: 'm' }, { name: 'Bertha Lee', sex: 'f' }, { name: 'Walter', sex: 'm' },
@@ -672,8 +670,11 @@ const SEED_CHILDREN = {
     { name: 'Stacey', sex: 'f' }, { name: 'Regina', sex: 'f' }
   ],
   'lemar-robertson': [
-    { name: 'Betty Butler', sex: 'f', alive: true, note: 'narrates Chapter Eight' },
-    { name: 'Marie', sex: 'f', alive: false }, { name: 'James', sex: 'm', alive: false }
+    { name: 'James', sex: 'm', alive: false },
+    { name: 'Donna Marie', sex: 'f', alive: false },
+    { name: 'Lemar', sex: 'm' },
+    { name: 'Abigail', sex: 'f' },
+    { name: 'Betty Butler', sex: 'f', alive: true, note: 'narrates Chapter Eight' }
   ],
   'susianna-robertson': [
     { name: 'Jaqueline', sex: 'f', alive: false },
@@ -683,10 +684,6 @@ const SEED_CHILDREN = {
     { name: 'Jackie', sex: 'f', note: 'mother of Alfreneisha, Cordell and Cleo' }
   ]
 };
-
-// Chapter Eight names three of Lamar's five children, so his branch opens short
-// on purpose -- the two missing names are for his family to fill in.
-const SEED_SHORTFALL = { 'lemar-robertson': 5 };
 
 // Stand-in portraits until a family member uploads a real photo. The doll is
 // picked from the person's own id, so it stays the same on every visit rather
@@ -726,7 +723,7 @@ const RELATIONS = ['Child', 'Spouse / married in', 'Adopted / raised as ours', '
 const SCOPES = ['My branch only', 'All nine branches'];
 // Knowledge-graph tiers: TRUNK (Lemar & Magnolia) > BRANCH (the 9) > TWIG > LEAF > BUD
 const TIERS = ['TWIG', 'LEAF', 'BUD'];
-const TIER_LABEL = { TWIG: 'grandkids', LEAF: 'great-grandkids', BUD: 'great-great-grandkids and beyond' };
+const TIER_LABEL = { TWIG: 'children', LEAF: 'grandchildren', BUD: 'great-grandchildren' };
 
 function tierFor(depth) { return depth >= 3 ? 'BUD' : TIERS[depth - 1]; }
 function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
@@ -774,12 +771,6 @@ class Component extends DCLogic {
   };
 
   componentDidMount() { this.centerOn(this.state.activeSlug, 'auto'); }
-
-  componentDidUpdate(_, prevState) {
-    if (prevState.people !== this.state.people || prevState.branches !== this.state.branches) {
-      saveState(this.state.people, this.state.branches);
-    }
-  }
 
   centerOn(slug, behavior) {
     const el = this.mainRef.current;
@@ -1192,7 +1183,7 @@ class Component extends DCLogic {
       const n = rows.length;
       const parts = TIERS.map(t => {
         const c = rows.filter(x => tierFor(x.depth) === t).length;
-        return c ? c + ' ' + t.toLowerCase() + (c === 1 ? '' : 's') : null;
+        return c ? c + ' ' + TIER_LABEL[t] : null;
       }).filter(Boolean);
       return {
         slug: b.slug, order: b.order, name: b.name, birth: b.birth, wellness: b.wellness,
@@ -1251,8 +1242,6 @@ class Component extends DCLogic {
         const living = kids.filter(p => p.alive === true).length;
         const gone = kids.filter(p => p.alive === false).length;
         const unknown = kids.length - living - gone;
-        const short = (!pid && SEED_SHORTFALL[expBranch.slug])
-          ? SEED_SHORTFALL[expBranch.slug] - kids.length : 0;
         genRows.push({
           heading: 'Children of ' + ownerName,
           genLabel: GEN_LABEL[i] || ('Generation ' + (i + 3)),
@@ -1264,9 +1253,6 @@ class Component extends DCLogic {
                 unknown ? unknown + ' still to confirm' : null
               ].filter(Boolean).join('  ·  ')
             : 'Nobody recorded yet — start with ' + ownerName + '’s oldest child.',
-          shortNote: short > 0
-            ? 'Chapter Eight names three of Lamar’s five children. ' + short + ' more are still for his family to add.'
-            : '',
           isEmpty: kids.length === 0,
           addLabel: pid ? '+ Add ' + ownerName + '’s oldest child' : '+ Add a child',
           add: () => this.addChildTo(expBranch.slug, pid),
@@ -1320,7 +1306,7 @@ class Component extends DCLogic {
     const treeTotal = s.people.length;
     const treeParts = TIERS.map(t => {
       const c = s.branches.reduce((n, b) => n + tierCount(b.slug, t), 0);
-      return c + ' ' + t.toLowerCase() + (c === 1 ? '' : 's');
+      return c + ' ' + TIER_LABEL[t];
     });
 
     const fParent = s.form.parentId ? this.person(s.form.parentId) : null;
